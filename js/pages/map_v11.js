@@ -7,22 +7,26 @@ window.KindrMap = {
 
     render: (container) => {
         console.log("Rendering Kindr Map v1.0.0...");
+
+        // CRITICAL FIX: Ensure visibility BEFORE any Leaflet calls
+        container.style.display = 'block';
+
         if (!window.KindrMap.isInitialized) {
             window.KindrMap.init(container);
         }
 
-        // Ensure visibility
-        container.style.display = 'block';
         if (window.KindrMap.instance) {
-            // CRITICAL: Multiple invalidations to ensure layout is captured
+            // Force layout capture
+            setTimeout(() => {
+                window.KindrMap.instance.invalidateSize();
+            }, 100);
+
+            // Repeated invalidation to handle slow mobile reflows
             const invalidator = setInterval(() => {
                 window.KindrMap.instance.invalidateSize();
-            }, 500);
+            }, 1000);
 
-            // Stop after 3 seconds of trying to fix layout
-            setTimeout(() => clearInterval(invalidator), 3500);
-
-            window.KindrMap.instance.invalidateSize();
+            setTimeout(() => clearInterval(invalidator), 4000);
         }
     },
 

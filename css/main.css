@@ -91,9 +91,7 @@ body {
 .splash-logo {
     max-width: 280px;
     height: auto;
-    /* Bleach background pattern to pure white so multiply eats it */
-    mix-blend-mode: multiply;
-    /* Makes white square transparent */
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.05));
 }
 
 .slogan-text {
