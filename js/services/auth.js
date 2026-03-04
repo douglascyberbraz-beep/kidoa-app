@@ -51,13 +51,9 @@ window.KindrAuth = {
         }
     },
 
-    register: async (email, pass, nickname, inviteCode) => {
+    register: async (email, pass, nickname) => {
         try {
-            // 1. Validar invitación primero
-            const isValid = await window.KindrAuth.validateInvitation(inviteCode);
-            if (!isValid) throw new Error("Código de invitación inválido o ya usado.");
-
-            // 2. Crear usuario en Auth
+            // 1. Crear usuario en Auth
             const res = await window.KindrAuthReal.createUserWithEmailAndPassword(email, pass);
             const user = res.user;
 
@@ -169,7 +165,6 @@ window.KindrAuth = {
                         
                         <div id="register-fields" style="display:none;">
                             <input type="text" id="reg-nickname" placeholder="Tu Apodo / Nickname" class="auth-input">
-                            <input type="text" id="auth-invite" placeholder="CÓDIGO DE INVITACIÓN" class="auth-input" style="border: 2px solid var(--accent); font-weight: bold; text-align: center;">
                         </div>
 
                         <input type="email" id="auth-email" placeholder="Email" class="auth-input">
@@ -236,14 +231,13 @@ window.KindrAuth = {
                 }
             } else {
                 const nick = document.getElementById('reg-nickname').value;
-                const invite = document.getElementById('auth-invite').value;
                 const termsAccepted = document.getElementById('accept-terms').checked;
 
-                if (!email || !pass || !nick || !invite) return showError("Todos los campos son obligatorios.");
+                if (!email || !pass || !nick) return showError("Todos los campos son obligatorios.");
                 if (!termsAccepted) return showError("Debes aceptar los Términos y Condiciones.");
 
                 try {
-                    await window.KindrAuth.register(email, pass, nick, invite);
+                    await window.KindrAuth.register(email, pass, nick);
                     modal.remove();
                     location.reload();
                 } catch (e) {
