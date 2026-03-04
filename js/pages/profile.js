@@ -1,8 +1,23 @@
 window.KindrProfile = {
-    render: (container) => {
+    render: async (container) => {
+        // Mostrar cargando mientras se inicializa auth si es necesario
+        container.innerHTML = `<div class="p-20 center-text"><div class="typing-dots"><span></span><span></span><span></span></div><p>Cargando perfil...</p></div>`;
+
+        // Pequeña espera para asegurar que el estado de auth se ha propagado
         const user = window.KindrAuth.checkAuth();
+
         if (!user) {
-            container.innerHTML = `<div class="p-20 center-text"><p>Inicia sesión para ver tu perfil.</p></div>`;
+            container.innerHTML = `
+                <div class="p-20 center-text">
+                    <div style="font-size: 3rem; margin-bottom: 20px;">👤</div>
+                    <h3>No has iniciado sesión</h3>
+                    <p>Inicia sesión para ver tus puntos, nivel y código de invitación.</p>
+                    <button id="login-from-profile" class="btn-primary" style="margin-top: 20px;">Iniciar Sesión</button>
+                </div>
+            `;
+            document.getElementById('login-from-profile').addEventListener('click', () => {
+                window.KindrAuth.renderAuthModal();
+            });
             return;
         }
 

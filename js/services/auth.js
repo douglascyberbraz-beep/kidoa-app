@@ -88,17 +88,60 @@ window.KindrAuth = {
         window.location.reload();
     },
 
-    setGuestMode: async () => {
+    googleLogin: async () => {
         try {
-            const res = await window.KindrAuthReal.signInAnonymously();
+            const provider = new firebase.auth.GoogleAuthProvider();
+            const res = await window.KindrAuthReal.signInWithPopup(provider);
+            // Si es nuevo usuario, crear perfil en Firestore
+            const doc = await window.KindrDB.collection('users').doc(res.user.uid).get();
+            if (!doc.exists) {
+                const profile = {
+                    uid: res.user.uid,
+                    email: res.user.email,
+                    nickname: res.user.displayName || "Explorador",
+                    points: 50,
+                    level: "Semilla",
+                    referralCode: 'KNDR-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
+                    createdAt: new Date()
+                };
+                await window.KindrDB.collection('users').doc(res.user.uid).set(profile);
+            }
             return res.user;
         } catch (e) {
-            console.error("Guest Auth Error:", e);
+            console.error("Google Login Error:", e);
+            throw e;
+        }
+    },
+
+    appleLogin: async () => {
+        try {
+            const provider = new firebase.auth.OAuthProvider('apple.com');
+            const res = await window.KindrAuthReal.signInWithPopup(provider);
+            // Lógica similar a Google para nuevo usuario
+            const doc = await window.KindrDB.collection('users').doc(res.user.uid).get();
+            if (!doc.exists) {
+                const profile = {
+                    uid: res.user.uid,
+                    email: res.user.email || "apple-user",
+                    nickname: "Explorador Apple",
+                    points: 50,
+                    level: "Semilla",
+                    referralCode: 'KNDR-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
+                    createdAt: new Date()
+                };
+                await window.KindrDB.collection('users').doc(res.user.uid).set(profile);
+            }
+            return res.user;
+        } catch (e) {
+            console.error("Apple Login Error:", e);
             throw e;
         }
     },
 
     renderAuthModal: () => {
+        // Asegurarse de que no haya duplicados
+        if (document.getElementById('auth-modal')) return;
+
         const modal = document.createElement('div');
         modal.id = 'auth-modal';
         modal.className = 'modal auth-modal';
@@ -106,32 +149,44 @@ window.KindrAuth = {
             <div class="auth-container slide-up-anim">
                 <div class="auth-card premium-glass">
                     <div class="auth-header">
-                        <div class="logo-icon gradient-bg">👤</div>
-                        <h3>Comunidad KINDR</h3>
-                        <p>Únete a la comunidad</p>
+                        <img src="assets/kindr-premium-final.png" alt="Kindr" style="height: 40px; margin-bottom: 15px;">
+                        <h3>Bienvenido a KINDR</h3>
+                        <p>Inicia sesión para compartir con tu tribu</p>
                     </div>
                     
                     <div id="auth-form">
-                        <div id="auth-error-msg" style="color: #ff4d4d; font-size: 12px; margin-bottom: 10px; display:none;"></div>
+                        <div id="auth-error-msg" style="color: #ff4d4d; font-size: 12px; margin-bottom: 10px; display:none; background: rgba(255,77,77,0.1); padding: 8px; border-radius: 8px;"></div>
                         
-                        <input type="text" id="reg-nickname" placeholder="Tu Apodo / Nickname" class="auth-input">
+                        <div id="register-fields" style="display:none;">
+                            <input type="text" id="reg-nickname" placeholder="Tu Apodo / Nickname" class="auth-input">
+                            <input type="text" id="auth-invite" placeholder="CÓDIGO DE INVITACIÓN" class="auth-input" style="border: 2px solid var(--accent); font-weight: bold; text-align: center;">
+                        </div>
+
                         <input type="email" id="auth-email" placeholder="Email" class="auth-input">
                         <input type="password" id="auth-pass" placeholder="Contraseña" class="auth-input">
-                        <input type="text" id="auth-invite" placeholder="CÓDIGO DE INVITACIÓN" class="auth-input" style="border: 2px solid var(--accent); font-weight: bold; text-align: center;">
                         
-                        <label style="display:flex; align-items:center; gap:8px; margin-top:12px; font-size:11px; color:#666; cursor:pointer;">
+                        <label id="terms-label" style="display:none; align-items:center; gap:8px; margin-top:12px; font-size:11px; color:#666; cursor:pointer;">
                             <input type="checkbox" id="accept-terms" style="width:18px; height:18px; accent-color:var(--primary-blue);">
                             Acepto los <a href="#" id="show-terms-link" style="color:var(--primary-blue); text-decoration:underline;">Términos y Condiciones</a>
                         </label>
                         
-                        <div style="display:flex; gap:10px; margin-top:15px;">
-                            <button id="do-register" class="btn-primary" style="flex:1">Registrarse</button>
-                            <button id="do-login" class="btn-secondary" style="flex:1">Entrar</button>
+                        <div style="display:flex; flex-direction:column; gap:10px; margin-top:15px;">
+                            <button id="main-auth-btn" class="btn-primary">Entrar</button>
+                            <button id="toggle-auth-mode" class="btn-text" style="font-size: 13px;">¿No tienes cuenta? Regístrate</button>
                         </div>
                         
-                        <div class="social-divider"><span>o</span></div>
+                        <div class="social-divider"><span>o continúa con</span></div>
                         
-                        <button id="do-guest" class="btn-text full-width">Explorar como Invitado</button>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
+                            <button id="do-google" class="btn-outline" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18"> Google
+                            </button>
+                            <button id="do-apple" class="btn-outline" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" width="16"> Apple
+                            </button>
+                        </div>
+
+                        <button id="do-guest" class="btn-secondary full-width">Explorar como Invitado</button>
                     </div>
                 </div>
             </div>
@@ -139,43 +194,71 @@ window.KindrAuth = {
 
         document.body.appendChild(modal);
 
+        let isLoginMode = true;
         const showError = (msg) => {
             const errDiv = document.getElementById('auth-error-msg');
             errDiv.textContent = msg;
             errDiv.style.display = 'block';
         };
 
-        document.getElementById('do-login').addEventListener('click', async () => {
+        const toggleMode = () => {
+            isLoginMode = !isLoginMode;
+            document.getElementById('register-fields').style.display = isLoginMode ? 'none' : 'block';
+            document.getElementById('terms-label').style.display = isLoginMode ? 'none' : 'flex';
+            document.getElementById('main-auth-btn').textContent = isLoginMode ? 'Entrar' : 'Registrarse';
+            document.getElementById('toggle-auth-mode').textContent = isLoginMode ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión';
+        };
+
+        document.getElementById('toggle-auth-mode').addEventListener('click', toggleMode);
+
+        document.getElementById('main-auth-btn').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const pass = document.getElementById('auth-pass').value;
 
-            if (!email || !pass) return showError("Email y contraseña requeridos.");
+            if (isLoginMode) {
+                if (!email || !pass) return showError("Email y contraseña requeridos.");
+                try {
+                    await window.KindrAuth.login(email, pass);
+                    modal.remove();
+                    location.reload();
+                } catch (e) {
+                    showError("Error al iniciar sesión. Revisa tus datos.");
+                }
+            } else {
+                const nick = document.getElementById('reg-nickname').value;
+                const invite = document.getElementById('auth-invite').value;
+                const termsAccepted = document.getElementById('accept-terms').checked;
 
-            try {
-                await window.KindrAuth.login(email, pass);
-                modal.remove();
-                location.reload();
-            } catch (e) {
-                showError("Error al iniciar sesión. Revisa tus datos.");
+                if (!email || !pass || !nick || !invite) return showError("Todos los campos son obligatorios.");
+                if (!termsAccepted) return showError("Debes aceptar los Términos y Condiciones.");
+
+                try {
+                    await window.KindrAuth.register(email, pass, nick, invite);
+                    modal.remove();
+                    location.reload();
+                } catch (e) {
+                    showError(e.message || "Error en el registro.");
+                }
             }
         });
 
-        document.getElementById('do-register').addEventListener('click', async () => {
-            const email = document.getElementById('auth-email').value;
-            const pass = document.getElementById('auth-pass').value;
-            const nick = document.getElementById('reg-nickname').value;
-            const invite = document.getElementById('auth-invite').value;
-            const termsAccepted = document.getElementById('accept-terms').checked;
-
-            if (!email || !pass || !nick || !invite) return showError("Todos los campos + invitación son obligatorios.");
-            if (!termsAccepted) return showError("Debes aceptar los Términos y Condiciones.");
-
+        document.getElementById('do-google').addEventListener('click', async () => {
             try {
-                await window.KindrAuth.register(email, pass, nick, invite);
+                await window.KindrAuth.googleLogin();
                 modal.remove();
                 location.reload();
             } catch (e) {
-                showError(e.message || "Error en el registro.");
+                showError("Error al conectar con Google.");
+            }
+        });
+
+        document.getElementById('do-apple').addEventListener('click', async () => {
+            try {
+                await window.KindrAuth.appleLogin();
+                modal.remove();
+                location.reload();
+            } catch (e) {
+                showError("Apple Login no disponible o cancelado.");
             }
         });
 
@@ -189,12 +272,10 @@ window.KindrAuth = {
             }
         });
 
-        // Terms link opens a simple alert with key info
         document.getElementById('show-terms-link').addEventListener('click', (e) => {
             e.preventDefault();
-            modal.remove();
-            // Navigate to legal page
             window.KindrApp.loadPage('legal');
+            modal.remove();
         });
     }
 };

@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <!-- App CSS -->
-    <link rel="stylesheet" href="css/main.css?v=1.2.0">
+    <link rel="stylesheet" href="css/main.css?v=1.2.1">
 
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -29,7 +29,14 @@
         <!-- Splash Screen -->
         <div id="splash-screen" class="splash-screen">
             <div class="logo-container">
-                <img src="assets/kindr-premium-logo.png" alt="Kindr Logo" class="splash-logo">
+                <img src="assets/kindr-premium-final.png" alt="Kindr Logo" class="splash-logo">
+                <div style="margin-top: 20px;">
+                    <button onclick="window.forceResetApp()"
+                        style="background: rgba(0,44,119,0.1); border: 1px solid rgba(0,44,119,0.2); color: #002C77; padding: 10px 20px; border-radius: 20px; font-size: 12px; cursor: pointer;">
+                        ♻️ Si la app no carga, pulsa aquí
+                    </button>
+                    <p style="font-size: 10px; color: #888; margin-top: 10px;">Versión v1.2.1 - Estabilidad Crítica</p>
+                </div>
             </div>
         </div>
 
@@ -79,10 +86,6 @@
         </button>
     </nav>
 
-    <!-- Login/Register Modal -->
-    <div id="auth-modal" class="modal hidden">
-        <!-- Auth content -->
-    </div>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -136,8 +139,8 @@
                     setTimeout(() => window.location.reload(true), 500);
                 };
 
-                navigator.serviceWorker.register('sw.js?v=1.2.0').then(reg => {
-                    console.log('Service Worker v1.2.0 registrado');
+                navigator.serviceWorker.register('sw.js?v=1.2.1').then(reg => {
+                    console.log('Service Worker v1.2.1 registrado');
 
                     // Detect updates and reload
                     reg.addEventListener('updatefound', () => {
