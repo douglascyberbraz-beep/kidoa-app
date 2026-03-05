@@ -58,18 +58,10 @@ window.KindrProfile = {
 
                 <div class="profile-section premium-glass" style="padding: 15px; border-radius: 20px; margin-bottom: 20px;">
                     <h3 style="font-size: 14px; color: var(--primary-navy); margin-bottom: 12px;">📌 Más</h3>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
-                        <button class="profile-quick-btn" data-goto="memories" style="background:#f5f5f5; border:none; padding:12px 8px; border-radius:14px; cursor:pointer; text-align:center;">
-                            <span style="display:block; font-size:1.3rem;">📖</span>
-                            <span style="font-size:11px; font-weight:600; color:var(--primary-navy);">Memories</span>
-                        </button>
-                        <button class="profile-quick-btn" data-goto="news" style="background:#f5f5f5; border:none; padding:12px 8px; border-radius:14px; cursor:pointer; text-align:center;">
-                            <span style="display:block; font-size:1.3rem;">✨</span>
-                            <span style="font-size:11px; font-weight:600; color:var(--primary-navy);">Noticias</span>
-                        </button>
-                        <button class="profile-quick-btn" data-goto="events" style="background:#f5f5f5; border:none; padding:12px 8px; border-radius:14px; cursor:pointer; text-align:center;">
-                            <span style="display:block; font-size:1.3rem;">🎈</span>
-                            <span style="font-size:11px; font-weight:600; color:var(--primary-navy);">Eventos</span>
+                    <div>
+                        <button class="profile-quick-btn" data-goto="memories" style="background:#f5f5f5; border:none; padding:12px 15px; border-radius:14px; cursor:pointer; text-align:center; width: 100%; display: flex; align-items: center; gap: 15px;">
+                            <span style="font-size:1.3rem;">📖</span>
+                            <span style="font-size:14px; font-weight:600; color:var(--primary-navy);">Mis Recuerdos (Memories)</span>
                         </button>
                     </div>
                 </div>

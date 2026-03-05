@@ -133,8 +133,6 @@ async function loadPage(pageName) {
 
             // Map table of renderers to satisfy pageName
             const renderers = {
-                'news': window.KindrNews,
-                'events': window.KindrEvents,
                 'tribu': window.KindrTribu,
                 'ranking': window.KindrRanking,
                 'chat': window.KindrChat,
