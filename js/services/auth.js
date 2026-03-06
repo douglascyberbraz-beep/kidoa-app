@@ -206,13 +206,13 @@ window.KindrAuth = {
             <div class="auth-container slide-up-anim">
                 <div class="auth-card premium-glass">
                     <div class="auth-header">
-                        <img src="assets/kindr-premium-final.png" alt="Kindr" style="height: 40px; margin-bottom: 15px;">
+                        <img src="assets/kindr-premium-final.png" alt="Kindr" style="height: 44px; margin-bottom: 20px;">
                         <h3>Bienvenido a KINDR</h3>
                         <p>Inicia sesión para compartir con tu tribu</p>
                     </div>
                     
                     <div id="auth-form">
-                        <div id="auth-error-msg" style="color: #ff4d4d; font-size: 12px; margin-bottom: 10px; display:none; background: rgba(255,77,77,0.1); padding: 8px; border-radius: 8px;"></div>
+                        <div id="auth-error-msg" style="color: #ff4d4d; font-size: 12px; margin-bottom: 15px; display:none; background: rgba(255,77,77,0.1); padding: 10px; border-radius: 12px;"></div>
                         
                         <div id="register-fields" style="display:none;">
                             <input type="text" id="reg-nickname" placeholder="Tu Apodo / Nickname" class="auth-input">
@@ -221,28 +221,28 @@ window.KindrAuth = {
                         <input type="email" id="auth-email" placeholder="Email" class="auth-input">
                         <input type="password" id="auth-pass" placeholder="Contraseña" class="auth-input">
                         
-                        <label id="terms-label" style="display:none; align-items:center; gap:8px; margin-top:12px; font-size:11px; color:#666; cursor:pointer;">
-                            <input type="checkbox" id="accept-terms" style="width:18px; height:18px; accent-color:var(--primary-blue);">
-                            Acepto los <a href="#" id="show-terms-link" style="color:var(--primary-blue); text-decoration:underline;">Términos y Condiciones</a>
+                        <label id="terms-label" style="display:none; align-items:center; justify-content: center; gap:8px; margin-top:12px; font-size:12px; color:#666; cursor:pointer;">
+                            <input type="checkbox" id="accept-terms" style="width:20px; height:20px; accent-color:var(--primary-blue);">
+                            <span>Acepto los <a href="#" id="show-terms-link" style="color:var(--primary-blue); font-weight:700; text-decoration:none;">Términos y Condiciones</a></span>
                         </label>
                         
-                        <div style="display:flex; flex-direction:column; gap:10px; margin-top:15px;">
-                            <button id="main-auth-btn" class="btn-primary">Entrar</button>
-                            <button id="toggle-auth-mode" class="btn-text" style="font-size: 13px;">¿No tienes cuenta? Regístrate</button>
+                        <div style="display:flex; flex-direction:column; gap:12px; margin-top:20px;">
+                            <button id="main-auth-btn" class="btn-primary" style="height: 54px; font-size: 1.1rem;">Entrar</button>
+                            <button id="toggle-auth-mode" class="btn-text" style="font-size: 14px; margin-top: 5px;">¿No tienes cuenta? Regístrate</button>
                         </div>
                         
                         <div class="social-divider"><span>o continúa con</span></div>
                         
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
-                            <button id="do-google" class="btn-outline" style="display:flex; align-items:center; justify-content:center; gap:8px;">
-                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18"> Google
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:20px;">
+                            <button id="do-google" class="btn-outline" style="display:flex; align-items:center; justify-content:center; gap:10px; height: 50px; border-radius: 15px;">
+                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"> Google
                             </button>
-                            <button id="do-apple" class="btn-outline" style="display:flex; align-items:center; justify-content:center; gap:8px;">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" width="16"> Apple
+                            <button id="do-apple" class="btn-outline" style="display:flex; align-items:center; justify-content:center; gap:10px; height: 50px; border-radius: 15px;">
+                                <img src="assets/apple_logo_black.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg'" width="18"> Apple
                             </button>
                         </div>
 
-                        <button id="do-guest" class="btn-secondary full-width">Explorar como Invitado</button>
+                        <button id="do-guest" class="btn-secondary full-width" style="height: 50px; border-radius: 15px; font-weight: 700; border: 1px solid #eee; background: #fff; color: #666;">Explorar como Invitado</button>
                     </div>
                 </div>
             </div>
