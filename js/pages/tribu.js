@@ -1,4 +1,4 @@
-window.KindrTribu = {
+window.KidoaTribu = {
     // Keep state cached in memory
     postsCache: null,
     activeTab: 'comunidad', // 'comunidad', 'eventos', 'noticias'
@@ -33,7 +33,7 @@ window.KindrTribu = {
         const actionBtn = document.getElementById('tribu-action-btn');
 
         // Direct load community
-        await window.KindrTribu.loadComunidad(contentContainer);
+        await window.KidoaTribu.loadComunidad(contentContainer);
 
         // Modal Logic (only for Comunidad)
         const modal = document.getElementById('post-modal');
@@ -50,7 +50,7 @@ window.KindrTribu = {
 
         document.getElementById('publish-btn').addEventListener('click', async () => {
             const text = contentInput.value.trim();
-            const user = window.KindrAuth.checkAuth();
+            const user = window.KidoaAuth.checkAuth();
 
             if (!user) {
                 alert("Identifícate para participar en la Tribu.");
@@ -63,11 +63,11 @@ window.KindrTribu = {
                 publishBtn.textContent = 'Publicando...';
 
                 try {
-                    await window.KindrData.addTribuPost(text, user);
-                    window.KindrPoints.addPoints('COMMENT');
+                    await window.KidoaData.addTribuPost(text, user);
+                    window.KidoaPoints.addPoints('COMMENT');
 
-                    if (window.KindrTribu.postsCache) {
-                        window.KindrTribu.postsCache.unshift({
+                    if (window.KidoaTribu.postsCache) {
+                        window.KidoaTribu.postsCache.unshift({
                             id: Date.now(),
                             user: user.nickname || "Tú",
                             avatar: user.photo || "😎",
@@ -76,8 +76,8 @@ window.KindrTribu = {
                             likes: 0,
                             comments: 0
                         });
-                        if (window.KindrTribu.activeTab === 'comunidad') {
-                            window.KindrTribu.renderPosts(contentContainer, window.KindrTribu.postsCache);
+                        if (window.KidoaTribu.activeTab === 'comunidad') {
+                            window.KidoaTribu.renderPosts(contentContainer, window.KidoaTribu.postsCache);
                         }
                     }
 
@@ -101,9 +101,9 @@ window.KindrTribu = {
     },
 
     loadComunidad: async (container) => {
-        const posts = await window.KindrData.getTribuPosts();
-        window.KindrTribu.postsCache = posts;
-        window.KindrTribu.renderPosts(container, posts);
+        const posts = await window.KidoaData.getTribuPosts();
+        window.KidoaTribu.postsCache = posts;
+        window.KidoaTribu.renderPosts(container, posts);
     },
 
     renderPosts: (container, postList) => {

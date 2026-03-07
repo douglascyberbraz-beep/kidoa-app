@@ -1,8 +1,8 @@
-window.KindrNews = {
+window.KidoaNews = {
     render: async (container) => {
         container.innerHTML = `
             <div class="page-header premium-header">
-                <h2>Noticias KINDR</h2>
+                <h2>Noticias KIDOA</h2>
                 <p>Actualidad regional para padres</p>
             </div>
             <div id="news-loading" class="center-text p-20">
@@ -26,7 +26,7 @@ window.KindrNews = {
                 if (pos) userCoords = `${pos.coords.latitude}, ${pos.coords.longitude}`;
             }
 
-            let news = await window.KindrAI.getNews(userCoords);
+            let news = await window.KidoaAI.getNews(userCoords);
             loading.remove();
 
             // Filtrar cualquier rastro de "Factor X" si el AI lo genera por error

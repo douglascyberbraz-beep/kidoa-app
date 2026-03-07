@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
-// KindrSafe - Safety Alerts Service
+// KidoaSafe - Safety Alerts Service
 // ------------------------------------------------------------------
-window.KindrSafe = {
+window.KidoaSafe = {
 
     ALERT_TYPES: {
         DANGER: { icon: '🚨', label: 'Peligro', color: '#E74C3C' },
@@ -14,7 +14,7 @@ window.KindrSafe = {
     // Obtener alertas cercanas
     getAlerts: async (coords) => {
         try {
-            const snap = await window.KindrDB.collection('alerts')
+            const snap = await window.KidoaDB.collection('alerts')
                 .where('active', '==', true)
                 .orderBy('createdAt', 'desc')
                 .limit(15)
@@ -70,7 +70,7 @@ window.KindrSafe = {
 
     // Reportar una nueva alerta
     reportAlert: async (alertData) => {
-        const user = window.KindrAuth.checkAuth();
+        const user = window.KidoaAuth.checkAuth();
         if (!user) return false;
 
         try {
@@ -82,16 +82,16 @@ window.KindrSafe = {
                 active: true,
                 votes: 0
             };
-            await window.KindrDB.collection('alerts').add(alert);
+            await window.KidoaDB.collection('alerts').add(alert);
 
             // Activity for Memories
-            await window.KindrDB.collection('activity').add({
+            await window.KidoaDB.collection('activity').add({
                 userId: user.uid,
                 type: 'safety_report',
                 timestamp: new Date()
             });
 
-            window.KindrPoints.addPoints('REVIEW');
+            window.KidoaPoints.addPoints('REVIEW');
             return true;
         } catch (e) {
             console.error("Error reportando alerta:", e);
@@ -102,7 +102,7 @@ window.KindrSafe = {
     // Votar una alerta (confirmar que sigue vigente)
     voteAlert: async (alertId) => {
         try {
-            const ref = window.KindrDB.collection('alerts').doc(alertId);
+            const ref = window.KidoaDB.collection('alerts').doc(alertId);
             const doc = await ref.get();
             if (doc.exists) {
                 await ref.update({ votes: (doc.data().votes || 0) + 1 });

@@ -1,7 +1,7 @@
-window.KindrAuth = {
+window.KidoaAuth = {
     // Estado interno para evitar múltiples guardados
     _currentUser: (function () {
-        const stored = localStorage.getItem('kindr_local_user');
+        const stored = localStorage.getItem('kidoa_local_user');
         if (stored) {
             try { return JSON.parse(stored); } catch (e) { return null; }
         }
@@ -10,14 +10,14 @@ window.KindrAuth = {
 
     init: (callback) => {
         // Escuchar cambios de estado de Firebase
-        window.KindrAuthReal.onAuthStateChanged(async (user) => {
+        window.KidoaAuthReal.onAuthStateChanged(async (user) => {
             if (user) {
                 try {
                     // Obtener perfil extendido de Firestore si existe
-                    const doc = await window.KindrDB.collection('users').doc(user.uid).get();
+                    const doc = await window.KidoaDB.collection('users').doc(user.uid).get();
                     const profile = doc.exists ? doc.data() : {};
 
-                    window.KindrAuth._currentUser = {
+                    window.KidoaAuth._currentUser = {
                         uid: user.uid,
                         email: user.email || "Invitado",
                         nickname: profile.nickname || "Explorador",
@@ -29,7 +29,7 @@ window.KindrAuth = {
                     };
                 } catch (e) {
                     console.warn("Resilient Init: Error fetching firestore profile, using minimal local state", e);
-                    window.KindrAuth._currentUser = {
+                    window.KidoaAuth._currentUser = {
                         uid: user.uid,
                         email: user.email || "Invitado",
                         nickname: "Explorador",
@@ -41,21 +41,21 @@ window.KindrAuth = {
                 }
             } else {
                 // Si no hay user en Firebase, buscar si hay una sesión local de "emergencia"
-                const localUser = window.KindrAuth._checkLocalSession();
-                window.KindrAuth._currentUser = localUser;
+                const localUser = window.KidoaAuth._checkLocalSession();
+                window.KidoaAuth._currentUser = localUser;
             }
-            if (callback) callback(window.KindrAuth._currentUser);
+            if (callback) callback(window.KidoaAuth._currentUser);
         });
     },
 
     checkAuth: () => {
-        return window.KindrAuth._currentUser;
+        return window.KidoaAuth._currentUser;
     },
 
     // Validar código de invitación en Firestore
     validateInvitation: async (code) => {
         if (!code) return false;
-        const snap = await window.KindrDB.collection('invitations')
+        const snap = await window.KidoaDB.collection('invitations')
             .where('code', '==', code.toUpperCase())
             .where('used', '==', false)
             .get();
@@ -64,7 +64,7 @@ window.KindrAuth = {
 
     login: async (email, pass) => {
         try {
-            const res = await window.KindrAuthReal.signInWithEmailAndPassword(email, pass);
+            const res = await window.KidoaAuthReal.signInWithEmailAndPassword(email, pass);
             return res.user;
         } catch (e) {
             console.error("Login Error:", e);
@@ -75,7 +75,7 @@ window.KindrAuth = {
     register: async (email, pass, nickname) => {
         try {
             // 1. Crear usuario en Auth
-            const res = await window.KindrAuthReal.createUserWithEmailAndPassword(email, pass);
+            const res = await window.KidoaAuthReal.createUserWithEmailAndPassword(email, pass);
             const user = res.user;
 
             // 3. Crear perfil en Firestore
@@ -88,7 +88,7 @@ window.KindrAuth = {
                 referralCode: 'KNDR-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
                 createdAt: new Date()
             };
-            await window.KindrDB.collection('users').doc(user.uid).set(profile);
+            await window.KidoaDB.collection('users').doc(user.uid).set(profile);
 
             // 4. Marcar invitación como usada (opcional, depende de la lógica del beta)
             // Aquí podrías actualizar el doc de la invitación si fuera de un solo uso
@@ -101,14 +101,14 @@ window.KindrAuth = {
     },
 
     logout: async () => {
-        localStorage.removeItem('kindr_local_user');
-        await window.KindrAuthReal.signOut();
+        localStorage.removeItem('kidoa_local_user');
+        await window.KidoaAuthReal.signOut();
         window.location.reload();
     },
 
     setGuestMode: async () => {
         try {
-            const res = await window.KindrAuthReal.signInAnonymously();
+            const res = await window.KidoaAuthReal.signInAnonymously();
             return res.user;
         } catch (e) {
             console.error("Guest Auth Error (Firebase):", e);
@@ -123,18 +123,18 @@ window.KindrAuth = {
                 points: 0,
                 level: 'Bronce'
             };
-            window.KindrAuth._saveLocalSession(mockUser);
-            window.KindrAuth._currentUser = mockUser;
+            window.KidoaAuth._saveLocalSession(mockUser);
+            window.KidoaAuth._currentUser = mockUser;
             return mockUser;
         }
     },
 
     _saveLocalSession: (user) => {
-        localStorage.setItem('kindr_local_user', JSON.stringify(user));
+        localStorage.setItem('kidoa_local_user', JSON.stringify(user));
     },
 
     _checkLocalSession: () => {
-        const stored = localStorage.getItem('kindr_local_user');
+        const stored = localStorage.getItem('kidoa_local_user');
         if (stored) {
             try {
                 return JSON.parse(stored);
@@ -148,9 +148,9 @@ window.KindrAuth = {
     googleLogin: async () => {
         try {
             const provider = new firebase.auth.GoogleAuthProvider();
-            const res = await window.KindrAuthReal.signInWithPopup(provider);
+            const res = await window.KidoaAuthReal.signInWithPopup(provider);
             // Si es nuevo usuario, crear perfil en Firestore
-            const doc = await window.KindrDB.collection('users').doc(res.user.uid).get();
+            const doc = await window.KidoaDB.collection('users').doc(res.user.uid).get();
             if (!doc.exists) {
                 const profile = {
                     uid: res.user.uid,
@@ -161,7 +161,7 @@ window.KindrAuth = {
                     referralCode: 'KNDR-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
                     createdAt: new Date()
                 };
-                await window.KindrDB.collection('users').doc(res.user.uid).set(profile);
+                await window.KidoaDB.collection('users').doc(res.user.uid).set(profile);
             }
             return res.user;
         } catch (e) {
@@ -173,9 +173,9 @@ window.KindrAuth = {
     appleLogin: async () => {
         try {
             const provider = new firebase.auth.OAuthProvider('apple.com');
-            const res = await window.KindrAuthReal.signInWithPopup(provider);
+            const res = await window.KidoaAuthReal.signInWithPopup(provider);
             // Lógica similar a Google para nuevo usuario
-            const doc = await window.KindrDB.collection('users').doc(res.user.uid).get();
+            const doc = await window.KidoaDB.collection('users').doc(res.user.uid).get();
             if (!doc.exists) {
                 const profile = {
                     uid: res.user.uid,
@@ -186,7 +186,7 @@ window.KindrAuth = {
                     referralCode: 'KNDR-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
                     createdAt: new Date()
                 };
-                await window.KindrDB.collection('users').doc(res.user.uid).set(profile);
+                await window.KidoaDB.collection('users').doc(res.user.uid).set(profile);
             }
             return res.user;
         } catch (e) {
@@ -206,8 +206,8 @@ window.KindrAuth = {
             <div class="auth-container slide-up-anim">
                 <div class="auth-card premium-glass">
                     <div class="auth-header">
-                        <img src="assets/kindr-premium-final.png" alt="Kindr" style="height: 44px; margin-bottom: 20px;">
-                        <h3>Bienvenido a KINDR</h3>
+                        <img src="assets/kidoa-premium-final.png" alt="Kidoa" style="height: 44px; margin-bottom: 20px;">
+                        <h3>Bienvenido a KIDOA</h3>
                         <p>Inicia sesión para compartir con tu tribu</p>
                     </div>
                     
@@ -274,7 +274,7 @@ window.KindrAuth = {
             if (isLoginMode) {
                 if (!email || !pass) return showError("Email y contraseña requeridos.");
                 try {
-                    await window.KindrAuth.login(email, pass);
+                    await window.KidoaAuth.login(email, pass);
                     modal.remove();
                     location.reload();
                 } catch (e) {
@@ -288,7 +288,7 @@ window.KindrAuth = {
                 if (!termsAccepted) return showError("Debes aceptar los Términos y Condiciones.");
 
                 try {
-                    await window.KindrAuth.register(email, pass, nick);
+                    await window.KidoaAuth.register(email, pass, nick);
                     modal.remove();
                     location.reload();
                 } catch (e) {
@@ -305,7 +305,7 @@ window.KindrAuth = {
 
         document.getElementById('do-google').addEventListener('click', async () => {
             try {
-                await window.KindrAuth.googleLogin();
+                await window.KidoaAuth.googleLogin();
                 modal.remove();
                 location.reload();
             } catch (e) {
@@ -315,7 +315,7 @@ window.KindrAuth = {
 
         document.getElementById('do-apple').addEventListener('click', async () => {
             try {
-                await window.KindrAuth.appleLogin();
+                await window.KidoaAuth.appleLogin();
                 modal.remove();
                 location.reload();
             } catch (e) {
@@ -325,7 +325,7 @@ window.KindrAuth = {
 
         document.getElementById('do-guest').addEventListener('click', async () => {
             try {
-                await window.KindrAuth.setGuestMode();
+                await window.KidoaAuth.setGuestMode();
                 modal.remove();
                 location.reload();
             } catch (e) {
@@ -335,7 +335,7 @@ window.KindrAuth = {
 
         document.getElementById('show-terms-link').addEventListener('click', (e) => {
             e.preventDefault();
-            window.KindrApp.loadPage('legal');
+            window.KidoaApp.loadPage('legal');
             modal.remove();
         });
     }

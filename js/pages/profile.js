@@ -1,10 +1,10 @@
-window.KindrProfile = {
+window.KidoaProfile = {
     render: async (container) => {
         // Mostrar cargando mientras se inicializa auth si es necesario
         container.innerHTML = `<div class="p-20 center-text"><div class="typing-dots"><span></span><span></span><span></span></div><p>Cargando perfil...</p></div>`;
 
         // Pequeña espera para asegurar que el estado de auth se ha propagado
-        const user = window.KindrAuth.checkAuth();
+        const user = window.KidoaAuth.checkAuth();
 
         if (!user) {
             container.innerHTML = `
@@ -16,18 +16,18 @@ window.KindrProfile = {
                 </div>
             `;
             document.getElementById('login-from-profile').addEventListener('click', () => {
-                window.KindrAuth.renderAuthModal();
+                window.KidoaAuth.renderAuthModal();
             });
             return;
         }
 
-        const levelInfo = window.KindrPoints.getLevelInfo(user.points);
+        const levelInfo = window.KidoaPoints.getLevelInfo(user.points);
 
         container.innerHTML = `
             <div class="profile-page">
                 <div class="profile-hero center-text">
                     <div class="profile-avatar-large gradient-bg">${user.photo || '👤'}</div>
-                    <h2 class="profile-name">${user.nickname || 'Usuario Kindr'}</h2>
+                    <h2 class="profile-name">${user.nickname || 'Usuario Kidoa'}</h2>
                     <p class="profile-email">${user.email}</p>
                 </div>
 
@@ -62,7 +62,7 @@ window.KindrProfile = {
                         <button class="profile-quick-btn" id="share-app-btn" style="background:#e3f2fd; border:none; padding:15px; border-radius:14px; cursor:pointer; text-align:left; width: 100%; display: flex; align-items: center; gap: 15px;">
                             <span style="font-size:1.3rem;">📲</span>
                             <div style="display:flex; flex-direction:column;">
-                                <span style="font-size:14px; font-weight:700; color:var(--primary-navy);">Compartir KINDR</span>
+                                <span style="font-size:14px; font-weight:700; color:var(--primary-navy);">Compartir KIDOA</span>
                                 <span style="font-size:11px; color:#5d8aa8;">Invita a otras familias</span>
                             </div>
                         </button>
@@ -89,7 +89,7 @@ window.KindrProfile = {
             const qrContainer = document.getElementById('referral-qr');
             if (qrContainer && window.QRCode) {
                 new QRCode(qrContainer, {
-                    text: `https://kindr.app/invite/${user.referralCode}`,
+                    text: `https://kidoa.app/invite/${user.referralCode}`,
                     width: 128,
                     height: 128,
                     colorDark: "#001d3d",
@@ -101,7 +101,7 @@ window.KindrProfile = {
 
         // Copy Link Logic
         document.getElementById('copy-ref-link').addEventListener('click', () => {
-            const link = `https://kindr.app/join?ref=${user.referralCode}`;
+            const link = `https://kidoa.app/join?ref=${user.referralCode}`;
             navigator.clipboard.writeText(link).then(() => {
                 const btn = document.getElementById('copy-ref-link');
                 btn.innerText = '¡Copiado!';
@@ -118,9 +118,9 @@ window.KindrProfile = {
         if (shareBtn) {
             shareBtn.addEventListener('click', async () => {
                 const shareData = {
-                    title: 'Únete a KINDR',
+                    title: 'Únete a KIDOA',
                     text: `¡Hola! Me encanta esta app para hacer planes en familia. Usa mi código de invitación: ${user.referralCode}`,
-                    url: `https://kindr.app/join?ref=${user.referralCode}`
+                    url: `https://kidoa.app/join?ref=${user.referralCode}`
                 };
 
                 if (navigator.share) {
@@ -138,13 +138,13 @@ window.KindrProfile = {
         // Quick navigation buttons
         container.querySelectorAll('.profile-quick-btn[data-goto]').forEach(btn => {
             btn.addEventListener('click', () => {
-                window.KindrApp.loadPage(btn.dataset.goto);
+                window.KidoaApp.loadPage(btn.dataset.goto);
             });
         });
 
         // Terms & Conditions link
         document.getElementById('terms-link').addEventListener('click', () => {
-            window.KindrApp.loadPage('legal');
+            window.KidoaApp.loadPage('legal');
         });
 
         // PWA Install
@@ -162,7 +162,7 @@ window.KindrProfile = {
         }
 
         document.getElementById('logout-btn').addEventListener('click', () => {
-            window.KindrAuth.logout();
+            window.KidoaAuth.logout();
         });
     }
 };

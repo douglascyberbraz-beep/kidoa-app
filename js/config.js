@@ -6,9 +6,9 @@
 
 const firebaseConfig = {
     apiKey: "AIzaSyDppR0-A8bEKT1sjJDst1N6uZV-EsTLSYo",
-    authDomain: "kindr-8d660.firebaseapp.com",
-    projectId: "kindr-8d660",
-    storageBucket: "kindr-8d660.firebasestorage.app",
+    authDomain: "kidoa-8d660.firebaseapp.com",
+    projectId: "kidoa-8d660",
+    storageBucket: "kidoa-8d660.firebasestorage.app",
     messagingSenderId: "552831875210",
     appId: "1:552831875210:web:1af5583c40e0d62bbf9573",
     measurementId: "G-2F3HNE2L5P"
@@ -25,9 +25,9 @@ const GEMINI_API_KEY = "AIzaSyD4tkqbo7diSZzpzu92magJiQJmpSoL8_Y";
 // Inicializar Firebase (Versión Compat para ejecución local sin servidor)
 if (window.firebase) {
     firebase.initializeApp(firebaseConfig);
-    window.KindrFirebaseApp = firebase.app();
-    window.KindrAuthReal = firebase.auth();
-    window.KindrDB = firebase.firestore();
+    window.KidoaFirebaseApp = firebase.app();
+    window.KidoaAuthReal = firebase.auth();
+    window.KidoaDB = firebase.firestore();
     console.log("🔥 Firebase conectado correctamente");
 } else {
     console.error("❌ Error: Librerías de Firebase no cargadas.");

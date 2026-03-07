@@ -1,6 +1,6 @@
-// Kindr App - Production v1.0.0
+// Kidoa App - Production v1.0.0
 // Sound System
-window.KindrSound = {
+window.KidoaSound = {
     play: (type) => {
         const sounds = {
             click: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3', // Soft wooden tap
@@ -35,22 +35,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     setTimeout(() => {
         const splash = document.getElementById('splash-screen');
         splash.style.opacity = '0';
-        window.KindrSound.play('start'); // Play magic chime on entry
+        window.KidoaSound.play('start'); // Play magic chime on entry
         setTimeout(() => {
             splash.style.display = 'none';
             document.getElementById('bottom-nav').classList.remove('hidden');
 
             // Production: Request location immediately for personalized experience
-            if (window.KindrMap) window.KindrMap.locateUser();
+            if (window.KidoaMap) window.KidoaMap.locateUser();
         }, 500);
     }, 2000); // Reduced slightly for better feel
 
     // Initialize Firebase Auth and wait for state
-    window.KindrAuth.init((user) => {
+    window.KidoaAuth.init((user) => {
         if (!user) {
             // No auth state: show modal
             if (!document.getElementById('auth-modal')) {
-                window.KindrAuth.renderAuthModal();
+                window.KidoaAuth.renderAuthModal();
             }
         } else {
             appState.user = user;
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Also do a quick sync check to handle initial render
-    const quickUser = window.KindrAuth.checkAuth();
+    const quickUser = window.KidoaAuth.checkAuth();
     appState.user = quickUser;
 
     // Initialize Navigation
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadPage('map');
 
     // Geolocation moved to be requested only when Map is loaded or explicitly requested
-    // see window.KindrMap.requestLocation()
+    // see window.KidoaMap.requestLocation()
 });
 
 function setupNavigation() {
@@ -83,7 +83,7 @@ function setupNavigation() {
 
             if (page === appState.currentPage) return;
 
-            window.KindrSound.play('click'); // Click sound feedback
+            window.KidoaSound.play('click'); // Click sound feedback
 
             // Remove active class from all
             navItems.forEach(nav => nav.classList.remove('active'));
@@ -123,10 +123,10 @@ async function loadPage(pageName) {
         updateNavStyles(pageName);
 
         if (pageName === 'map') {
-            if (window.KindrMap) {
-                window.KindrMap.render(mapViewport);
+            if (window.KidoaMap) {
+                window.KidoaMap.render(mapViewport);
             } else {
-                console.error("KindrMap no definido");
+                console.error("KidoaMap no definido");
             }
         } else {
             container.classList.remove('hidden');
@@ -134,14 +134,14 @@ async function loadPage(pageName) {
 
             // Map table of renderers to satisfy pageName
             const renderers = {
-                'tribu': window.KindrTribu,
-                'ranking': window.KindrRanking,
-                'news_events': window.KindrNewsEvents,
-                'profile': window.KindrProfile,
-                'legal': window.KindrLegal,
-                'quests': window.KindrQuestsPage,
-                'safe': window.KindrSafePage,
-                'memories': window.KindrMemories
+                'tribu': window.KidoaTribu,
+                'ranking': window.KidoaRanking,
+                'news_events': window.KidoaNewsEvents,
+                'profile': window.KidoaProfile,
+                'legal': window.KidoaLegal,
+                'quests': window.KidoaQuestsPage,
+                'safe': window.KidoaSafePage,
+                'memories': window.KidoaMemories
             };
 
             const renderer = renderers[pageName];
@@ -161,7 +161,7 @@ async function loadPage(pageName) {
     }
 }
 
-window.KindrApp = {
+window.KidoaApp = {
     currentPage: appState.currentPage,
     loadPage: loadPage,
     navigate: (page) => {
@@ -187,6 +187,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
 window.addEventListener('pointsUpdated', (e) => {
     console.log("Global Points Update:", e.detail);
     if (appState.currentPage === 'profile') {
-        window.KindrProfile.render(document.getElementById('main-content'));
+        window.KidoaProfile.render(document.getElementById('main-content'));
     }
 });

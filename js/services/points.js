@@ -1,4 +1,4 @@
-window.KindrPoints = {
+window.KidoaPoints = {
     // Configuración de la tabla de puntos
     REWARDS: {
         REGISTER: 50,
@@ -15,20 +15,20 @@ window.KindrPoints = {
         { min: 0, name: "Explorador Novato", icon: "🌱" },
         { min: 150, name: "Explorador Activo", icon: "🌿" },
         { min: 500, name: "Guía de la Tribu", icon: "🌳" },
-        { min: 1200, name: "Maestro Kindr", icon: "⭐" },
-        { min: 2500, name: "Leyenda Kindr", icon: "👑" }
+        { min: 1200, name: "Maestro Kidoa", icon: "⭐" },
+        { min: 2500, name: "Leyenda Kidoa", icon: "👑" }
     ],
 
     // Obtener información de nivel basada en puntos
     getLevelInfo: (points = 0) => {
         const pts = points || 0;
-        let currentLevel = window.KindrPoints.LEVELS[0];
+        let currentLevel = window.KidoaPoints.LEVELS[0];
         let nextLevel = null;
 
-        for (let i = 0; i < window.KindrPoints.LEVELS.length; i++) {
-            if (pts >= window.KindrPoints.LEVELS[i].min) {
-                currentLevel = window.KindrPoints.LEVELS[i];
-                nextLevel = window.KindrPoints.LEVELS[i + 1] || null;
+        for (let i = 0; i < window.KidoaPoints.LEVELS.length; i++) {
+            if (pts >= window.KidoaPoints.LEVELS[i].min) {
+                currentLevel = window.KidoaPoints.LEVELS[i];
+                nextLevel = window.KidoaPoints.LEVELS[i + 1] || null;
             }
         }
 
@@ -46,19 +46,19 @@ window.KindrPoints = {
 
     // Simular otorgar puntos
     addPoints: (action, userId) => {
-        const pointsToAdd = window.KindrPoints.REWARDS[action] || 0;
+        const pointsToAdd = window.KidoaPoints.REWARDS[action] || 0;
         console.log(`Otorgando ${pointsToAdd} puntos por acción: ${action}`);
 
-        const userStr = localStorage.getItem('kindr_user');
+        const userStr = localStorage.getItem('kidoa_user');
         if (userStr) {
             let user = JSON.parse(userStr);
             user.points = (user.points || 0) + pointsToAdd;
-            localStorage.setItem('kindr_user', JSON.stringify(user));
+            localStorage.setItem('kidoa_user', JSON.stringify(user));
             window.dispatchEvent(new CustomEvent('pointsUpdated', { detail: user.points }));
-        } else if (localStorage.getItem('kindr_guest') === 'true') {
-            let pts = parseInt(localStorage.getItem('kindr_guest_points')) || 0;
+        } else if (localStorage.getItem('kidoa_guest') === 'true') {
+            let pts = parseInt(localStorage.getItem('kidoa_guest_points')) || 0;
             pts += pointsToAdd;
-            localStorage.setItem('kindr_guest_points', pts.toString());
+            localStorage.setItem('kidoa_guest_points', pts.toString());
             window.dispatchEvent(new CustomEvent('pointsUpdated', { detail: pts }));
         }
         return pointsToAdd;

@@ -1,4 +1,4 @@
-window.KindrLegal = {
+window.KidoaLegal = {
     render: (container) => {
         container.innerHTML = `
             <div class="legal-page" style="padding: 20px; max-width: 640px; margin: 0 auto;">
@@ -9,7 +9,7 @@ window.KindrLegal = {
                 <div class="legal-section premium-glass" style="padding: 20px; border-radius: 16px; margin-bottom: 20px;">
                     <h3 style="color: var(--primary-navy); margin-bottom: 10px;">1. Uso de la Aplicación</h3>
                     <p style="font-size: 13px; line-height: 1.6; color: #555;">
-                        KINDR es una plataforma colaborativa para familias. Al usar esta aplicación, te comprometes a:
+                        KIDOA es una plataforma colaborativa para familias. Al usar esta aplicación, te comprometes a:
                     </p>
                     <ul style="font-size: 13px; line-height: 1.8; color: #555; padding-left: 20px; margin-top: 8px;">
                         <li>Proporcionar información veraz y respetuosa en tus reseñas y publicaciones.</li>
@@ -45,21 +45,21 @@ window.KindrLegal = {
                         <li><strong>Oposición:</strong> Oponerte al tratamiento de tus datos en cualquier momento.</li>
                     </ul>
                     <p style="font-size: 13px; line-height: 1.6; color: #555; margin-top: 10px;">
-                        Para ejercer estos derechos, contacta a: <strong>privacy@kindr.app</strong>
+                        Para ejercer estos derechos, contacta a: <strong>privacy@kidoa.app</strong>
                     </p>
                 </div>
 
                 <div class="legal-section premium-glass" style="padding: 20px; border-radius: 16px; margin-bottom: 20px;">
                     <h3 style="color: var(--primary-navy); margin-bottom: 10px;">4. Contenido y Propiedad Intelectual</h3>
                     <p style="font-size: 13px; line-height: 1.6; color: #555;">
-                        Al publicar contenido en KINDR (reseñas, fotos, posts), mantienes la propiedad de tu contenido pero nos otorgas una licencia no exclusiva para mostrarlo dentro de la plataforma. KINDR se reserva el derecho de moderar o eliminar contenido que viole estos términos.
+                        Al publicar contenido en KIDOA (reseñas, fotos, posts), mantienes la propiedad de tu contenido pero nos otorgas una licencia no exclusiva para mostrarlo dentro de la plataforma. KIDOA se reserva el derecho de moderar o eliminar contenido que viole estos términos.
                     </p>
                 </div>
 
                 <div class="legal-section premium-glass" style="padding: 20px; border-radius: 16px; margin-bottom: 20px;">
                     <h3 style="color: var(--primary-navy); margin-bottom: 10px;">5. Cookies y Tecnologías de Seguimiento</h3>
                     <p style="font-size: 13px; line-height: 1.6; color: #555;">
-                        KINDR utiliza tecnologías estándar de almacenamiento local (localStorage, Firebase Authentication tokens) exclusivamente para mantener tu sesión activa y tus preferencias. No utilizamos cookies de publicidad ni rastreamos tu actividad fuera de la aplicación.
+                        KIDOA utiliza tecnologías estándar de almacenamiento local (localStorage, Firebase Authentication tokens) exclusivamente para mantener tu sesión activa y tus preferencias. No utilizamos cookies de publicidad ni rastreamos tu actividad fuera de la aplicación.
                     </p>
                 </div>
 
@@ -67,8 +67,8 @@ window.KindrLegal = {
                     <h3 style="color: var(--primary-navy); margin-bottom: 10px;">6. Contacto</h3>
                     <p style="font-size: 13px; line-height: 1.6; color: #555;">
                         Para cualquier consulta sobre estos términos o tu privacidad:<br>
-                        📧 <strong>legal@kindr.app</strong><br>
-                        🌐 <strong>kindr.app</strong>
+                        📧 <strong>legal@kidoa.app</strong><br>
+                        🌐 <strong>kidoa.app</strong>
                     </p>
                 </div>
 
@@ -79,9 +79,9 @@ window.KindrLegal = {
         `;
 
         document.getElementById('legal-back').addEventListener('click', () => {
-            const user = window.KindrAuth.checkAuth();
+            const user = window.KidoaAuth.checkAuth();
             if (user) {
-                window.KindrApp.loadPage('profile');
+                window.KidoaApp.loadPage('profile');
             } else {
                 // If not logged in, they likely came from the Auth Modal
                 // Re-render auth modal effectively by reloading or calling the check

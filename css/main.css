@@ -1,5 +1,5 @@
 :root {
-    /* Premium "Kindr" Palette */
+    /* Premium "Kidoa" Palette */
     --primary-navy: #002C77;
     /* Official Logo Blue */
     --primary-blue: #4CC9F0;
@@ -261,7 +261,7 @@ body {
     animation: magical-float 3s infinite ease-in-out;
 }
 
-.kindr-marker-pin {
+.kidoa-marker-pin {
     width: 44px !important;
     height: 44px !important;
     border-radius: 50% !important;
@@ -332,7 +332,7 @@ body {
 }
 
 /* Branded Map Layer - Waze-style */
-.kindr-map-tiles {
+.kidoa-map-tiles {
     filter: brightness(1.08) contrast(1.1) saturate(1.5) sepia(0.05);
     opacity: 1;
 }
@@ -662,7 +662,7 @@ body {
     }
 }
 
-.highlight-poi .kindr-marker-pin {
+.highlight-poi .kidoa-marker-pin {
     animation: marker-pulse 2s infinite ease-in-out;
 }
 
@@ -1484,7 +1484,7 @@ body {
 }
 
 /* =========================================
-   KINDR QUEST - Misiones Familiares
+   KIDOA QUEST - Misiones Familiares
    ========================================= */
 
 .quests-page {
@@ -1670,7 +1670,7 @@ body {
 }
 
 /* =========================================
-   KINDR SAFE - Alertas de Seguridad
+   KIDOA SAFE - Alertas de Seguridad
    ========================================= */
 
 .safe-page {
@@ -1733,7 +1733,7 @@ body {
 }
 
 /* =========================================
-   KINDR MEMORIES - Diario Familiar
+   KIDOA MEMORIES - Diario Familiar
    ========================================= */
 
 .memories-page {
@@ -1889,3 +1889,70 @@ body {
     display: inline-block;
     margin-top: 6px;
 }
+/* Navigator Mode GPS Styles */
+.navigator-view .leaflet-pane.leaflet-map-pane {
+    transform: perspective(800px) rotateX(60deg) scale(1.5) !important;
+    transform-origin: center calc(100% - 150px);
+    transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.kidoa-map-tiles.night-mode {
+    filter: brightness(0.9) contrast(1.2) saturate(2) hue-rotate(200deg);
+}
+
+.nav-mode-btn {
+    background: linear-gradient(135deg, #1A2980, #26D0CE) !important;
+    color: white !important;
+    border-radius: 12px !important;
+    margin-right: 5px !important;
+    font-size: 14px !important;
+    padding: 0 10px !important;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(38, 208, 206, 0.5);
+    transition: all 0.3s ease;
+}
+
+.nav-mode-btn.active {
+    background: linear-gradient(135deg, #FF416C, #FF4B2B) !important;
+    box-shadow: 0 4px 15px rgba(255, 65, 108, 0.6);
+    animation: navPulse 2s infinite;
+}
+
+@keyframes navPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.family-car-icon {
+    font-size: 35px;
+    line-height: 1;
+    text-align: center;
+    text-shadow: 0 0 15px rgba(76, 201, 240, 0.9);
+    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
+    transform: translateY(-20px);
+    animation: floatCar 2s ease-in-out infinite;
+    position: relative;
+}
+
+.family-car-icon::after {
+    content: "Fam";
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #FF4B2B;
+    color: white;
+    font-size: 10px;
+    font-weight: 900;
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+@keyframes floatCar {
+    0%, 100% { transform: translateY(-20px) scale(1); }
+    50% { transform: translateY(-25px) scale(1.05); }
+}
+

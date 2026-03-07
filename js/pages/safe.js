@@ -1,9 +1,9 @@
-window.KindrSafePage = {
+window.KidoaSafePage = {
     render: async (container) => {
         container.innerHTML = `
             <div class="safe-page">
                 <div class="page-header center-text">
-                    <h2 style="color: var(--primary-navy); font-weight: 800;">🛡️ KINDR Safe</h2>
+                    <h2 style="color: var(--primary-navy); font-weight: 800;">🛡️ KIDOA Safe</h2>
                     <p style="color: #888; font-size: 13px;">Alertas de seguridad en tu zona</p>
                 </div>
 
@@ -46,7 +46,7 @@ window.KindrSafePage = {
         const alertsList = document.getElementById('alerts-list');
 
         // Load alerts
-        const alerts = await window.KindrSafe.getAlerts();
+        const alerts = await window.KidoaSafe.getAlerts();
         alertsList.innerHTML = '';
 
         if (alerts.length === 0) {
@@ -59,7 +59,7 @@ window.KindrSafePage = {
             `;
         } else {
             alerts.forEach(alert => {
-                const typeInfo = window.KindrSafe.ALERT_TYPES[alert.type] || window.KindrSafe.ALERT_TYPES.INFO;
+                const typeInfo = window.KidoaSafe.ALERT_TYPES[alert.type] || window.KidoaSafe.ALERT_TYPES.INFO;
                 const card = document.createElement('div');
                 card.className = 'alert-card entry-anim';
                 card.innerHTML = `
@@ -95,8 +95,8 @@ window.KindrSafePage = {
                 const alertId = e.target.dataset.alert;
                 e.target.textContent = '✅';
                 e.target.disabled = true;
-                await window.KindrSafe.voteAlert(alertId);
-                window.KindrSound.play('click');
+                await window.KidoaSafe.voteAlert(alertId);
+                window.KidoaSound.play('click');
             });
         });
 
@@ -136,7 +136,7 @@ window.KindrSafePage = {
             submitBtn.disabled = true;
             submitBtn.textContent = 'Enviando...';
 
-            const success = await window.KindrSafe.reportAlert({
+            const success = await window.KidoaSafe.reportAlert({
                 type: selectedType,
                 title,
                 location,
@@ -146,7 +146,7 @@ window.KindrSafePage = {
             if (success) {
                 modal.classList.add('hidden');
                 alert("✅ Alerta reportada. ¡Gracias por cuidar a la comunidad! +20 puntos");
-                window.KindrSafePage.render(container);
+                window.KidoaSafePage.render(container);
             } else {
                 alert("Error al enviar. Inténtalo de nuevo.");
             }

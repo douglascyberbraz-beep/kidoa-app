@@ -1,12 +1,12 @@
 // ------------------------------------------------------------------
-// KindrData - Firestore Service (con fallback a datos estáticos)
+// KidoaData - Firestore Service (con fallback a datos estáticos)
 // ------------------------------------------------------------------
-window.KindrData = {
+window.KidoaData = {
 
     // -- LOCATIONS --
     getLocations: async () => {
         try {
-            const snap = await window.KindrDB.collection('locations').get();
+            const snap = await window.KidoaDB.collection('locations').get();
             if (!snap.empty) {
                 return snap.docs.map(d => ({ id: d.id, ...d.data() }));
             }
@@ -32,7 +32,7 @@ window.KindrData = {
     // -- NEWS --
     getNews: async () => {
         try {
-            const snap = await window.KindrDB.collection('news').orderBy('date', 'desc').limit(10).get();
+            const snap = await window.KidoaDB.collection('news').orderBy('date', 'desc').limit(10).get();
             if (!snap.empty) {
                 return snap.docs.map(d => ({ id: d.id, ...d.data() }));
             }
@@ -49,7 +49,7 @@ window.KindrData = {
     // -- EVENTS --
     getEvents: async () => {
         try {
-            const snap = await window.KindrDB.collection('events').orderBy('date', 'asc').limit(10).get();
+            const snap = await window.KidoaDB.collection('events').orderBy('date', 'asc').limit(10).get();
             if (!snap.empty) {
                 return snap.docs.map(d => ({ id: d.id, ...d.data() }));
             }
@@ -66,7 +66,7 @@ window.KindrData = {
     // -- TRIBU POSTS --
     getTribuPosts: async () => {
         try {
-            const snap = await window.KindrDB.collection('posts').orderBy('createdAt', 'desc').limit(20).get();
+            const snap = await window.KidoaDB.collection('posts').orderBy('createdAt', 'desc').limit(20).get();
             if (!snap.empty) {
                 return snap.docs.map(d => ({ id: d.id, ...d.data() }));
             }
@@ -91,7 +91,7 @@ window.KindrData = {
                 comments: 0,
                 createdAt: new Date()
             };
-            await window.KindrDB.collection('posts').add(post);
+            await window.KidoaDB.collection('posts').add(post);
             return true;
         } catch (e) {
             console.error("Error añadiendo post:", e);
@@ -102,7 +102,7 @@ window.KindrData = {
     // -- RANKING / CONTRIBUTORS --
     getContributors: async () => {
         try {
-            const snap = await window.KindrDB.collection('users').orderBy('points', 'desc').limit(10).get();
+            const snap = await window.KidoaDB.collection('users').orderBy('points', 'desc').limit(10).get();
             if (!snap.empty) {
                 return snap.docs.map(d => {
                     const data = d.data();
@@ -120,7 +120,7 @@ window.KindrData = {
         }
         // Fallback estático
         return [
-            { name: "Elena Ramos", points: 1250, rank: "Maestro Kindr", contributions: 45, role: "🥇 Top" },
+            { name: "Elena Ramos", points: 1250, rank: "Maestro Kidoa", contributions: 45, role: "🥇 Top" },
             { name: "Carlos Ruiz", points: 980, rank: "Guía Tribu", contributions: 32, role: "🥈 Pro" },
             { name: "Marta Sanz", points: 750, rank: "Guía Tribu", contributions: 28, role: "🥉 Social" },
             { name: "Javier López", points: 420, rank: "Explorador", contributions: 15, role: "🎖️ Activo" }

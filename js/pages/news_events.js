@@ -1,4 +1,4 @@
-window.KindrNewsEvents = {
+window.KidoaNewsEvents = {
     render: async (container) => {
         container.innerHTML = `
             <div class="page-header sticky-header" style="flex-direction: column; align-items: stretch; gap: 15px; padding-bottom: 5px;">
@@ -41,10 +41,10 @@ window.KindrNewsEvents = {
             }
 
             if (tab === 'news') {
-                const news = await window.KindrData.getNews(); // Simplified or IA based
+                const news = await window.KidoaData.getNews(); // Simplified or IA based
                 renderNews(news);
             } else if (tab === 'events') {
-                const events = await window.KindrData.getEvents();
+                const events = await window.KidoaData.getEvents();
                 renderEvents(events);
             } else if (tab === 'becas') {
                 renderBecas();
@@ -114,7 +114,7 @@ window.KindrNewsEvents = {
             content.innerHTML = `
                 <div class="becas-list" style="width: 92%; max-width: 500px;">
                     <div class="info-alert" style="background: #e3f2fd; padding: 15px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid var(--primary-blue);">
-                        <p style="margin:0; font-size: 0.9rem; color: var(--primary-navy);"><strong>💡 Tip Kindr:</strong> Mantén activadas las notificaciones para no perderte ningún plazo de matriculación en tu zona.</p>
+                        <p style="margin:0; font-size: 0.9rem; color: var(--primary-navy);"><strong>💡 Tip Kidoa:</strong> Mantén activadas las notificaciones para no perderte ningún plazo de matriculación en tu zona.</p>
                     </div>
                     
                     <div class="beca-item premium-glass" style="padding: 20px; border-radius: 20px; margin-bottom: 15px; border: 1px solid #eee;">

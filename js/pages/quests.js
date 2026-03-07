@@ -1,9 +1,9 @@
-window.KindrQuestsPage = {
+window.KidoaQuestsPage = {
     render: async (container) => {
         container.innerHTML = `
             <div class="quests-page">
                 <div class="page-header center-text" style="padding-bottom: 5px;">
-                    <h2 style="color: var(--primary-navy); font-weight: 800;">⚔️ KINDR Quest</h2>
+                    <h2 style="color: var(--primary-navy); font-weight: 800;">⚔️ KIDOA Quest</h2>
                     <p style="color: #888; font-size: 13px;">Misiones familiares para explorar juntos</p>
                 </div>
 
@@ -35,7 +35,7 @@ window.KindrQuestsPage = {
         const list = document.getElementById('quests-list');
 
         // Load active quests
-        const quests = await window.KindrQuests.getActiveQuests();
+        const quests = await window.KidoaQuests.getActiveQuests();
 
         // Update stats
         document.getElementById('q-active').textContent = quests.filter(q => q.status === 'active').length;
@@ -49,7 +49,7 @@ window.KindrQuestsPage = {
             list.innerHTML = '<p class="center-text p-20" style="color: #888;">No tienes misiones activas. ¡Genera algunas!</p>';
         } else {
             quests.forEach(quest => {
-                const typeInfo = window.KindrQuests.MISSION_TYPES[quest.type] || { icon: '🎯', label: 'Misión', color: '#666' };
+                const typeInfo = window.KidoaQuests.MISSION_TYPES[quest.type] || { icon: '🎯', label: 'Misión', color: '#666' };
                 const progress = quest.progress || 0;
                 const total = quest.totalSteps || quest.objectives?.length || 1;
                 const pct = Math.round((progress / total) * 100);
@@ -117,17 +117,17 @@ window.KindrQuestsPage = {
                     e.target.disabled = true;
                     e.target.textContent = '⌛...';
 
-                    const success = await window.KindrQuests.updateQuestProgress(qId, newProgress, isComplete);
+                    const success = await window.KidoaQuests.updateQuestProgress(qId, newProgress, isComplete);
 
                     if (success) {
                         if (isComplete) {
-                            window.KindrSound.play('success');
+                            window.KidoaSound.play('success');
                             alert(`🎉 ¡Misión "${quest.title}" completada! +${quest.points} puntos`);
                         } else {
-                            window.KindrSound.play('click');
+                            window.KidoaSound.play('click');
                         }
                         // Re-render
-                        window.KindrQuestsPage.render(container);
+                        window.KidoaQuestsPage.render(container);
                     } else {
                         e.target.disabled = false;
                         e.target.textContent = 'Error ⚠️';
@@ -152,17 +152,17 @@ window.KindrQuestsPage = {
                 } catch (e) { }
             }
 
-            const newQuests = await window.KindrQuests.generateQuests(coords);
+            const newQuests = await window.KidoaQuests.generateQuests(coords);
             if (newQuests && newQuests.length > 0) {
                 list.innerHTML = '<p class="center-text p-20">💾 Guardando misiones en tu perfil...</p>';
 
                 // Save them to Firestore properly
                 for (const q of newQuests) {
-                    await window.KindrQuests.saveQuest(q);
+                    await window.KidoaQuests.saveQuest(q);
                 }
 
                 // Re-render to show new active quests from Firestore
-                window.KindrQuestsPage.render(container);
+                window.KidoaQuestsPage.render(container);
             } else {
                 alert("No se pudieron generar misiones en este momento. Inténtalo de nuevo.");
             }

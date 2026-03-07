@@ -1,6 +1,6 @@
-window.KindrAI = {
+window.KidoaAI = {
     // Especialización en Crianza
-    SYSTEM_PROMPT: `Eres KINDR IA, la asistente oficial de la App KINDR, experta líder en crianza consciente, salud infantil (0-15 años), psicología positiva y nutrición. 
+    SYSTEM_PROMPT: `Eres KIDOA IA, la asistente oficial de la App KIDOA, experta líder en crianza consciente, salud infantil (0-15 años), psicología positiva y nutrición. 
     Tu misión es ayudar a padres modernos a encontrar planes y soluciones.
     - Estilo: Empático, ultra-personalizado, premium.
     - Seguridad: Si detectas consultas médicas críticas, ofrece consejos de calma pero siempre recomienda visitar al pediatra.
@@ -12,7 +12,7 @@ window.KindrAI = {
         Prioriza contenido local de Castilla y León.
         Formato JSON estricto: [ { "title": "", "summary": "", "source": "url", "sourceName": "" } ]`;
 
-        return await window.KindrAI._callGemini(prompt);
+        return await window.KidoaAI._callGemini(prompt);
     },
 
     // Buscar Eventos Infantiles (0-15 años)
@@ -22,20 +22,20 @@ window.KindrAI = {
         IMPORTANTE: Necesito las coordenadas aproximadas del evento para el mapa.
         Formato JSON estricto: [ { "name": "", "date": "", "info": "", "url": "", "lat": 0.0, "lng": 0.0 } ]`;
 
-        return await window.KindrAI._callGemini(prompt);
+        return await window.KidoaAI._callGemini(prompt);
     },
 
     // Chat Especializado
     chat: async (userMessage, history = []) => {
-        const prompt = `${window.KindrAI.SYSTEM_PROMPT}\n\nHistorial: ${JSON.stringify(history)}\nUsuario: ${userMessage}`;
-        const response = await window.KindrAI._callGemini(prompt, false); // false = return text, not json
+        const prompt = `${window.KidoaAI.SYSTEM_PROMPT}\n\nHistorial: ${JSON.stringify(history)}\nUsuario: ${userMessage}`;
+        const response = await window.KidoaAI._callGemini(prompt, false); // false = return text, not json
         return response;
     },
 
     // Helper para llamadas a Gemini
     _callGemini: async (prompt, expectJson = true) => {
         if (!window.GEMINI_KEY || window.GEMINI_KEY.includes('PEGAR_AQUI')) {
-            return window.KindrAI._getMockData(prompt);
+            return window.KidoaAI._getMockData(prompt);
         }
 
         try {
@@ -53,7 +53,7 @@ window.KindrAI = {
             }
             return text;
         } catch (e) {
-            console.error("Error en KindrAI:", e);
+            console.error("Error en KidoaAI:", e);
             return expectJson ? [] : "Lo siento, tengo problemas para conectarme ahora mismo.";
         }
     },

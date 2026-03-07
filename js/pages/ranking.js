@@ -1,8 +1,8 @@
-window.KindrRanking = {
+window.KidoaRanking = {
     render: async (container) => {
         container.innerHTML = `
             <div class="page-header center-text">
-                <h2 style="color: var(--primary-navy); font-weight: 800;">🏆 Ranking KINDR</h2>
+                <h2 style="color: var(--primary-navy); font-weight: 800;">🏆 Ranking KIDOA</h2>
                 <div class="tab-scroller">
                     <button class="tab-btn active" data-tab="sites">Top Sitios</button>
                     <button class="tab-btn" data-tab="users">Contribuidores</button>
@@ -27,7 +27,7 @@ window.KindrRanking = {
 
         const renderSites = async () => {
             list.innerHTML = '<div class="center-text p-20"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
-            const locations = await window.KindrData.getLocations();
+            const locations = await window.KidoaData.getLocations();
             const sorted = [...locations].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 10);
             list.innerHTML = '';
             sorted.forEach((site, index) => {
@@ -50,14 +50,14 @@ window.KindrRanking = {
                 // Clicking triggers map navigation
                 card.onclick = () => {
                     // Navigate to Map
-                    window.KindrApp.loadPage('tribu'); // Note: The user might expect the map tab? 
+                    window.KidoaApp.loadPage('tribu'); // Note: The user might expect the map tab? 
                     // Actually we need to make sure the app loads the MAP page and sets the view
-                    window.KindrApp.navigate('map');
+                    window.KidoaApp.navigate('map');
                     setTimeout(() => {
-                        if (window.KindrMap && window.KindrMap.instance) {
-                            window.KindrMap.instance.flyTo([site.lat, site.lng], 16);
+                        if (window.KidoaMap && window.KidoaMap.instance) {
+                            window.KidoaMap.instance.flyTo([site.lat, site.lng], 16);
                             // Open popup after fly
-                            const m = window.KindrMap.markers.find(m => m.data.id === site.id);
+                            const m = window.KidoaMap.markers.find(m => m.data.id === site.id);
                             if (m) m.instance.openPopup();
                         }
                     }, 500);
@@ -68,10 +68,10 @@ window.KindrRanking = {
 
         const renderContributors = async () => {
             list.innerHTML = '<div class="center-text p-20"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
-            let users = await window.KindrData.getContributors();
+            let users = await window.KidoaData.getContributors();
 
             // Inject current user
-            const me = window.KindrAuth.checkAuth();
+            const me = window.KidoaAuth.checkAuth();
             if (me && !me.isGuest) {
                 users.push({
                     name: me.nickname || me.email,
@@ -122,7 +122,7 @@ window.KindrRanking = {
                 e.target.classList.add('active');
                 if (tab === 'sites') await renderSites();
                 else await renderContributors();
-                window.KindrSound.play('click');
+                window.KidoaSound.play('click');
             });
         });
     }

@@ -1,4 +1,4 @@
-window.KindrEvents = {
+window.KidoaEvents = {
     // Helper para calcular distancia entre dos puntos (Haversine)
     getDistance: (lat1, lon1, lat2, lon2) => {
         const R = 6371; // Radio de la Tierra en km
@@ -38,13 +38,13 @@ window.KindrEvents = {
                 if (pos) userLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude, name: "tu ubicación" };
             }
 
-            const events = await window.KindrAI.getEvents(`${userLoc.lat}, ${userLoc.lng}`);
+            const events = await window.KidoaAI.getEvents(`${userLoc.lat}, ${userLoc.lng}`);
             loading.remove();
 
             // Filtrar por radio de 30km (en el cliente para precisión extrema si el AI devuelve más)
             const filteredEvents = events.filter(ev => {
                 if (!ev.lat || !ev.lng) return true; // Si no tiene coordenadas, lo dejamos por si acaso
-                const dist = window.KindrEvents.getDistance(userLoc.lat, userLoc.lng, ev.lat, ev.lng);
+                const dist = window.KidoaEvents.getDistance(userLoc.lat, userLoc.lng, ev.lat, ev.lng);
                 ev.distance = dist.toFixed(1);
                 return dist <= 30;
             });

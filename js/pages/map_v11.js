@@ -1,29 +1,29 @@
-// Definitive Kindr Map Engine - v1.0.0 (Production)
-window.KindrMap = {
+// Definitive Kidoa Map Engine - v1.0.0 (Production)
+window.KidoaMap = {
     instance: null,
     isInitialized: false,
     markers: [],
     currentFilter: 'all',
 
     render: async (container) => {
-        console.log("Rendering Kindr Map v1.0.0...");
+        console.log("Rendering Kidoa Map v1.0.0...");
 
         // CRITICAL FIX: Ensure visibility BEFORE any Leaflet calls
         container.style.display = 'block';
 
-        if (!window.KindrMap.isInitialized) {
-            await window.KindrMap.init(container);
+        if (!window.KidoaMap.isInitialized) {
+            await window.KidoaMap.init(container);
         }
 
-        if (window.KindrMap.instance) {
+        if (window.KidoaMap.instance) {
             // Force layout capture
             setTimeout(() => {
-                window.KindrMap.instance.invalidateSize();
+                window.KidoaMap.instance.invalidateSize();
             }, 100);
 
             // Repeated invalidation to handle slow mobile reflows
             const invalidator = setInterval(() => {
-                window.KindrMap.instance.invalidateSize();
+                window.KidoaMap.instance.invalidateSize();
             }, 1000);
 
             setTimeout(() => clearInterval(invalidator), 4000);
@@ -31,13 +31,13 @@ window.KindrMap = {
     },
 
     init: async (container) => {
-        if (window.KindrMap.isInitialized && window.KindrMap.instance) return;
+        if (window.KidoaMap.isInitialized && window.KidoaMap.instance) return;
 
         try {
             console.log("Initializing Definitive Map Engine v1.0.0...");
 
             // Setup the Base Map with Canvas for maximum performance
-            if (!window.KindrMap.instance) {
+            if (!window.KidoaMap.instance) {
                 const map = L.map(container, {
                     zoomControl: false,
                     attributionControl: false,
@@ -45,40 +45,40 @@ window.KindrMap = {
                     preferCanvas: true
                 }).setView([41.6520, -4.7286], 15); // Default to Valladolid Center
 
-                // Switching to CartoDB Voyager for a more vibrant, "Waze-style" base
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                // Switching to CartoDB Dark Matter for a Waze-style Night Navigation look
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
                     attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
                     subdomains: 'abcd',
                     maxZoom: 20,
-                    className: 'kindr-map-tiles'
+                    className: 'kidoa-map-tiles night-mode'
                 }).addTo(map);
 
-                window.KindrMap.instance = map;
+                window.KidoaMap.instance = map;
             }
 
             // Ultimate fix para problema de celdas/cuadrículas en dispositivos móviles usando ResizeObserver
             const resizeObserver = new ResizeObserver(() => {
-                if (window.KindrMap.instance) window.KindrMap.instance.invalidateSize();
+                if (window.KidoaMap.instance) window.KidoaMap.instance.invalidateSize();
             });
             resizeObserver.observe(container);
 
-            window.KindrMap.isInitialized = true;
+            window.KidoaMap.isInitialized = true;
 
             // UI Injections
-            window.KindrMap.injectUI(container);
+            window.KidoaMap.injectUI(container);
 
             // Load Markers
-            await window.KindrMap.loadMarkers();
+            await window.KidoaMap.loadMarkers();
 
             // Check for Geolocation
-            window.KindrMap.tryAutoLocate();
+            window.KidoaMap.tryAutoLocate();
 
             // New Feature: Clic largo o clic para añadir punto
-            window.KindrMap.instance.on('contextmenu', (e) => {
-                window.KindrMap.showAddSiteModal(e.latlng.lat, e.latlng.lng);
+            window.KidoaMap.instance.on('contextmenu', (e) => {
+                window.KidoaMap.showAddSiteModal(e.latlng.lat, e.latlng.lng);
             });
         } catch (e) {
-            console.error("KindrMap Init Failed:", e);
+            console.error("KidoaMap Init Failed:", e);
             // Fallback UI inside container instead of crashing app.js
             container.innerHTML = `<div class="p-20 center-text" style="color:var(--primary-navy);"><h3>Magia cargando...</h3><p>Estamos preparando el mapa para ti.</p></div>`;
         }
@@ -92,6 +92,7 @@ window.KindrMap = {
             <div class="map-search-bar">
                 <span class="gemini-sparkle">✨</span>
                 <input type="text" id="map-search-input" class="map-search-input" placeholder="Pregunta a Gemini o busca un lugar...">
+                <button id="nav-mode-btn" class="locate-me-btn nav-mode-btn">🚙 Navegar</button>
                 <button id="locate-me-btn" class="locate-me-btn">📍</button>
             </div>
             <div id="search-results-list"></div>
@@ -109,10 +110,11 @@ window.KindrMap = {
         // Event Listeners
         const input = document.getElementById('map-search-input');
         input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') window.KindrMap.handleSearch(input.value);
+            if (e.key === 'Enter') window.KidoaMap.handleSearch(input.value);
         });
 
-        document.getElementById('locate-me-btn').addEventListener('click', () => window.KindrMap.locateUser());
+        document.getElementById('locate-me-btn').addEventListener('click', () => window.KidoaMap.locateUser());
+        document.getElementById('nav-mode-btn').addEventListener('click', () => window.KidoaMap.toggleNavMode());
 
         // Chips
         const chips = document.querySelectorAll('.filter-chip');
@@ -120,29 +122,29 @@ window.KindrMap = {
             chip.addEventListener('click', () => {
                 chips.forEach(c => c.classList.remove('active'));
                 chip.classList.add('active');
-                window.KindrMap.filterMarkers(chip.dataset.type);
+                window.KidoaMap.filterMarkers(chip.dataset.type);
             });
         });
     },
 
     loadMarkers: async () => {
-        const locations = await window.KindrData.getLocations();
-        window.KindrMap.clearMarkers();
+        const locations = await window.KidoaData.getLocations();
+        window.KidoaMap.clearMarkers();
 
         locations.forEach(loc => {
-            const marker = window.KindrMap.createMarker(loc);
-            window.KindrMap.markers.push({ instance: marker, data: loc });
+            const marker = window.KidoaMap.createMarker(loc);
+            window.KidoaMap.markers.push({ instance: marker, data: loc });
         });
     },
 
     createMarker: (loc) => {
-        // Official Kindr Icon for markers (Magical Floating Orb concept)
+        // Official Kidoa Icon for markers (Magical Floating Orb concept)
         const isHighRated = loc.rating >= 4.5;
-        const kindrIcon = L.divIcon({
+        const kidoaIcon = L.divIcon({
             className: `custom-div-icon ${isHighRated ? 'highlight-poi' : ''}`,
             html: `
-                <div class="kindr-marker">
-                    <div class="kindr-marker-pin" style="background: ${isHighRated ? 'linear-gradient(135deg, var(--accent-pink), #ff758c)' : 'linear-gradient(135deg, var(--primary-blue), #4cc9f0)'};">
+                <div class="kidoa-marker">
+                    <div class="kidoa-marker-pin" style="background: ${isHighRated ? 'linear-gradient(135deg, var(--accent-pink), #ff758c)' : 'linear-gradient(135deg, var(--primary-blue), #4cc9f0)'};">
                         <img src="assets/logo_white.png" style="width: 70%; height: 70%; object-fit: contain;">
                     </div>
                     ${isHighRated ? `<div class="marker-label-floating" style="position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); background: white; padding: 2px 10px; border-radius: 10px; font-size: 10px; font-weight: 800; color: var(--primary-navy); white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #eee;">${loc.name}</div>` : ''}
@@ -164,10 +166,10 @@ window.KindrMap = {
                     </div>
                     
                     <div class="popup-actions" style="display: flex; flex-direction: column; gap: 8px;">
-                        <button class="btn-primary small full-width" style="padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 700;" onclick="window.KindrMap.showAddSiteModal(${loc.lat}, ${loc.lng}, '${loc.name.replace(/'/g, "\\'")}')">
+                        <button class="btn-primary small full-width" style="padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 700;" onclick="window.KidoaMap.showAddSiteModal(${loc.lat}, ${loc.lng}, '${loc.name.replace(/'/g, "\\'")}')">
                             ✍️ Escribir Reseña
                         </button>
-                        <button class="btn-secondary small full-width" style="background: #f0f4f8; color: var(--primary-navy); border: none; padding: 10px; border-radius: 10px; font-size: 11px; font-weight: 700;" onclick="window.KindrMap.openExternal('${loc.name.replace(/'/g, "\\'")}', ${loc.lat}, ${loc.lng})">
+                        <button class="btn-secondary small full-width" style="background: #f0f4f8; color: var(--primary-navy); border: none; padding: 10px; border-radius: 10px; font-size: 11px; font-weight: 700;" onclick="window.KidoaMap.openExternal('${loc.name.replace(/'/g, "\\'")}', ${loc.lat}, ${loc.lng})">
                             🚙 Cómo llegar
                         </button>
                     </div>
@@ -175,16 +177,16 @@ window.KindrMap = {
             </div>
         `;
 
-        const marker = L.marker([loc.lat, loc.lng], { icon: kindrIcon }).addTo(window.KindrMap.instance);
+        const marker = L.marker([loc.lat, loc.lng], { icon: kidoaIcon }).addTo(window.KidoaMap.instance);
         marker.bindPopup(popupContent, { maxWidth: 300, className: 'premium-popup-wrap' });
         return marker;
     },
 
     showAddSiteModal: (lat, lng, name = "") => {
-        const user = window.KindrAuth.checkAuth();
+        const user = window.KidoaAuth.checkAuth();
         if (!user) {
             alert("Necesitas estar registrado para añadir o reseñar sitios.");
-            window.KindrAuth.renderAuthModal();
+            window.KidoaAuth.renderAuthModal();
             return;
         }
 
@@ -275,14 +277,14 @@ window.KindrMap = {
             }
 
             // SAVE Logic (Mock for now, points rewarded)
-            window.KindrPoints.addPoints('REVIEW');
+            window.KidoaPoints.addPoints('REVIEW');
             if (document.getElementById('media-input').files.length > 0) {
-                window.KindrPoints.addPoints('PHOTO_VIDEO');
+                window.KidoaPoints.addPoints('PHOTO_VIDEO');
             }
 
             // Create a marker on the fly if it was a new site
             if (!name) {
-                window.KindrMap.createMarker({
+                window.KidoaMap.createMarker({
                     name: finalName,
                     lat: lat,
                     lng: lng,
@@ -300,17 +302,17 @@ window.KindrMap = {
     },
 
     clearMarkers: () => {
-        window.KindrMap.markers.forEach(m => window.KindrMap.instance.removeLayer(m.instance));
-        window.KindrMap.markers = [];
+        window.KidoaMap.markers.forEach(m => window.KidoaMap.instance.removeLayer(m.instance));
+        window.KidoaMap.markers = [];
     },
 
     filterMarkers: (type) => {
-        window.KindrMap.currentFilter = type;
-        window.KindrMap.markers.forEach(m => {
+        window.KidoaMap.currentFilter = type;
+        window.KidoaMap.markers.forEach(m => {
             if (type === 'all' || m.data.type === type) {
-                if (!window.KindrMap.instance.hasLayer(m.instance)) m.instance.addTo(window.KindrMap.instance);
+                if (!window.KidoaMap.instance.hasLayer(m.instance)) m.instance.addTo(window.KidoaMap.instance);
             } else {
-                window.KindrMap.instance.removeLayer(m.instance);
+                window.KidoaMap.instance.removeLayer(m.instance);
             }
         });
     },
@@ -324,26 +326,26 @@ window.KindrMap = {
 
         // MAGIC: Use Gemini for Intent Analysis
         try {
-            const intent = await window.KindrMap.analyzeWithGemini(query);
+            const intent = await window.KidoaMap.analyzeWithGemini(query);
             console.log("Gemini Intent:", intent);
 
             if (intent.type === 'geocoding') {
-                await window.KindrMap.performGeocoding(intent.location);
+                await window.KidoaMap.performGeocoding(intent.location);
             } else if (intent.type === 'category') {
-                window.KindrMap.filterMarkers(intent.category);
+                window.KidoaMap.filterMarkers(intent.category);
                 // Fly to best center for that category
-                const filtered = window.KindrMap.markers.filter(m => m.data.type === intent.category);
+                const filtered = window.KidoaMap.markers.filter(m => m.data.type === intent.category);
                 if (filtered.length > 0) {
                     const group = new L.featureGroup(filtered.map(f => f.instance));
-                    window.KindrMap.instance.fitBounds(group.getBounds().pad(0.5));
+                    window.KidoaMap.instance.fitBounds(group.getBounds().pad(0.5));
                 }
             } else {
                 // Default to photon geocoding
-                await window.KindrMap.performGeocoding(query);
+                await window.KidoaMap.performGeocoding(query);
             }
         } catch (e) {
             console.error("Gemini Search Failed, falling back to basic:", e);
-            await window.KindrMap.performGeocoding(query);
+            await window.KidoaMap.performGeocoding(query);
         } finally {
             input.disabled = false;
             input.placeholder = "Busca lo que quieras...";
@@ -365,7 +367,7 @@ window.KindrMap = {
             return { type: "geocoding", location: query };
         }
 
-        const prompt = `Analiza esta búsqueda de un usuario en KINDR (App de crianza): "${query}". 
+        const prompt = `Analiza esta búsqueda de un usuario en KIDOA (App de crianza): "${query}". 
         Devuelve SOLO un JSON con este formato:
         { 
           "type": "geocoding" | "category" | "semantic", 
@@ -411,7 +413,77 @@ window.KindrMap = {
 
         if (data.features && data.features.length > 0) {
             const coord = data.features[0].geometry.coordinates;
-            window.KindrMap.instance.flyTo([coord[1], coord[0]], 15);
+            window.KidoaMap.instance.flyTo([coord[1], coord[0]], 15);
+        }
+    },
+
+    toggleNavMode: () => {
+        const btn = document.getElementById('nav-mode-btn');
+        const mapViewport = document.getElementById('map-viewport-v11');
+
+        if (window.KidoaMap.isNavModeActive) {
+            // Disable
+            window.KidoaMap.isNavModeActive = false;
+            btn.classList.remove('active');
+            btn.innerHTML = '🚙 Navegar';
+            mapViewport.classList.remove('navigator-view');
+
+            if (window.KidoaMap.watchId) {
+                navigator.geolocation.clearWatch(window.KidoaMap.watchId);
+                window.KidoaMap.watchId = null;
+            }
+        } else {
+            // Enable
+            window.KidoaMap.isNavModeActive = true;
+            btn.classList.add('active');
+            btn.innerHTML = '🛑 Detener';
+            mapViewport.classList.add('navigator-view');
+
+            // Start continuous GPS tracking
+            window.KidoaMap.startGPSWatch();
+        }
+    },
+
+    startGPSWatch: () => {
+        if (!navigator.geolocation) return;
+
+        const input = document.getElementById('map-search-input');
+        if (input) input.placeholder = "Navegando GPS activo...";
+
+        if (window.KidoaMap.watchId) {
+            navigator.geolocation.clearWatch(window.KidoaMap.watchId);
+        }
+
+        window.KidoaMap.watchId = navigator.geolocation.watchPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                // Keep centering map on user in navigator mode
+                window.KidoaMap.instance.flyTo([lat, lng], 18, {
+                    animate: true,
+                    duration: 1.5
+                });
+
+                window.KidoaMap.updateUserIcon(lat, lng);
+            },
+            (err) => console.warn("GPS falló:", err),
+            { enableHighAccuracy: true, maximumAge: 0 }
+        );
+    },
+
+    updateUserIcon: (lat, lng) => {
+        if (!window.KidoaMap.userMarker) {
+            const familyIcon = L.divIcon({
+                className: 'family-loc-icon',
+                html: '<div class="family-car-icon">🚙💨</div>',
+                iconSize: [40, 40],
+                iconAnchor: [20, 20]
+            });
+            window.KidoaMap.userMarker = L.marker([lat, lng], { icon: familyIcon, zIndexOffset: 1000 }).addTo(window.KidoaMap.instance);
+            window.KidoaMap.userMarker.bindPopup('<div style="font-weight:bold;color:var(--primary-navy)">¡De camino en familia!</div>');
+        } else {
+            window.KidoaMap.userMarker.setLatLng([lat, lng]);
         }
     },
 
@@ -428,23 +500,9 @@ window.KindrMap = {
             (position) => {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
-                // Efecto de visualización suave hacia la ubicación
-                window.KindrMap.instance.setView([lat, lng], 16);
+                window.KidoaMap.instance.setView([lat, lng], 16);
 
-                // Añadir un marcador de usuario en tiempo real si no existe
-                if (!window.KindrMap.userMarker) {
-                    const userIcon = L.divIcon({
-                        className: 'user-loc-icon',
-                        html: '<div style="width:20px;height:20px;background:#4CC9F0;border-radius:50%;border:3px solid white;box-shadow:0 0 10px rgba(0,0,0,0.5); animation: pulse 1.5s infinite;"></div>',
-                        iconSize: [20, 20],
-                        iconAnchor: [10, 10]
-                    });
-                    window.KindrMap.userMarker = L.marker([lat, lng], { icon: userIcon, zIndexOffset: 1000 }).addTo(window.KindrMap.instance);
-                    window.KindrMap.userMarker.bindPopup('<div style="font-weight:bold;color:var(--primary-navy)">¡Estás aquí!</div>').openPopup();
-                } else {
-                    window.KindrMap.userMarker.setLatLng([lat, lng]);
-                    window.KindrMap.userMarker.openPopup();
-                }
+                window.KidoaMap.updateUserIcon(lat, lng);
 
                 if (input) input.placeholder = "Pregunta lo que necesites...";
             },
@@ -469,7 +527,7 @@ window.KindrMap = {
         try {
             if (navigator.permissions && navigator.permissions.query) {
                 navigator.permissions.query({ name: 'geolocation' }).then(result => {
-                    if (result.state === 'granted') window.KindrMap.locateUser();
+                    if (result.state === 'granted') window.KidoaMap.locateUser();
                 }).catch(e => console.warn('Geolocation permission query failed:', e));
             }
         } catch (e) {
