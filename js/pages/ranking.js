@@ -161,9 +161,22 @@ window.KidoaRanking = {
         window.KidoaApp.navigate('map');
         setTimeout(() => {
             if (window.KidoaMap && window.KidoaMap.instance) {
-                window.KidoaMap.instance.flyTo([lat, lng], 16, { animate: true, duration: 2 });
-                const m = window.KidoaMap.markers.find(m => m.data.id === id || (m.data.lat === lat && m.data.lng === lng));
-                if (m) m.instance.openPopup();
+                window.KidoaMap.instance.flyTo({
+                    center: [lng, lat],
+                    zoom: 16,
+                    pitch: 0,
+                    animate: true,
+                    duration: 2000
+                });
+
+                // Wait for flyto to finish or markers to load
+                setTimeout(() => {
+                    const m = window.KidoaMap.markers.find(m =>
+                        (m.data && m.data.id && String(m.data.id) === String(id)) ||
+                        (m.data && Math.abs(m.data.lat - lat) < 0.0001 && Math.abs(m.data.lng - lng) < 0.0001)
+                    );
+                    if (m) m.instance.togglePopup();
+                }, 1000);
             }
         }, 600);
     }

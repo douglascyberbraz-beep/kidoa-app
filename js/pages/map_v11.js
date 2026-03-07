@@ -29,7 +29,7 @@ window.KidoaMap = {
                 style: 'https://demotiles.maplibre.org/style.json',
                 center: [-4.7286, 41.6520],
                 zoom: 15,
-                pitch: 40, // Elegant 40-degree tilt
+                pitch: 0, // Traditional flat view
                 bearing: 0,
                 antialias: true
             });
@@ -54,7 +54,6 @@ window.KidoaMap = {
                 window.KidoaMap.injectUI(container);
                 await window.KidoaMap.loadMarkers();
                 window.KidoaMap.startGPSWatch();
-                window.KidoaMap.initGyro();
             });
 
             window.KidoaMap.instance.on('dblclick', (e) => {
@@ -62,25 +61,8 @@ window.KidoaMap = {
             });
 
         } catch (e) {
-            console.error("KidoaMap 3D Init Failed:", e);
-            container.innerHTML = `<div class="p-20 center-text"><h3>Cargando Mapa 3D...</h3></div>`;
-        }
-    },
-
-    initGyro: () => {
-        if (window.DeviceOrientationEvent) {
-            window.addEventListener('deviceorientation', (e) => {
-                if (!window.KidoaMap.instance || window.KidoaApp.currentPage !== 'map') return;
-                // alpha: rotation around z-axis (compass), beta: front-to-back tilt
-                if (e.alpha !== null) {
-                    window.KidoaMap.instance.setBearing(e.alpha);
-                }
-                if (e.beta !== null) {
-                    // Normalize beta (0-90) to map pitch (30-60)
-                    const normalizedPitch = Math.min(Math.max(30, e.beta), 60);
-                    window.KidoaMap.instance.setPitch(normalizedPitch);
-                }
-            }, true);
+            console.error("KidoaMap Init Failed:", e);
+            container.innerHTML = `<div class="p-20 center-text"><h3>Cargando Mapa...</h3></div>`;
         }
     },
 
@@ -120,7 +102,7 @@ window.KidoaMap = {
         container.appendChild(compassBtn);
 
         compassBtn.onclick = () => {
-            window.KidoaMap.instance.easeTo({ bearing: 0, pitch: 45, duration: 1000 });
+            window.KidoaMap.instance.easeTo({ bearing: 0, pitch: 0, duration: 1000 });
         };
 
         const input = document.getElementById('map-search-input');
@@ -131,7 +113,7 @@ window.KidoaMap = {
         document.getElementById('locate-me-btn').addEventListener('click', () => {
             if (window.KidoaMap.userMarker) {
                 const lngLat = window.KidoaMap.userMarker.getLngLat();
-                window.KidoaMap.instance.flyTo({ center: lngLat, zoom: 18, pitch: 45, speed: 1.2 });
+                window.KidoaMap.instance.flyTo({ center: lngLat, zoom: 16, pitch: 0, speed: 1.2 });
             } else {
                 window.KidoaMap.locateUser();
             }
@@ -191,7 +173,7 @@ window.KidoaMap = {
             .setPopup(popup)
             .addTo(window.KidoaMap.instance);
 
-        window.KidoaMap.markers.push({ instance: marker, type: loc.type });
+        window.KidoaMap.markers.push({ instance: marker, type: loc.type, data: loc });
     },
 
     clearMarkers: () => {
@@ -276,7 +258,7 @@ window.KidoaMap = {
         navigator.geolocation.getCurrentPosition((pos) => {
             const lat = pos.coords.latitude;
             const lng = pos.coords.longitude;
-            window.KidoaMap.instance.flyTo({ center: [lng, lat], zoom: 17, pitch: 60 });
+            window.KidoaMap.instance.flyTo({ center: [lng, lat], zoom: 16, pitch: 0 });
             window.KidoaMap.updateUserIcon(lat, lng);
         });
     },

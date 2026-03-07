@@ -147,10 +147,22 @@ window.KidoaAI = {
     },
 
     _getMockData: (prompt) => {
-        // Fallback robusto para demos sin internet/clave
-        if (prompt.includes('noticia')) return [
-            { title: "Bono Cuidado Regional", summary: "Nuevas ayudas para la conciliación familiar disponibles este mes.", source: "https://ejemplo.es", sourceName: "BOE" }
+        // Fallback robusto para demos sin internet/clave - Centrado en Valladolid/Castilla y León
+        if (prompt.includes('Activities') || prompt.includes('Today')) return [
+            { id: 1, title: "Pícnic en el Campo Grande", summary: "Disfruta de una tarde entre pavos reales y patos en el corazón de Valladolid. ¡Llevad pan para los patos!", time: "16:00 - 19:00", location: "Parque Campo Grande", lat: 41.6444, lng: -4.7303, price: "Gratis", age: "Todas las edades" },
+            { id: 2, title: "Ruta de Fuentes Monumentales", summary: "Explora las fuentes más famosas del centro: desde la Fuente de Cervantes hasta la Plaza Mayor.", time: "Mañana o Tarde", location: "Plaza Mayor", lat: 41.6525, lng: -4.7286, price: "Gratis", age: "6-12 años" },
+            { id: 3, title: "Visita al Museo de la Ciencia", summary: "Descubre el planetario y las salas interactivas. Ideal para un día nublado.", time: "10:00 - 18:00", location: "Museo de la Ciencia", lat: 41.6385, lng: -4.7431, price: "5€", age: "4-15 años" }
         ];
+
+        if (prompt.includes('News') || prompt.includes('Noticias')) return [
+            { id: 101, title: "Nuevas ayudas a la Conciliación JCYL", summary: "La Junta de Castilla y León anuncia el nuevo programa de apoyo para familias con niños menores de 3 años.", source: "https://www.jcyl.es", sourceName: "Junta de Castilla y León", date: "Hoy" },
+            { id: 102, title: "Valladolid amplía carriles bici escolares", summary: "El ayuntamiento mejora la seguridad en los accesos a los centros educativos del barrio de Parquesol.", source: "https://www.valladolid.es", sourceName: "Ayto. Valladolid", date: "Ayer" }
+        ];
+
+        if (prompt.includes('Events')) return [
+            { id: 201, title: "Taller de Teatro Infantil", date: "Próximo Sábado", location: "Teatro Calderón", price: "3€", lat: 41.6550, lng: -4.7240 }
+        ];
+
         return [];
     }
 };

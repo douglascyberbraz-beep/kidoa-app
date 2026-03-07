@@ -79,7 +79,7 @@ window.KidoaProfile = {
                             <h3>Tu Código Mágico</h3>
                             <p>Cópialo y envíalo a tus grupos de WhatsApp</p>
                         </div>
-                        <div id="ref-code-display" class="ref-code-big">${user.referralCode}</div>
+                        <div id="ref-code-display" class="ref-code-big">${user.referralCode || 'AMIGOS2025'}</div>
                     </div>
                     <button id="copy-ref-link" class="btn-primary-gradient full-width">Copiar Enlace de Invitación</button>
                     <div id="referral-qr" class="qr-preview"></div>

@@ -109,7 +109,7 @@ window.KidoaToday = {
                             window.KidoaMap.instance.flyTo({
                                 center: [act.lng || -4.7286, act.lat || 41.6520],
                                 zoom: 17,
-                                pitch: 40,
+                                pitch: 0,
                                 speed: 1.5
                             });
                         }
