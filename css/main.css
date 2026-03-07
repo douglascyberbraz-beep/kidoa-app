@@ -336,11 +336,13 @@ body {
     overflow-x: auto;
     padding: 5px 15px 15px 15px;
     /* Added horizontal padding to prevent cut off */
-    width: 100%;
+    width: 100vw;
+    max-width: 600px;
     position: absolute;
     top: 75px;
     left: 0;
     z-index: 999;
+    box-sizing: border-box;
 }
 
 .map-filters::-webkit-scrollbar {
@@ -1926,10 +1928,8 @@ body {
 
 /* Clean Navigator Mode GPS Styles */
 .navigator-view .leaflet-pane.leaflet-map-pane {
-    transform: perspective(1000px) rotateX(45deg) scale(1.4) !important;
-    transform-origin: center calc(100% - 100px);
-    /* Lowered pivot so horizon is higher */
-    transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+    /* Perspective removed to make it native 2D flat Google style */
+    transition: transform 0.5s ease;
 }
 
 .kidoa-map-tiles.nav-brand-mode {
