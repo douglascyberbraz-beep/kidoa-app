@@ -22,7 +22,16 @@ window.KidoaNewsEvents = {
         const content = document.getElementById('news-events-content');
         const locStatus = document.getElementById('loc-status');
 
+        // Reactive Sync
+        window.addEventListener('kidoa-location-sync', (e) => {
+            if (window.KidoaApp.currentPage === 'news_events') {
+                locStatus.innerText = "📍 Información de tu zona sincronizada";
+                loadContent(currentTab || 'news');
+            }
+        });
+
         const loadContent = async (tab) => {
+            currentTab = tab;
             content.innerHTML = '<div class="center-text p-20"><div class="typing-dots"><span></span><span></span><span></span></div><p>Cargando información personalizada...</p></div>';
 
             let coords = window.lastKnownCoords || "41.6520, -4.7286";

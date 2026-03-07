@@ -29,7 +29,7 @@ window.KidoaMap = {
                 style: 'https://demotiles.maplibre.org/style.json',
                 center: [-4.7286, 41.6520],
                 zoom: 15,
-                pitch: 45, // Back to morning pitch
+                pitch: 40, // Elegant 40-degree tilt
                 bearing: 0,
                 antialias: true
             });
@@ -54,6 +54,7 @@ window.KidoaMap = {
                 window.KidoaMap.injectUI(container);
                 await window.KidoaMap.loadMarkers();
                 window.KidoaMap.startGPSWatch();
+                window.KidoaMap.initGyro();
             });
 
             window.KidoaMap.instance.on('dblclick', (e) => {
@@ -63,6 +64,23 @@ window.KidoaMap = {
         } catch (e) {
             console.error("KidoaMap 3D Init Failed:", e);
             container.innerHTML = `<div class="p-20 center-text"><h3>Cargando Mapa 3D...</h3></div>`;
+        }
+    },
+
+    initGyro: () => {
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', (e) => {
+                if (!window.KidoaMap.instance || window.KidoaApp.currentPage !== 'map') return;
+                // alpha: rotation around z-axis (compass), beta: front-to-back tilt
+                if (e.alpha !== null) {
+                    window.KidoaMap.instance.setBearing(e.alpha);
+                }
+                if (e.beta !== null) {
+                    // Normalize beta (0-90) to map pitch (30-60)
+                    const normalizedPitch = Math.min(Math.max(30, e.beta), 60);
+                    window.KidoaMap.instance.setPitch(normalizedPitch);
+                }
+            }, true);
         }
     },
 
@@ -221,7 +239,13 @@ window.KidoaMap = {
         navigator.geolocation.watchPosition((pos) => {
             const lat = pos.coords.latitude;
             const lng = pos.coords.longitude;
-            window.lastKnownCoords = `${lat}, ${lng}`; // Use global standard
+            const newCoords = `${lat}, ${lng}`;
+
+            if (window.lastKnownCoords !== newCoords) {
+                window.lastKnownCoords = newCoords;
+                window.dispatchEvent(new CustomEvent('kidoa-location-sync', { detail: newCoords }));
+            }
+
             window.KidoaMap.updateUserIcon(lat, lng);
             if (pos.coords.heading !== null) {
                 window.KidoaMap.instance.easeTo({ bearing: pos.coords.heading, duration: 1000 });
