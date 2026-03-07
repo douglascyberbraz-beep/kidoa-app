@@ -160,7 +160,13 @@ window.KidoaMap = {
     },
 
     loadMarkers: async () => {
-        const locations = await window.KidoaData.getLocations();
+        let coords = "41.6520, -4.7286";
+        if (window.KidoaMap.userMarker) {
+            const pos = window.KidoaMap.userMarker.getLatLng();
+            coords = `${pos.lat}, ${pos.lng}`;
+        }
+
+        const locations = await window.KidoaData.getLocations(coords);
         window.KidoaMap.clearMarkers();
 
         locations.forEach(loc => {
@@ -358,25 +364,31 @@ window.KidoaMap = {
 
         const input = document.getElementById('map-search-input');
         input.disabled = true;
-        input.placeholder = "IA Gemini analizando...";
+        input.placeholder = "✨ Kidoa IA pensando...";
 
-        // MAGIC: Use Gemini for Intent Analysis
         try {
-            const intent = await window.KidoaMap.analyzeWithGemini(query);
-            console.log("Gemini Intent:", intent);
+            let coords = "41.6520, -4.7286";
+            if (window.KidoaMap.userMarker) {
+                const pos = window.KidoaMap.userMarker.getLatLng();
+                coords = `${pos.lat}, ${pos.lng}`;
+            }
 
-            if (intent.type === 'geocoding') {
-                await window.KidoaMap.performGeocoding(intent.location);
-            } else if (intent.type === 'category') {
-                window.KidoaMap.filterMarkers(intent.category);
-                // Fly to best center for that category
-                const filtered = window.KidoaMap.markers.filter(m => m.data.type === intent.category);
-                if (filtered.length > 0) {
-                    const group = new L.featureGroup(filtered.map(f => f.instance));
-                    window.KidoaMap.instance.fitBounds(group.getBounds().pad(0.5));
+            const results = await window.KidoaData.searchLocations(query, coords);
+
+            if (results && results.length > 0) {
+                // Clear old and put new AI generated pins
+                window.KidoaMap.clearMarkers();
+                results.forEach(loc => {
+                    const marker = window.KidoaMap.createMarker(loc);
+                    window.KidoaMap.markers.push({ instance: marker, data: loc });
+                });
+
+                // Fly to first logical result
+                if (results[0].lat && results[0].lng) {
+                    window.KidoaMap.instance.flyTo([results[0].lat, results[0].lng], 14, { animate: true });
                 }
             } else {
-                // Default to photon geocoding
+                // Fallback to strict geocoding if AI fails or returns empty
                 await window.KidoaMap.performGeocoding(query);
             }
         } catch (e) {
@@ -384,7 +396,8 @@ window.KidoaMap = {
             await window.KidoaMap.performGeocoding(query);
         } finally {
             input.disabled = false;
-            input.placeholder = "Busca lo que quieras...";
+            input.placeholder = "Pregunta a Gemini o busca un lugar...";
+            input.value = "";
         }
     },
 

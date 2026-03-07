@@ -33,6 +33,27 @@ window.KidoaAI = {
         return await window.KidoaAI._callGemini(prompt);
     },
 
+    // Generador Dinámico de Mapa (Basado en Coordenadas)
+    getDynamicLocations: async (coordinates = "41.6520, -4.7286") => {
+        const prompt = `Actúa como guía turístico local familiar. Genera 8 sitios reales increíbles para ir con niños (parques, museos, ludotecas, restaurantes kid-friendly) en un radio cercano de las coordenadas GPS: ${coordinates}.
+        Devuélvelos en formato JSON estricto para mapearlos directamente.
+        Asegúrate de incluir sus nombres reales locales, no te inventes nombres de comercios si no existen, dales coordenadas muy cercanas al usuario.
+        Formato esperado:
+        [ { "id": UID_NUMERICO_UNICO, "name": "Nombre Real", "type": "park"|"museum"|"school"|"theater"|"kidzone"|"food", "lat": NUMERO, "lng": NUMERO, "rating": NUMERO_4_A_5, "reviews": NUMERO } ]`;
+
+        return await window.KidoaAI._callGemini(prompt);
+    },
+
+    // Búsqueda Semántica Dinámica
+    searchDynamicLocations: async (query, coordinates = "41.6520, -4.7286") => {
+        const prompt = `El usuario, ubicado en las coordenadas: ${coordinates}, ha buscado: "${query}".
+        Recomienda 4 o 5 lugares locales reales que resuelvan perfectamente esta necesidad.
+        Formato esperado JSON:
+        [ { "id": UID_NUMERICO_UNICO, "name": "Nombre Real", "type": "park"|"museum"|"school"|"theater"|"kidzone"|"food"|"generic", "lat": NUMERO, "lng": NUMERO, "rating": 4.8, "reviews": 120 } ]`;
+
+        return await window.KidoaAI._callGemini(prompt);
+    },
+
     // Chat Especializado
     chat: async (userMessage, history = []) => {
         const prompt = `${window.KidoaAI.SYSTEM_PROMPT}\n\nHistorial: ${JSON.stringify(history)}\nUsuario: ${userMessage}`;

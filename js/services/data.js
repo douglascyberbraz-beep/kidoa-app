@@ -4,29 +4,38 @@
 window.KidoaData = {
 
     // -- LOCATIONS --
-    getLocations: async () => {
+    getLocations: async (coords = "41.6520, -4.7286") => {
         try {
+            // Priority: Dynamic AI Generation
+            if (window.GEMINI_KEY && !window.GEMINI_KEY.includes('PEGAR_AQUI')) {
+                const dynamicLocs = await window.KidoaAI.getDynamicLocations(coords);
+                if (dynamicLocs && dynamicLocs.length > 0) return dynamicLocs;
+            }
+
+            // Fallback: Firestore
             const snap = await window.KidoaDB.collection('locations').get();
             if (!snap.empty) {
                 return snap.docs.map(d => ({ id: d.id, ...d.data() }));
             }
         } catch (e) {
-            console.warn("Firestore getLocations fallback:", e);
+            console.warn("AI/Firestore getLocations fallback:", e);
         }
-        // Fallback estático ENRIQUECIDO
+        // Fallback: Default Static
         return [
-            { id: 101, name: "Campo Grande", type: "park", lat: 41.6444, lng: -4.7303, rating: 4.8, reviews: 245, image: "https://images.unsplash.com/photo-1596431718100-33671233075c?auto=format&fit=crop&w=400" },
-            { id: 102, name: "Museo de la Ciencia", type: "museum", lat: 41.6385, lng: -4.7431, rating: 4.6, reviews: 189, image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400" },
-            { id: 103, name: "Parque Ribera de Castilla", type: "park", lat: 41.6661, lng: -4.7171, rating: 4.3, reviews: 92 },
-            { id: 301, name: "Escuela Infantil Municipal 'Fantasía'", type: "school", lat: 41.6580, lng: -4.7250, rating: 4.9, reviews: 42 },
-            { id: 302, name: "CEIP Miguel de Cervantes", type: "school", lat: 41.6410, lng: -4.7180, rating: 4.7, reviews: 156 },
-            { id: 401, name: "Teatro Calderón (Sesión Infantil)", type: "theater", lat: 41.6545, lng: -4.7265, rating: 4.8, reviews: 310 },
-            { id: 402, name: "Cines Broadway (Kids)", type: "cinema", lat: 41.6480, lng: -4.7320, rating: 4.5, reviews: 88 },
-            { id: 501, name: "Zona Infantil Plaza Mayor", type: "kidzone", lat: 41.6525, lng: -4.7285, rating: 4.6, reviews: 520 },
-            { id: 502, name: "Ludoteca 'El Recreo'", type: "kidzone", lat: 41.6595, lng: -4.7380, rating: 4.7, reviews: 75 },
-            { id: 104, name: "Pizza y Come (Kid Friendly)", type: "food", lat: 41.6525, lng: -4.7280, rating: 4.5, reviews: 56 },
-            { id: 105, name: "Ludoteca Arco Iris", type: "kidzone", lat: 41.6492, lng: -4.7350, rating: 4.7, reviews: 34 }
+            { id: 101, name: "Campo Grande (Estático)", type: "park", lat: 41.6444, lng: -4.7303, rating: 4.8, reviews: 245, image: "https://images.unsplash.com/photo-1596431718100-33671233075c?auto=format&fit=crop&w=400" },
+            { id: 102, name: "Museo de la Ciencia", type: "museum", lat: 41.6385, lng: -4.7431, rating: 4.6, reviews: 189, image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400" }
         ];
+    },
+
+    searchLocations: async (query, coords = "41.6520, -4.7286") => {
+        try {
+            if (window.GEMINI_KEY && !window.GEMINI_KEY.includes('PEGAR_AQUI')) {
+                return await window.KidoaAI.searchDynamicLocations(query, coords);
+            }
+        } catch (e) {
+            console.warn("AI searchLocations fallback:", e);
+        }
+        return []; // Empty means fallback to local filtering in UI
     },
 
     // -- NEWS --
