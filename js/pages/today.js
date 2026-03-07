@@ -51,20 +51,32 @@ window.KidoaToday = {
         fetchAndRender(initialCoords);
 
         const renderActivities = (activities) => {
-            const card = document.createElement('div');
-            card.className = 'today-card premium-glass entry-anim';
-            card.style.animationDelay = `${idx * 0.1}s`;
-            card.style.padding = '20px';
-            card.style.borderRadius = '24px';
-            card.style.marginBottom = '15px';
-            card.style.border = '1px solid rgba(255,255,255,0.6)';
-            card.style.boxShadow = 'var(--shadow-medium)';
-            card.style.position = 'relative';
+            if (!activities || activities.length === 0) {
+                content.innerHTML = `
+                    <div class="center-text p-40 text-light entry-anim">
+                        <span style="font-size: 3rem;">🏜️</span>
+                        <p>No se han encontrado planes para hoy en tu zona.</p>
+                        <button class="btn-text" onclick="window.KidoaApp.loadPage('today')" style="margin-top:20px; text-decoration:underline;">Reintentar</button>
+                    </div>`;
+                return;
+            }
 
-            const priceText = act.price || 'Gratis';
-            const isFree = priceText.toLowerCase().includes('grat');
+            content.innerHTML = '';
+            activities.forEach((act, idx) => {
+                const card = document.createElement('div');
+                card.className = 'today-card premium-glass entry-anim';
+                card.style.animationDelay = `${idx * 0.1}s`;
+                card.style.padding = '20px';
+                card.style.borderRadius = '24px';
+                card.style.marginBottom = '15px';
+                card.style.border = '1px solid rgba(255,255,255,0.6)';
+                card.style.boxShadow = 'var(--shadow-medium)';
+                card.style.position = 'relative';
 
-            card.innerHTML = `
+                const priceText = act.price || 'Gratis';
+                const isFree = priceText.toLowerCase().includes('grat');
+
+                card.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
                         <span style="background: rgba(76, 201, 240, 0.15); color: var(--primary-navy); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;">${act.age || 'Para todos'}</span>
                         <span style="font-size: 11px; font-weight: 700; color: ${isFree ? '#27AE60' : '#E67E22'};">${priceText}</span>
@@ -88,28 +100,25 @@ window.KidoaToday = {
                     </div>
                 `;
 
-            content.appendChild(card);
+                content.appendChild(card);
 
-            const goToMap = () => {
-                window.KidoaApp.loadPage('map');
-                setTimeout(() => {
-                    if (window.KidoaMap && window.KidoaMap.instance) {
-                        window.KidoaMap.instance.flyTo({
-                            center: [act.lng || -4.7286, act.lat || 41.6520],
-                            zoom: 17,
-                            pitch: 45,
-                            speed: 1.5
-                        });
-                    }
-                }, 500);
-            };
+                const goToMap = () => {
+                    window.KidoaApp.loadPage('map');
+                    setTimeout(() => {
+                        if (window.KidoaMap && window.KidoaMap.instance) {
+                            window.KidoaMap.instance.flyTo({
+                                center: [act.lng || -4.7286, act.lat || 41.6520],
+                                zoom: 17,
+                                pitch: 40,
+                                speed: 1.5
+                            });
+                        }
+                    }, 500);
+                };
 
-            document.getElementById(`loc-btn-${idx}`).onclick = goToMap;
-            document.getElementById(`map-btn-${idx}`).onclick = goToMap;
-        });
-    } catch(err) {
-        console.error("TODAY Load Error:", err);
-        content.innerHTML = '<div class="center-text p-40">Error al cargar planes. Reintenta pronto o verifica tu conexión.</div>';
+                document.getElementById(`loc-btn-${idx}`).onclick = goToMap;
+                document.getElementById(`map-btn-${idx}`).onclick = goToMap;
+            });
+        };
     }
-}
 };
