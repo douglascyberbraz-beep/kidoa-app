@@ -16,7 +16,7 @@
     <link href='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css' rel='stylesheet' />
 
     <!-- App CSS -->
-    <link rel="stylesheet" href="css/main.css?v=1.2.4">
+    <link rel="stylesheet" href="css/main.css?v=1.2.5">
 
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -39,7 +39,7 @@
                         regs.forEach(reg => reg.unregister());
                     });
                 }
-                localStorage.setItem('kidoa_migrated_v5', 'true');
+                localStorage.setItem('kidoa_migrated_v6', 'true');
                 // Force a true hard reload from server
                 setTimeout(() => {
                     window.location.href = window.location.href.split('#')[0] + (window.location.href.includes('?') ? '&' : '?') + 'nocache=' + new Date().getTime();
@@ -154,8 +154,8 @@
                     setTimeout(() => window.location.reload(true), 500);
                 };
 
-                navigator.serviceWorker.register('sw.js?v=1.2.4').then(reg => {
-                    console.log('Service Worker v1.2.4 registrado');
+                navigator.serviceWorker.register('sw.js?v=1.2.5').then(reg => {
+                    console.log('Service Worker v1.2.5 registrado');
 
                     // Detect updates and reload
                     reg.addEventListener('updatefound', () => {

@@ -28,12 +28,12 @@ window.KidoaMap = {
                 container: container,
                 style: 'https://demotiles.maplibre.org/style.json',
                 center: [-4.7286, 41.6520],
-                zoom: 16,
-                pitch: 0, // Mapa clásico plano
+                zoom: 17,
+                pitch: 60, // Perspectiva GPS Waze-Dinamica
                 bearing: 0,
                 antialias: true,
-                pitchWithRotate: false,
-                maxPitch: 60
+                pitchWithRotate: true,
+                maxPitch: 85
             });
 
             window.KidoaMap.instance.on('load', async () => {
@@ -108,7 +108,7 @@ window.KidoaMap = {
         document.getElementById('locate-me-btn').addEventListener('click', () => {
             if (window.KidoaMap.userMarker) {
                 const lngLat = window.KidoaMap.userMarker.getLngLat();
-                window.KidoaMap.instance.flyTo({ center: lngLat, zoom: 16, pitch: 0, speed: 1.2 });
+                window.KidoaMap.instance.easeTo({ center: lngLat, zoom: 18, pitch: 60, speed: 1.2 });
             } else {
                 window.KidoaMap.locateUser();
             }
@@ -194,14 +194,14 @@ window.KidoaMap = {
             if (results && results.length > 0) {
                 window.KidoaMap.clearMarkers();
                 results.forEach(loc => window.KidoaMap.createMarker(loc));
-                window.KidoaMap.instance.flyTo({ center: [results[0].lng, results[0].lat], zoom: 16, pitch: 0, speed: 1.0 });
+                window.KidoaMap.instance.flyTo({ center: [results[0].lng, results[0].lat], zoom: 17, pitch: 60, speed: 1.0 });
             } else {
                 // geocoding fallback
                 const resp = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=1`);
                 const data = await resp.json();
                 if (data.features && data.features.length > 0) {
                     const c = data.features[0].geometry.coordinates;
-                    window.KidoaMap.instance.flyTo({ center: c, zoom: 16 });
+                    window.KidoaMap.instance.flyTo({ center: c, zoom: 17, pitch: 60 });
                 }
             }
         } catch (e) { console.warn("Search error:", e); }
@@ -241,50 +241,48 @@ window.KidoaMap = {
             lastLat = lat;
             lastLng = lng;
 
-            window.KidoaMap.updateUserIcon(lat, lng);
+            window.KidoaMap.updateUserIcon(lat, lng, heading); // Pass the updated heading to the marker physically
 
             window.KidoaMap.instance.easeTo({
                 center: [lng, lat],
-                bearing: 0, // Mantenemos el Norte arriba en modo clásico a menos que se rote manualmente
-                pitch: 0,
-                zoom: 16,
-                duration: 1000
+                bearing: heading || window.KidoaMap.instance.getBearing(), // Auto-rotación Waze si nos movemos
+                pitch: 60,
+                zoom: 18,
+                duration: 1200
             });
         }, null, { enableHighAccuracy: true });
     },
 
-    updateUserIcon: (lat, lng) => {
+    updateUserIcon: (lat, lng, heading = 0) => {
         if (!window.KidoaMap.userMarker) {
             const el = document.createElement('div');
             el.innerHTML = `
-                <div class="waze-nav-icon" style="
-                    width: 70px; height: 70px; 
-                    background: radial-gradient(circle, rgba(76,201,240,0.5) 0%, rgba(76,201,240,0) 70%); 
-                    border-radius: 50%; 
-                    display: flex; align-items: center; justify-content: center;
-                    animation: radar-pulse 2s infinite ease-out;
+                <div class="user-gps-arrow" style="
+                    width: 50px; height: 50px;
+                    background: radial-gradient(circle, rgba(0,255,150,0.3) 0%, transparent 70%);
+                    display: flex; justify-content: center; align-items: center;
+                    border-radius: 50%;
+                    transform: rotate(${heading}deg);
+                    transition: transform 0.3s ease-out;
                 ">
                     <div style="
-                        width: 0; height: 0; 
-                        border-left: 14px solid transparent;
-                        border-right: 14px solid transparent;
-                        border-bottom: 26px solid #FF3366; /* Hot pink arrow */
+                        width: 0; 
+                        height: 0; 
+                        border-left: 12px solid transparent;
+                        border-right: 12px solid transparent;
+                        border-bottom: 24px solid var(--accent-pink);
                         filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
                         transform: translateY(-4px);
                     "></div>
                 </div>
-                <style>
-                    @keyframes radar-pulse {
-                        0% { transform: scale(0.6) rotateX(45deg); opacity: 1; }
-                        100% { transform: scale(1.6) rotateX(45deg); opacity: 0; }
-                    }
-                </style>
             `;
             window.KidoaMap.userMarker = new maplibregl.Marker({ element: el, pitchAlignment: 'map', rotationAlignment: 'map' })
                 .setLngLat([lng, lat])
                 .addTo(window.KidoaMap.instance);
         } else {
             window.KidoaMap.userMarker.setLngLat([lng, lat]);
+            const arrow = window.KidoaMap.userMarker.getElement().querySelector('.user-gps-arrow');
+            if (arrow) arrow.style.transform = `rotate(${heading}deg)`;
         }
     },
 
@@ -299,7 +297,7 @@ window.KidoaMap = {
         navigator.geolocation.getCurrentPosition((pos) => {
             const lat = pos.coords.latitude;
             const lng = pos.coords.longitude;
-            window.KidoaMap.instance.flyTo({ center: [lng, lat], zoom: 16, pitch: 0 });
+            window.KidoaMap.instance.flyTo({ center: [lng, lat], zoom: 18, pitch: 60 });
             window.KidoaMap.updateUserIcon(lat, lng);
         });
     },

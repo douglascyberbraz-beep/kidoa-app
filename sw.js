@@ -1,5 +1,5 @@
-const CACHE_NAME = 'kidoa-cache-v1.2.4';
-const TILE_CACHE = 'kidoa-tiles-v1.2.4';
+const CACHE_NAME = 'kidoa-cache-v1.2.5';
+const TILE_CACHE = 'kidoa-tiles-v1.2.5';
 const ASSETS = [
     './',
     'index.html',
