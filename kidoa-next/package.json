@@ -28,9 +28,9 @@
     "@capacitor/cli": "^8.2.0",
     "@types/google.maps": "^3.58.1",
     "@types/react": "19.2.14",
-    "autoprefixer": "latest",
-    "postcss": "latest",
-    "tailwindcss": "latest",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.0",
     "typescript": "5.9.3"
   }
 }
