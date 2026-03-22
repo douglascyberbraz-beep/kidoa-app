@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useAppContext } from "../context/AppContext";
 
 const navItems = [
     { id: "map", label: "Mapa", icon: "🗺️" },
@@ -11,13 +12,18 @@ const navItems = [
 ];
 
 export default function BottomNav({ activePage, onNavigate }: { activePage: string, onNavigate: (id: string) => void }) {
+    const { playSound } = useAppContext();
+
     return (
         <div className="fixed bottom-[25px] left-1/2 -translate-x-1/2 w-[92%] max-w-[500px] h-[75px] bg-white/75 backdrop-blur-2xl rounded-[40px] flex justify-around items-center px-4 shadow-2xl z-[1500] border border-white/30">
             {navItems.map((item) => (
                 <motion.button
                     key={item.id}
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => onNavigate(item.id)}
+                    onClick={() => {
+                        playSound('click');
+                        onNavigate(item.id);
+                    }}
                     className={`relative flex flex-col items-center justify-center transition-colors duration-300 ${item.id === "map" ? "-mt-10" : ""} ${activePage === item.id ? "text-blue-900" : "text-slate-400"}`}
                 >
                     {item.id === "map" ? (

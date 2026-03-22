@@ -13,10 +13,12 @@ const firebaseConfig = {
 };
 
 // Use environment variables in a real production build
-const GEMINI_KEY = "AIzaSyDoOl7_ujmTvRmN_kuH8LcCP" + "qoYQGKsG9Y";
+const GEMINI_KEY = process.env.NEXT_PUBLIC_GEMINI_KEY || "";
+const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
+const MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAPS_ID || "";
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-export { auth, db, GEMINI_KEY };
+export { auth, db, GEMINI_KEY, GOOGLE_MAPS_API_KEY, MAP_ID };

@@ -35,39 +35,53 @@ export default function AppMain() {
 
     if (loading) return null;
 
+    const [targetDetails, setTargetDetails] = useState<any>(null);
+    const [targetCoords, setTargetCoords] = useState<string | null>(null);
+
+    const navigateToMap = (coords: string, details?: any) => {
+        setTargetDetails(details);
+        setTargetCoords(coords);
+        setCoords(coords);
+        setCurrentPage("map");
+    };
+
     return (
-        <main className="relative h-[100dvh] w-full max-w-[600px] mx-auto bg-white overflow-hidden shadow-2xl">
-            <AnimatePresence>
-                {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
-            </AnimatePresence>
-            
-            <AnimatePresence>
-                {!user && !showSplash && <AuthModal />}
-            </AnimatePresence>
-
-            <div className={`h-full w-full pb-[110px] transition-all duration-700 ${showSplash ? 'blur-lg scale-95' : 'blur-0 scale-100'}`}>
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={currentPage}
-                        variants={pageVariants}
-                        initial="initial"
-                        animate="animate"
-                        exit="exit"
-                        transition={{ duration: 0.4, ease: "circOut" }}
-                        className="h-full w-full"
+        <main className="fixed inset-0 bg-slate-100 overflow-hidden font-sans text-slate-900 select-none">
+            <AnimatePresence mode="wait">
+                {showSplash ? (
+                    <SplashScreen onComplete={() => setShowSplash(false)} />
+                ) : (
+                    <motion.div 
+                        key="content"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="h-full pt-4"
                     >
-                        {currentPage === "map" && <MapPage lastKnownCoords={coords} />}
-                        {currentPage === "today" && <TodayPage lastKnownCoords={coords} />}
-                        {currentPage === "tribu" && <TribuPage />}
-                        {currentPage === "safe" && <SafePage />}
-                        {currentPage === "profile" && <ProfilePage />}
-                    </motion.div>
-                </AnimatePresence>
-            </div>
+                        <header className="px-8 pb-4 flex justify-between items-center bg-white/50 backdrop-blur-md">
+                            <div className="flex items-center gap-2">
+                                <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center text-xl shadow-lg shadow-blue-500/20">🚀</div>
+                                <h1 className="text-2xl font-black text-blue-900 tracking-tighter">KIDOA</h1>
+                            </div>
+                            <div className="flex gap-2">
+                                <div className="bg-white/80 px-4 py-2 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-2">
+                                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Nivel {user?.level || 1}</span>
+                                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                                </div>
+                            </div>
+                        </header>
 
-            <BottomNav activePage={currentPage} onNavigate={setCurrentPage} />
+                        <div className="h-full">
+                            {currentPage === "map" && <MapPage lastKnownCoords={coords} targetCoords={targetCoords} targetDetails={targetDetails} />}
+                            {currentPage === "today" && <TodayPage lastKnownCoords={coords} onNavigateToMap={navigateToMap} />}
+                            {currentPage === "tribu" && <TribuPage />}
+                            {currentPage === "safe" && <SafePage lastKnownCoords={coords} />}
+                            {currentPage === "profile" && <ProfilePage />}
+                        </div>
+
+                        <BottomNav activePage={currentPage} onNavigate={(id) => setCurrentPage(id)} />
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </main>
     );
 }
-
-

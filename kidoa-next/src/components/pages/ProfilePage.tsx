@@ -1,12 +1,36 @@
 "use client";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useAppContext } from '../../context/AppContext';
 import { AuthService } from '../../services/auth_service';
+import AuthModal from "../AuthModal";
 
 export default function ProfilePage() {
     const { user, playSound } = useAppContext();
+    const [showAuth, setShowAuth] = useState(false);
     
-    if (!user) return null;
+    if (!user) {
+        return (
+            <div className="p-8 h-[70vh] flex flex-col items-center justify-center bg-slate-50 text-center">
+                <motion.div 
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="w-32 h-32 bg-blue-100 rounded-[40px] flex items-center justify-center text-6xl mb-6 shadow-inner tracking-tighter"
+                >
+                    💤
+                </motion.div>
+                <h2 className="text-2xl font-black text-blue-900 mb-2">Tu perfil está durmiendo</h2>
+                <p className="text-slate-500 font-medium mb-8 px-6">Identifícate para desbloquear insignias, niveles y planes personalizados.</p>
+                <button 
+                    onClick={() => { playSound('click'); setShowAuth(true); }}
+                    className="bg-blue-600 text-white font-black px-10 py-4 rounded-2xl shadow-xl shadow-blue-500/30 active:scale-95 transition-all"
+                >
+                    Entrar en Kidoa ✨
+                </button>
+                {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
+            </div>
+        );
+    }
 
     const progress = (user.points % 100);
 

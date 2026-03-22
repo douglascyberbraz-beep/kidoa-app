@@ -46,4 +46,46 @@ export class KidoaAI {
         `;
         return await this.callGemini(prompt, true);
     }
+
+    static async getNearbySafety(coords: string) {
+        const prompt = `
+            ENCUENTRA 3 HOSPITALES O PUESTOS DE POLICÍA REALES CERCA DE: ${coords} (Lat, Lng).
+            OBJETIVO: Ayuda a una familia en caso de emergencia.
+            FORMATO JSON: [{type: 'hospital'|'police', name, distance, status: 'Abierto 24h'|'Cerrado', address}]
+        `;
+        return await this.callGemini(prompt, true);
+    }
+
+    static async getNewsAndScholarships() {
+        const prompt = `
+            ACTÚA COMO UN PERIODISTA FAMILIAR. 
+            BUSCA Y DEVUELVE:
+            1. Una noticia real y positiva de hoy relevante para padres/familias (España/Global).
+            2. Una beca, ayuda o subvención familiar real y vigente (España).
+            FORMATO JSON: { 
+                news: { title, summary, source, url },
+                scholarship: { title, summary, deadline, url }
+            }
+        `;
+        return await this.callGemini(prompt, true);
+    }
+
+    static async tribeChat(message: string, context: any) {
+        const prompt = `
+            ACTÚA COMO "LA TRIBU": Una comunidad real de padres y expertos de Kidoa. 
+            CONTEXTO: Usuario ${context.nickname}, Nivel ${context.level}.
+            MENSAJE DEL USUARIO: "${message}"
+
+            OBJETIVO: Responde como UNO de los miembros de la comunidad. 
+            ELIGE UNA PERSONA AL AZAR (o la más adecuada):
+            1. "Marta (Guía Kidoa)": Sabia, empática, profesional.
+            2. "Carlos (Padre de 3)": Práctico, con humor, algo cansado pero feliz.
+            3. "Sofía (Psicóloga Infantil)": Enfocada en el desarrollo emocional, suave.
+            4. "Hugo (Explorador Pro)": Aventurero, buscador de ofertas y planes secretos.
+
+            FORMATO JSON OBLIGATORIO: { "persona": "nombre", "avatar": "emoji", "message": "texto" }
+            MÁXIMO 2 PÁRRAFOS.
+        `;
+        return await this.callGemini(prompt, true);
+    }
 }
