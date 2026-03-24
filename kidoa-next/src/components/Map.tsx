@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '../context/AppContext';
 import { DataService } from '../services/data_service';
 import { KidoaAI } from '../services/ai_service';
@@ -22,8 +23,10 @@ export default function KidoaMap({
     const map = useRef<maplibregl.Map | null>(null);
     const markersRef = useRef<{ instance: maplibregl.Marker, type: string, data: any }[]>([]);
     const userMarkerRef = useRef<maplibregl.Marker | null>(null);
+    const itineraryMarkersRef = useRef<maplibregl.Marker[]>([]);
     
     const [searchQuery, setSearchQuery] = useState("");
+    const [aiResponse, setAiResponse] = useState<string | null>(null);
     const [isSearching, setIsSearching] = useState(false);
     const [activeFilter, setActiveFilter] = useState("all");
     
@@ -156,30 +159,21 @@ export default function KidoaMap({
                         'type': 'fill-extrusion',
                         'minzoom': 15,
                         'paint': {
-                            'fill-extrusion-color': '#2a3a5a',
-                            'fill-extrusion-height': [
-                                'interpolate',
-                                ['linear'],
-                                ['zoom'],
-                                15,
-                                0,
-                                15.05,
-                                ['get', 'height']
-                            ],
-                            'fill-extrusion-base': [
-                                'interpolate',
-                                ['linear'],
-                                ['zoom'],
-                                15,
-                                0,
-                                15.05,
-                                ['get', 'min_height']
-                            ],
-                            'fill-extrusion-opacity': 0.8
+                            'fill-extrusion-color': '#334e62',
+                            'fill-extrusion-height': ['get', 'height'],
+                            'fill-extrusion-base': ['get', 'min_height'],
+                            'fill-extrusion-opacity': 0.9
                         }
                     },
                     labelLayerId
                 );
+
+                // Add Premium Sky & Fog
+                (map.current as any).setFog({
+                    'range': [0.5, 10],
+                    'color': '#1d2c4d',
+                    'horizon-blend': 0.1
+                });
             }
 
             loadMarkers();
@@ -251,30 +245,58 @@ export default function KidoaMap({
     const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && searchQuery.trim()) {
             setIsSearching(true);
+            setAiResponse(null);
+            clearItinerary();
+            
             try {
-                const prompt = `Busca las coordenadas (lat, lng) para el lugar: "${searchQuery}". 
-                Si es una búsqueda general (ej: "parques"), elige el punto más céntrico o relevante en Valladolid, España (o detecta la ciudad). 
-                Responde SOLO un JSON: {"lat": número, "lng": número, "name": "nombre real"}`;
-                
-                const res = await KidoaAI.callGemini(prompt, true);
-                if (res && res.lat && res.lng) {
+                const res = await KidoaAI.askMaps(searchQuery, lastKnownCoords);
+                if (res) {
                     playSound('success');
-                    map.current?.flyTo({
-                        center: [res.lng, res.lat],
-                        zoom: 17,
-                        essential: true
-                    });
-                } else {
-                    playSound('click');
+                    if (res.answer) setAiResponse(res.answer);
+                    
+                    if (res.recommendedPlace) {
+                        const { lat, lng, name } = res.recommendedPlace;
+                        map.current?.flyTo({
+                            center: [lng, lat],
+                            zoom: 18,
+                            pitch: 60,
+                            essential: true
+                        });
+                        createMarker({ ...res.recommendedPlace, id: 'recommendation' });
+                    }
+
+                    if (res.itinerary && res.itinerary.length > 0) {
+                        res.itinerary.forEach((point: any, idx: number) => {
+                            const el = document.createElement('div');
+                            el.style.cssText = `
+                                width: 24px; height: 24px; border-radius: 50%;
+                                background: #F72585; color: white;
+                                display: flex; align-items: center; justify-content: center;
+                                font-size: 10px; font-weight: 900; border: 2px solid white;
+                                box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+                            `;
+                            el.innerText = (idx + 1).toString();
+                            
+                            const m = new maplibregl.Marker({ element: el })
+                                .setLngLat([point.lng, point.lat])
+                                .setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(`<b>${point.name}</b><br>${point.time || ''}`))
+                                .addTo(map.current!);
+                            itineraryMarkersRef.current.push(m);
+                        });
+                    }
                 }
             } catch(e) {
                 console.error("Search error:", e);
-                playSound('click');
+                playSound('error');
             } finally {
                 setIsSearching(false);
-                setSearchQuery("");
             }
         }
+    };
+
+    const clearItinerary = () => {
+        itineraryMarkersRef.current.forEach(m => m.remove());
+        itineraryMarkersRef.current = [];
     };
 
     const filterMarkers = (type: string) => {
@@ -330,17 +352,40 @@ export default function KidoaMap({
             
             {/* Overlay UI */}
             <div className="absolute top-12 left-1/2 -translate-x-1/2 w-[92%] max-w-[500px] z-10 flex flex-col gap-3 pointer-events-none">
-                <div className="flex items-center bg-white/95 backdrop-blur-2xl rounded-3xl px-6 py-4 shadow-2xl border border-white/50 pointer-events-auto transition-all focus-within:ring-2 focus-within:ring-teal-500/50 focus-within:scale-[1.02]">
-                    <span className="mr-3 text-lg">{isSearching ? "✨" : "🔍"}</span>
-                    <input 
-                        type="text" 
-                        value={searchQuery}
-                        onChange={e => setSearchQuery(e.target.value)}
-                        onKeyDown={handleSearch}
-                        placeholder={isSearching ? "IA Pensando..." : "Explora con Gemini..."}
-                        disabled={isSearching}
-                        className="bg-transparent border-none outline-none flex-1 text-sm text-slate-900 font-bold placeholder-slate-400"
-                    />
+                <div className="flex flex-col gap-2 bg-white/95 backdrop-blur-2xl rounded-[32px] p-2 shadow-2xl border border-white/50 pointer-events-auto transition-all focus-within:ring-2 focus-within:ring-teal-500/50">
+                    <div className="flex items-center px-4 py-2">
+                        <span className="mr-3 text-lg">{isSearching ? "✨" : "🔍"}</span>
+                        <input 
+                            type="text" 
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                            onKeyDown={handleSearch}
+                            placeholder={isSearching ? "Kidoa IA analizando..." : "Pregunta a Maps (ej: plan para la tarde)"}
+                            disabled={isSearching}
+                            className="bg-transparent border-none outline-none flex-1 text-sm text-slate-900 font-bold placeholder-slate-400"
+                        />
+                        {searchQuery && (
+                            <button onClick={() => { setSearchQuery(""); setAiResponse(null); clearItinerary(); }} className="p-2 text-slate-400">✕</button>
+                        )}
+                    </div>
+                    
+                    <AnimatePresence>
+                        {aiResponse && (
+                            <motion.div 
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                className="px-6 pb-4 overflow-hidden border-t border-slate-100 mt-1"
+                            >
+                                <div className="text-[10px] font-black text-teal-600 uppercase tracking-widest mb-1 flex items-center gap-1">
+                                    <span className="animate-pulse">✨</span> Kidoa AI Insight
+                                </div>
+                                <p className="text-xs text-slate-700 font-medium leading-relaxed italic">
+                                    "{aiResponse}"
+                                </p>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
 
                 <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide pointer-events-auto px-1 no-scrollbar drop-shadow-sm">

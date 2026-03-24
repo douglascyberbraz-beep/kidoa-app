@@ -1,19 +1,26 @@
 import { GEMINI_KEY } from "./firebase";
 
 export class KidoaAI {
-    static async callGemini(prompt: string, expectJson: boolean = true) {
+    static async callGemini(prompt: string, expectJson: boolean = true, history: { role: 'user' | 'model', parts: { text: string }[] }[] = []) {
         try {
             const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
+            const body = {
+                contents: [
+                    ...history,
+                    { role: 'user', parts: [{ text: prompt }] }
+                ],
+                generationConfig: expectJson ? { responseMimeType: "application/json" } : {}
+            };
+
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: expectJson ? { responseMimeType: "application/json" } : {}
-                })
+                body: JSON.stringify(body)
             });
 
             const data = await response.json();
+            if (data.error) throw new Error(data.error.message);
+            
             const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
             if (expectJson) {
@@ -29,6 +36,33 @@ export class KidoaAI {
             console.error("AI Service Error:", e);
             return null;
         }
+    }
+
+    static async askMaps(query: string, coords: string) {
+        const prompt = `
+            ACTÚA COMO "KIDOA ASK MAPS" (Inspirado en Google Maps 2026).
+            UBICACIÓN ACTUAL: ${coords}
+            CONSULTA DEL USUARIO: "${query}"
+
+            OBJETIVO: Responde detalladamente y sugiere el mejor lugar REAL.
+            FORMATO JSON OBLIGATORIO: {
+                "answer": "Explicación detallada de por qué este lugar es perfecto (estilo conversacional)",
+                "recommendedPlace": {
+                    "name": "Nombre real",
+                    "lat": número,
+                    "lng": número,
+                    "vibe": "vibe corta",
+                    "expertTip": "tip del experto",
+                    "summary": "resumen corto",
+                    "type": "tipo de lugar"
+                },
+                "itinerary": [
+                    {"name": "parada 1", "lat": lat, "lng": lng, "time": "14:00"},
+                    {"name": "parada 2", "lat": lat, "lng": lng, "time": "16:00"}
+                ] (Opcional, solo si el usuario pide un plan o mañana/tarde)
+            }
+        `;
+        return await this.callGemini(prompt, true);
     }
 
     static async getTodayActivities(coords: string, prefs: any) {
