@@ -1,6 +1,6 @@
-// Kidoa App - Production v1.0.0
+// GoHappy App - Production v1.0.0
 // Sound System
-window.KidoaSound = {
+window.GoHappySound = {
     play: (type) => {
         const sounds = {
             click: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73268c2f16.mp3', // Pop/click
@@ -38,24 +38,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     setTimeout(() => {
         const splash = document.getElementById('splash-screen');
         splash.style.opacity = '0';
-        window.KidoaSound.play('start'); // Play magic chime on entry
+        window.GoHappySound.play('start'); // Play magic chime on entry
         setTimeout(() => {
             splash.style.display = 'none';
             document.getElementById('bottom-nav').classList.remove('hidden');
 
             // Set up initial view if map was loaded first
-            if (appState.currentPage === 'map' && window.KidoaMap && window.KidoaMap.instance) {
-                window.KidoaMap.instance.invalidateSize();
+            if (appState.currentPage === 'map' && window.GoHappyMap && window.GoHappyMap.instance) {
+                window.GoHappyMap.instance.invalidateSize();
             }
         }, 500);
     }, 1500); // Shorter splash screen
 
     // Initialize Firebase Auth and wait for state
-    window.KidoaAuth.init((user) => {
+    window.GoHappyAuth.init((user) => {
         if (!user) {
             // No auth state: show modal
             if (!document.getElementById('auth-modal')) {
-                window.KidoaAuth.renderAuthModal();
+                window.GoHappyAuth.renderAuthModal();
             }
         } else {
             appState.user = user;
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Also do a quick sync check to handle initial render
-    const quickUser = window.KidoaAuth.checkAuth();
+    const quickUser = window.GoHappyAuth.checkAuth();
     appState.user = quickUser;
 
     // Initialize Navigation
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadPage('map');
 
     // Geolocation moved to be requested only when Map is loaded or explicitly requested
-    // see window.KidoaMap.requestLocation()
+    // see window.GoHappyMap.requestLocation()
 });
 
 function setupNavigation() {
@@ -88,7 +88,7 @@ function setupNavigation() {
 
             if (page === appState.currentPage) return;
 
-            window.KidoaSound.play('click'); // Click sound feedback
+            window.GoHappySound.play('click'); // Click sound feedback
 
             // Remove active class from all
             navItems.forEach(nav => nav.classList.remove('active'));
@@ -128,10 +128,10 @@ async function loadPage(pageName) {
         updateNavStyles(pageName);
 
         if (pageName === 'map') {
-            if (window.KidoaMap) {
-                window.KidoaMap.render(mapViewport);
+            if (window.GoHappyMap) {
+                window.GoHappyMap.render(mapViewport);
             } else {
-                console.error("KidoaMap no definido");
+                console.error("GoHappyMap no definido");
             }
         } else {
             container.classList.remove('hidden');
@@ -139,14 +139,14 @@ async function loadPage(pageName) {
 
             // Map table of renderers to satisfy pageName
             const renderers = {
-                'today': window.KidoaToday,
-                'ranking': window.KidoaRanking,
-                'news_events': window.KidoaNewsEvents,
-                'profile': window.KidoaProfile,
-                'legal': window.KidoaLegal,
-                'quests': window.KidoaQuestsPage,
-                'safe': window.KidoaSafePage,
-                'memories': window.KidoaMemories
+                'today': window.GoHappyToday,
+                'ranking': window.GoHappyRanking,
+                'news_events': window.GoHappyNewsEvents,
+                'profile': window.GoHappyProfile,
+                'legal': window.GoHappyLegal,
+                'quests': window.GoHappyQuestsPage,
+                'safe': window.GoHappySafePage,
+                'memories': window.GoHappyMemories
             };
 
             const renderer = renderers[pageName];
@@ -166,7 +166,7 @@ async function loadPage(pageName) {
     }
 }
 
-window.KidoaApp = {
+window.GoHappyApp = {
     currentPage: appState.currentPage,
     loadPage: loadPage,
     navigate: (page) => {
@@ -192,6 +192,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 window.addEventListener('pointsUpdated', (e) => {
     console.log("Global Points Update:", e.detail);
     if (appState.currentPage === 'profile') {
-        window.KidoaProfile.render(document.getElementById('main-content'));
+        window.GoHappyProfile.render(document.getElementById('main-content'));
     }
 });
+

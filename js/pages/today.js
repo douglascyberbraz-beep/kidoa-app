@@ -1,6 +1,6 @@
-window.KidoaToday = {
+window.GoHappyToday = {
     render: async (container) => {
-        const storedPrefs = JSON.parse(localStorage.getItem('kidoa_family_prefs'));
+        const storedPrefs = JSON.parse(localStorage.getItem('GoHappy_family_prefs'));
 
         container.innerHTML = `
             <div class="page-header sticky-header">
@@ -18,13 +18,13 @@ window.KidoaToday = {
         const content = document.getElementById('today-content');
 
         if (!storedPrefs) {
-            window.KidoaToday.renderQuestionnaire(content);
+            window.GoHappyToday.renderQuestionnaire(content);
             return;
         }
 
         const fetchAndRender = async (coords, preferences) => {
             // Check limits for free users
-            const limitInfo = window.KidoaAI.checkTodayLimit();
+            const limitInfo = window.GoHappyAI.checkTodayLimit();
             if (!limitInfo.canRequest) {
                 content.innerHTML = `
                     <div class="usage-limit-banner entry-anim">
@@ -38,16 +38,16 @@ window.KidoaToday = {
             }
 
             console.log("TODAY: Fetching for", coords, preferences);
-            content.innerHTML = '<div class="center-text p-40"><div class="typing-dots"><span></span><span></span><span></span></div><p style="margin-top:15px; color:var(--text-light);">KIDOA IA está analizando planes reales cerca de ti...</p></div>';
+            content.innerHTML = '<div class="center-text p-40"><div class="typing-dots"><span></span><span></span><span></span></div><p style="margin-top:15px; color:var(--text-light);">GoHappy IA está analizando planes reales cerca de ti...</p></div>';
 
             try {
-                const activities = await window.KidoaAI.getTodayActivities(coords, preferences);
-                window.KidoaAI.incrementTodayUsage();
+                const activities = await window.GoHappyAI.getTodayActivities(coords, preferences);
+                window.GoHappyAI.incrementTodayUsage();
                 renderActivities(activities);
             } catch (err) {
                 console.error("TODAY Load Error:", err);
                 // Fallback direct to mock if AI fails hard
-                const mock = window.KidoaAI._getMockData('today');
+                const mock = window.GoHappyAI._getMockData('today');
                 renderActivities(mock);
             }
         };
@@ -100,10 +100,10 @@ window.KidoaToday = {
                 content.appendChild(card);
 
                 const goToMap = () => {
-                    window.KidoaApp.loadPage('map');
+                    window.GoHappyApp.loadPage('map');
                     setTimeout(() => {
-                        if (window.KidoaMap && window.KidoaMap.instance) {
-                            window.KidoaMap.instance.flyTo({
+                        if (window.GoHappyMap && window.GoHappyMap.instance) {
+                            window.GoHappyMap.instance.flyTo({
                                 center: [act.lng || -4.7286, act.lat || 41.6520],
                                 zoom: 16,
                                 speed: 1.5
@@ -122,13 +122,13 @@ window.KidoaToday = {
                             window.open(act.link, '_blank');
                         } else {
                             // Add points
-                            if (window.KidoaPoints) await window.KidoaPoints.addPoints('QUEST');
+                            if (window.GoHappyPoints) await window.GoHappyPoints.addPoints('QUEST');
                             
                             // Save to Activity (Firestore)
-                            const user = window.KidoaAuth.checkAuth();
+                            const user = window.GoHappyAuth.checkAuth();
                             if (user && !user.isGuest) {
                                 try {
-                                    await window.KidoaDB.collection('activity').add({
+                                    await window.GoHappyDB.collection('activity').add({
                                         userId: user.uid,
                                         type: 'visit',
                                         title: act.title,
@@ -161,8 +161,8 @@ window.KidoaToday = {
             `;
             content.appendChild(refineDiv);
             document.getElementById('refine-search').onclick = () => {
-                localStorage.removeItem('kidoa_family_prefs');
-                window.KidoaToday.render(container);
+                localStorage.removeItem('GoHappy_family_prefs');
+                window.GoHappyToday.render(container);
             };
         };
 
@@ -245,8 +245,9 @@ window.KidoaToday = {
                 distance: container.querySelector('[data-id="distance"] .selected').dataset.value,
                 timestamp: Date.now()
             };
-            localStorage.setItem('kidoa_family_prefs', JSON.stringify(prefs));
-            window.KidoaToday.render(container.parentElement); // Re-render page
+            localStorage.setItem('GoHappy_family_prefs', JSON.stringify(prefs));
+            window.GoHappyToday.render(container.parentElement); // Re-render page
         };
     }
 };
+

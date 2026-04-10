@@ -1,6 +1,6 @@
-window.KidoaAI = {
+window.GoHappyAI = {
     // Especialización en Crianza
-    SYSTEM_PROMPT: `Eres KIDOA IA, la asistente oficial de la App KIDOA, experta líder en crianza consciente, salud infantil (0-15 años), psicología positiva y nutrición. 
+    SYSTEM_PROMPT: `Eres GoHappy IA, la asistente oficial de la App GoHappy, experta líder en crianza consciente, salud infantil (0-15 años), psicología positiva y nutrición. 
     Tu misión es ayudar a padres modernos a encontrar planes y soluciones basados ESTRICTAMENTE en su zona geográfica actual.
     - Estilo: Empático, ultra-personalizado, premium.
     - Geografía: Identifica SIEMPRE la ciudad y provincia de las coordenadas proporcionadas y limita la información a esa zona.
@@ -15,7 +15,7 @@ window.KidoaAI = {
         4. No menciones otras regiones. Solo información de su zona o provincia autonoma.
         Formato JSON: [ { "title": "", "summary": "", "link": "url", "sourceName": "Fuente Local", "date": "Hoy" } ]`;
 
-        return await window.KidoaAI._callGemini(prompt);
+        return await window.GoHappyAI._callGemini(prompt);
     },
 
     // Buscar Eventos Infantiles (0-15 años)
@@ -26,7 +26,7 @@ window.KidoaAI = {
         3. Solo eventos en su municipio o municipios colindantes (su zona).
         Formato JSON: [ { "title": "", "date": "", "location": "Sitio Real", "price": "", "lat": NUM, "lng": NUM } ]`;
 
-        return await window.KidoaAI._callGemini(prompt);
+        return await window.GoHappyAI._callGemini(prompt);
     },
 
     // Buscar Becas y Ayudas
@@ -37,7 +37,7 @@ window.KidoaAI = {
         3. Keywords: niños, crianza, infantil, educación.
         Formato JSON: [ { "title": "", "description": "", "status": "PLAZO ABIERTO", "statusColor": "green", "linkText": "Ver bases oficiales" } ]`;
 
-        return await window.KidoaAI._callGemini(prompt);
+        return await window.GoHappyAI._callGemini(prompt);
     },
 
     getTodayActivities: async (coordinates = "41.6520, -4.7286", preferences = null) => {
@@ -76,17 +76,17 @@ window.KidoaAI = {
            - CONSEJO CLAVE (ej: "Llevad calzado cómodo", "Reservad antes de ir").
         6. Formato JSON estricto: [ { "title": "", "summary": "", "time": "", "location": "", "lat": NUM, "lng": NUM, "price": "", "link": "", "age": "", "duration": "", "tip": "" } ]`;
 
-        return await window.KidoaAI._callGemini(prompt);
+        return await window.GoHappyAI._callGemini(prompt);
     },
 
     // Check usage limits for free users
     checkTodayLimit: () => {
-        const user = window.KidoaAuth.checkAuth();
+        const user = window.GoHappyAuth.checkAuth();
         const isPremium = user && (user.level === 'Oro' || user.level === 'Premium' || user.isPremium);
         if (isPremium) return { canRequest: true };
 
         const today = new Date().toDateString();
-        const usage = JSON.parse(localStorage.getItem('kidoa_today_usage') || '{}');
+        const usage = JSON.parse(localStorage.getItem('GoHappy_today_usage') || '{}');
 
         if (usage.date !== today) {
             usage.date = today;
@@ -101,9 +101,9 @@ window.KidoaAI = {
     },
 
     incrementTodayUsage: () => {
-        const usage = JSON.parse(localStorage.getItem('kidoa_today_usage') || '{}');
+        const usage = JSON.parse(localStorage.getItem('GoHappy_today_usage') || '{}');
         usage.count = (usage.count || 0) + 1;
-        localStorage.setItem('kidoa_today_usage', JSON.stringify(usage));
+        localStorage.setItem('GoHappy_today_usage', JSON.stringify(usage));
     },
 
     // Generador Dinámico de Mapa (Basado en Coordenadas)
@@ -114,7 +114,7 @@ window.KidoaAI = {
         Formato esperado:
         [ { "id": UID_NUMERICO_UNICO, "name": "Nombre Real", "type": "park"|"museum"|"school"|"theater"|"kidzone"|"food", "lat": NUMERO, "lng": NUMERO, "rating": NUMERO_4_A_5, "reviews": NUMERO } ]`;
 
-        return await window.KidoaAI._callGemini(prompt);
+        return await window.GoHappyAI._callGemini(prompt);
     },
 
     // Búsqueda Semántica Dinámica
@@ -124,7 +124,7 @@ window.KidoaAI = {
         Formato esperado JSON:
         [ { "id": UID_NUMERICO_UNICO, "name": "Nombre Real", "type": "park"|"museum"|"school"|"theater"|"kidzone"|"food"|"generic", "lat": NUMERO, "lng": NUMERO, "rating": 4.8, "reviews": 120 } ]`;
 
-        return await window.KidoaAI._callGemini(prompt);
+        return await window.GoHappyAI._callGemini(prompt);
     },
 
     // Generar Misiones Contextuales
@@ -134,40 +134,40 @@ window.KidoaAI = {
         Ten en cuenta el clima actual típico de la zona.
         Formato JSON estricto: [ { "id": "q_ai_1", "title": "Nombre divertido", "description": "Breve descripción", "type": "EXPLORATION"|"CREATIVITY", "category": "Misión", "difficulty": "fácil"|"media", "points": 100, "objectives": ["Paso 1", "Paso 2"], "totalSteps": 2, "status": "active" } ]`;
 
-        return await window.KidoaAI._callGemini(prompt);
+        return await window.GoHappyAI._callGemini(prompt);
     },
 
     // Generar Alerta/Consejo de Seguridad (Clima o Noticias)
     getDailySafeInsight: async (coordinates = "41.6520, -4.7286") => {
-        const prompt = `Actúa como asesor de seguridad familiar de Kidoa. Ubicación: ${coordinates}.
+        const prompt = `Actúa como asesor de seguridad familiar de GoHappy. Ubicación: ${coordinates}.
         1. Identifica la CIUDAD y el CLIMA ACTUAL REAL de esa zona.
         2. Genera un consejo de seguridad o meteorología infantil MUY ESPECÍFICO para HOY.
         3. Si hay avisos meteorológicos reales (AEMET o similar), menciónalos.
         4. Si no hay avisos, da un consejo de salud estacional (ej: polen, protección solar, abrigo).
         No uses frases genéricas como "Analizando tu zona". Da información directa y útil en 1 o 2 frases.`;
 
-        return await window.KidoaAI._callGemini(prompt, false); // False = Devuelve texto, no JSON
+        return await window.GoHappyAI._callGemini(prompt, false); // False = Devuelve texto, no JSON
     },
 
     // Generar Topic Diario para la Tribu
     getDailyTribuTopic: async (coordinates = "41.6520, -4.7286") => {
         const prompt = `Genera un post para un foro de padres ('La Tribu') en la ciudad correspondiente a las coordenadas GPS: ${coordinates}.
         Debe ser un debate o consejo interesante sobre crianza y la vida en esa ciudad específica.
-        Formato JSON estricto: { "authorKey": "KIDOA_IA", "title": "El Debate del Día 🤖", "content": "Contenido del debate..." }`;
-        return await window.KidoaAI._callGemini(prompt, true);
+        Formato JSON estricto: { "authorKey": "GoHappy_IA", "title": "El Debate del Día 🤖", "content": "Contenido del debate..." }`;
+        return await window.GoHappyAI._callGemini(prompt, true);
     },
 
     // Chat Especializado
     chat: async (userMessage, history = []) => {
-        const prompt = `${window.KidoaAI.SYSTEM_PROMPT}\n\nHistorial: ${JSON.stringify(history)}\nUsuario: ${userMessage}`;
-        const response = await window.KidoaAI._callGemini(prompt, false); // false = return text, not json
+        const prompt = `${window.GoHappyAI.SYSTEM_PROMPT}\n\nHistorial: ${JSON.stringify(history)}\nUsuario: ${userMessage}`;
+        const response = await window.GoHappyAI._callGemini(prompt, false); // false = return text, not json
         return response;
     },
 
     // Helper para llamadas a Gemini
     _callGemini: async (prompt, expectJson = true) => {
         if (!window.GEMINI_KEY || window.GEMINI_KEY.includes('PEGAR_AQUI')) {
-            return window.KidoaAI._getMockData(prompt);
+            return window.GoHappyAI._getMockData(prompt);
         }
 
         try {
@@ -179,7 +179,7 @@ window.KidoaAI = {
                 requestBody.generationConfig = { response_mime_type: "application/json" };
             }
 
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${window.GEMINI_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${window.GEMINI_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody)
@@ -188,14 +188,14 @@ window.KidoaAI = {
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error("Gemini API Error:", response.status, errorText);
-                return window.KidoaAI._getMockData(prompt);
+                return window.GoHappyAI._getMockData(prompt);
             }
 
             const data = await response.json();
 
             if (!data.candidates || !data.candidates[0].content) {
                 console.error("Gemini returned no content:", data);
-                return window.KidoaAI._getMockData(prompt);
+                return window.GoHappyAI._getMockData(prompt);
             }
 
             const text = data.candidates[0].content.parts[0].text;
@@ -224,13 +224,13 @@ window.KidoaAI = {
                     return JSON.parse(cleanText);
                 } catch (e) {
                     console.error("Error parsing Gemini JSON:", text, e);
-                    return window.KidoaAI._getMockData(prompt);
+                    return window.GoHappyAI._getMockData(prompt);
                 }
             }
             return text.trim();
         } catch (e) {
-            console.error("Network or execution error en KidoaAI:", e);
-            return window.KidoaAI._getMockData(prompt);
+            console.error("Network or execution error en GoHappyAI:", e);
+            return window.GoHappyAI._getMockData(prompt);
         }
     },
 
@@ -266,3 +266,4 @@ window.KidoaAI = {
         return [];
     }
 };
+

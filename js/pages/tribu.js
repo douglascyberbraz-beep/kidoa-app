@@ -1,4 +1,4 @@
-window.KidoaTribu = {
+window.GoHappyTribu = {
     // Keep state cached in memory
     postsCache: null,
     activeTab: 'comunidad', // 'comunidad', 'eventos', 'noticias'
@@ -33,7 +33,7 @@ window.KidoaTribu = {
         const actionBtn = document.getElementById('tribu-action-btn');
 
         // Direct load community
-        await window.KidoaTribu.loadComunidad(contentContainer);
+        await window.GoHappyTribu.loadComunidad(contentContainer);
 
         // Modal Logic (only for Comunidad)
         const modal = document.getElementById('post-modal');
@@ -50,7 +50,7 @@ window.KidoaTribu = {
 
         document.getElementById('publish-btn').addEventListener('click', async () => {
             const text = contentInput.value.trim();
-            const user = window.KidoaAuth.checkAuth();
+            const user = window.GoHappyAuth.checkAuth();
 
             if (!user) {
                 alert("Identifícate para participar en la Tribu.");
@@ -63,11 +63,11 @@ window.KidoaTribu = {
                 publishBtn.textContent = 'Publicando...';
 
                 try {
-                    await window.KidoaData.addTribuPost(text, user);
-                    window.KidoaPoints.addPoints('COMMENT');
+                    await window.GoHappyData.addTribuPost(text, user);
+                    window.GoHappyPoints.addPoints('COMMENT');
 
-                    if (window.KidoaTribu.postsCache) {
-                        window.KidoaTribu.postsCache.unshift({
+                    if (window.GoHappyTribu.postsCache) {
+                        window.GoHappyTribu.postsCache.unshift({
                             id: Date.now(),
                             user: user.nickname || "Tú",
                             avatar: user.photo || "😎",
@@ -76,8 +76,8 @@ window.KidoaTribu = {
                             likes: 0,
                             comments: 0
                         });
-                        if (window.KidoaTribu.activeTab === 'comunidad') {
-                            window.KidoaTribu.renderPosts(contentContainer, window.KidoaTribu.postsCache);
+                        if (window.GoHappyTribu.activeTab === 'comunidad') {
+                            window.GoHappyTribu.renderPosts(contentContainer, window.GoHappyTribu.postsCache);
                         }
                     }
 
@@ -101,9 +101,9 @@ window.KidoaTribu = {
     },
 
     loadComunidad: async (container) => {
-        const posts = await window.KidoaData.getTribuPosts();
-        window.KidoaTribu.postsCache = posts;
-        window.KidoaTribu.renderPosts(container, posts);
+        const posts = await window.GoHappyData.getTribuPosts();
+        window.GoHappyTribu.postsCache = posts;
+        window.GoHappyTribu.renderPosts(container, posts);
 
         // Async AI Topic Injection
         setTimeout(async () => {
@@ -115,11 +115,11 @@ window.KidoaTribu = {
                         if (pos) coords = `${pos.coords.latitude}, ${pos.coords.longitude}`;
                     } catch (e) { }
 
-                    const aiTopic = await window.KidoaAI.getDailyTribuTopic(coords);
+                    const aiTopic = await window.GoHappyAI.getDailyTribuTopic(coords);
                     if (aiTopic && aiTopic.title) {
                         const aiPost = {
                             id: 'ai-topic',
-                            user: "KIDOA IA",
+                            user: "GoHappy IA",
                             avatar: "🤖",
                             time: aiTopic.date || "Ahora",
                             content: `<strong>${aiTopic.title}</strong><br><br>${aiTopic.content}`,
@@ -127,10 +127,10 @@ window.KidoaTribu = {
                             comments: aiTopic.comments || 4,
                             isAI: true
                         };
-                        window.KidoaTribu.postsCache.unshift(aiPost);
+                        window.GoHappyTribu.postsCache.unshift(aiPost);
                         // Only re-render if still on comunidad tab
-                        if (window.KidoaTribu.activeTab === 'comunidad') {
-                            window.KidoaTribu.renderPosts(container, window.KidoaTribu.postsCache);
+                        if (window.GoHappyTribu.activeTab === 'comunidad') {
+                            window.GoHappyTribu.renderPosts(container, window.GoHappyTribu.postsCache);
                         }
                     }
                 } catch (e) {
@@ -173,3 +173,4 @@ window.KidoaTribu = {
         });
     }
 };
+

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kidoa-cache-v1.2.9';
+const CACHE_NAME = 'gohappy-cache-v2.0.0';
 const TILE_CACHE = 'kidoa-tiles-v1.2.9';
 const ASSETS = [
     './',

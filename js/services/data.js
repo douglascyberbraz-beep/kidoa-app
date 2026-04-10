@@ -1,19 +1,19 @@
 // ------------------------------------------------------------------
-// KidoaData - Firestore Service (con fallback a datos estáticos)
+// GoHappyData - Firestore Service (con fallback a datos estáticos)
 // ------------------------------------------------------------------
-window.KidoaData = {
+window.GoHappyData = {
 
     // -- LOCATIONS --
     getLocations: async (coords = "41.6520, -4.7286") => {
         try {
             // Priority: Dynamic AI Generation
             if (window.GEMINI_KEY && !window.GEMINI_KEY.includes('PEGAR_AQUI')) {
-                const dynamicLocs = await window.KidoaAI.getDynamicLocations(coords);
+                const dynamicLocs = await window.GoHappyAI.getDynamicLocations(coords);
                 if (dynamicLocs && dynamicLocs.length > 0) return dynamicLocs;
             }
 
             // Fallback: Firestore
-            const snap = await window.KidoaDB.collection('locations').get();
+            const snap = await window.GoHappyDB.collection('locations').get();
             if (!snap.empty) {
                 return snap.docs.map(d => ({ id: d.id, ...d.data() }));
             }
@@ -31,7 +31,7 @@ window.KidoaData = {
     searchLocations: async (query, coords = "41.6520, -4.7286") => {
         try {
             if (window.GEMINI_KEY && !window.GEMINI_KEY.includes('PEGAR_AQUI')) {
-                return await window.KidoaAI.searchDynamicLocations(query, coords);
+                return await window.GoHappyAI.searchDynamicLocations(query, coords);
             }
         } catch (e) {
             console.warn("AI searchLocations fallback:", e);
@@ -43,9 +43,9 @@ window.KidoaData = {
     getNews: async (coords) => {
         try {
             if (window.GEMINI_KEY && !window.GEMINI_KEY.includes('PEGAR_AQUI')) {
-                return await window.KidoaAI.getNews(coords);
+                return await window.GoHappyAI.getNews(coords);
             }
-            const snap = await window.KidoaDB.collection('news').orderBy('date', 'desc').limit(10).get();
+            const snap = await window.GoHappyDB.collection('news').orderBy('date', 'desc').limit(10).get();
             if (!snap.empty) {
                 return snap.docs.map(d => ({ id: d.id, ...d.data() }));
             }
@@ -63,9 +63,9 @@ window.KidoaData = {
     getEvents: async (coords) => {
         try {
             if (window.GEMINI_KEY && !window.GEMINI_KEY.includes('PEGAR_AQUI')) {
-                return await window.KidoaAI.getEvents(coords);
+                return await window.GoHappyAI.getEvents(coords);
             }
-            const snap = await window.KidoaDB.collection('events').orderBy('date', 'asc').limit(10).get();
+            const snap = await window.GoHappyDB.collection('events').orderBy('date', 'asc').limit(10).get();
             if (!snap.empty) {
                 return snap.docs.map(d => ({ id: d.id, ...d.data() }));
             }
@@ -83,7 +83,7 @@ window.KidoaData = {
     getBecas: async (coords) => {
         try {
             if (window.GEMINI_KEY && !window.GEMINI_KEY.includes('PEGAR_AQUI')) {
-                return await window.KidoaAI.getBecas(coords);
+                return await window.GoHappyAI.getBecas(coords);
             }
         } catch (e) {
             console.warn("AI getBecas fallback:", e);
@@ -98,7 +98,7 @@ window.KidoaData = {
     // -- TRIBU POSTS --
     getTribuPosts: async () => {
         try {
-            const snap = await window.KidoaDB.collection('posts').orderBy('createdAt', 'desc').limit(20).get();
+            const snap = await window.GoHappyDB.collection('posts').orderBy('createdAt', 'desc').limit(20).get();
             if (!snap.empty) {
                 return snap.docs.map(d => ({ id: d.id, ...d.data() }));
             }
@@ -123,7 +123,7 @@ window.KidoaData = {
                 comments: 0,
                 createdAt: new Date()
             };
-            await window.KidoaDB.collection('posts').add(post);
+            await window.GoHappyDB.collection('posts').add(post);
             return true;
         } catch (e) {
             console.error("Error añadiendo post:", e);
@@ -134,7 +134,7 @@ window.KidoaData = {
     getTodayActivities: async (coords, preferences = null) => {
         try {
             if (window.GEMINI_KEY && !window.GEMINI_KEY.includes('PEGAR_AQUI')) {
-                return await window.KidoaAI.getTodayActivities(coords, preferences);
+                return await window.GoHappyAI.getTodayActivities(coords, preferences);
             }
         } catch (e) {
             console.warn("AI getTodayActivities fallback:", e);
@@ -148,7 +148,7 @@ window.KidoaData = {
     // -- RANKING / CONTRIBUTORS --
     getContributors: async () => {
         try {
-            const snap = await window.KidoaDB.collection('users').orderBy('points', 'desc').limit(10).get();
+            const snap = await window.GoHappyDB.collection('users').orderBy('points', 'desc').limit(10).get();
             if (!snap.empty) {
                 return snap.docs.map(d => {
                     const data = d.data();
@@ -166,10 +166,11 @@ window.KidoaData = {
         }
         // Fallback estático
         return [
-            { name: "Elena Ramos", points: 1250, rank: "Maestro Kidoa", contributions: 45, role: "🥇 Top" },
+            { name: "Elena Ramos", points: 1250, rank: "Maestro GoHappy", contributions: 45, role: "🥇 Top" },
             { name: "Carlos Ruiz", points: 980, rank: "Guía Tribu", contributions: 32, role: "🥈 Pro" },
             { name: "Marta Sanz", points: 750, rank: "Guía Tribu", contributions: 28, role: "🥉 Social" },
             { name: "Javier López", points: 420, rank: "Explorador", contributions: 15, role: "🎖️ Activo" }
         ];
     }
 };
+

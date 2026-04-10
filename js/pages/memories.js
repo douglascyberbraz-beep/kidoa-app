@@ -1,6 +1,6 @@
-window.KidoaMemories = {
+window.GoHappyMemories = {
     render: async (container) => {
-        const user = window.KidoaAuth.checkAuth();
+        const user = window.GoHappyAuth.checkAuth();
         const now = new Date();
         const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
             'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -47,7 +47,7 @@ window.KidoaMemories = {
                 <!-- AI Reflection -->
                 <div class="memory-reflection premium-glass" id="memory-reflection">
                     <div class="reflection-header">
-                        <span>🤖 Reflexión KIDOA IA</span>
+                        <span>🤖 Reflexión GoHappy IA</span>
                     </div>
                     <p id="reflection-text" class="reflection-body">
                         <span class="typing-dots"><span></span><span></span><span></span></span>
@@ -69,7 +69,7 @@ window.KidoaMemories = {
         `;
 
         // Load activity data
-        const activity = await window.KidoaMemories._getActivity(user);
+        const activity = await window.GoHappyMemories._getActivity(user);
 
         // Update stats
         document.getElementById('mem-places').textContent = activity.places;
@@ -78,7 +78,7 @@ window.KidoaMemories = {
         document.getElementById('mem-quests').textContent = activity.quests;
 
         // Generate AI reflection
-        window.KidoaMemories._generateReflection(activity, currentMonth);
+        window.GoHappyMemories._generateReflection(activity, currentMonth);
 
         // Render timeline
         const timeline = document.getElementById('memory-timeline');
@@ -100,11 +100,11 @@ window.KidoaMemories = {
 
         // Share button
         document.getElementById('share-memories').addEventListener('click', () => {
-            const shareText = `🎉 Mi mes de ${currentMonth} en KIDOA:\n🗺️ ${activity.places} sitios visitados\n⭐ ${activity.points} puntos ganados\n⚔️ ${activity.quests} misiones completadas\n\n¡Únete! kidoa.app`;
+            const shareText = `🎉 Mi mes de ${currentMonth} en GoHappy:\n🗺️ ${activity.places} sitios visitados\n⭐ ${activity.points} puntos ganados\n⚔️ ${activity.quests} misiones completadas\n\n¡Únete! GoHappy.app`;
 
             if (navigator.share) {
                 navigator.share({
-                    title: `Mis Memories KIDOA - ${currentMonth}`,
+                    title: `Mis Memories GoHappy - ${currentMonth}`,
                     text: shareText
                 });
             } else {
@@ -112,7 +112,7 @@ window.KidoaMemories = {
                     alert('📋 ¡Resumen copiado al portapapeles!');
                 });
             }
-            window.KidoaSound.play('success');
+            window.GoHappySound.play('success');
         });
     },
 
@@ -122,7 +122,7 @@ window.KidoaMemories = {
             try {
                 const now = new Date();
                 const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-                const snap = await window.KidoaDB.collection('activity')
+                const snap = await window.GoHappyDB.collection('activity')
                     .where('userId', '==', user.uid)
                     .where('timestamp', '>=', startOfMonth)
                     .orderBy('timestamp', 'desc')
@@ -135,7 +135,7 @@ window.KidoaMemories = {
                         photos: activities.filter(a => a.type === 'photo').length,
                         points: user.points || 0,
                         quests: activities.filter(a => a.type === 'quest_completed').length,
-                        events: activities.map(a => window.KidoaMemories._activityToEvent(a))
+                        events: activities.map(a => window.GoHappyMemories._activityToEvent(a))
                     };
                 } else {
                     // Si no hay actividad real pero está logueado, devolvemos un estado vacío motivador
@@ -192,10 +192,10 @@ window.KidoaMemories = {
         try {
             const prompt = `Genera una reflexión motivadora y emocional de 2-3 frases para una familia que en ${month} ha visitado ${activity.places} sitios, compartido ${activity.photos} fotos, completado ${activity.quests} misiones y ganado ${activity.points} puntos en una app de planes familiares. Sé cálido y específico. No uses emojis. Máximo 150 caracteres.`;
 
-            const text = await window.KidoaAI._callGemini(prompt, false);
-            reflectionEl.textContent = text || window.KidoaMemories._getDefaultReflection(activity, month);
+            const text = await window.GoHappyAI._callGemini(prompt, false);
+            reflectionEl.textContent = text || window.GoHappyMemories._getDefaultReflection(activity, month);
         } catch (e) {
-            reflectionEl.textContent = window.KidoaMemories._getDefaultReflection(activity, month);
+            reflectionEl.textContent = window.GoHappyMemories._getDefaultReflection(activity, month);
         }
     },
 
@@ -206,3 +206,4 @@ window.KidoaMemories = {
         return `Cada salida en familia es una inversión en recuerdos. Este mes ya has dado ${activity.places} pasos hacia aventuras que contaréis durante años.`;
     }
 };
+

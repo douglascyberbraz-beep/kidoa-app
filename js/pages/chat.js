@@ -1,17 +1,17 @@
-window.KidoaChat = {
+window.GoHappyChat = {
     render: (container) => {
         container.innerHTML = `
             <div class="chat-container">
                 <div class="chat-header premium-glass">
                     <div class="bot-avatar gradient-bg">🐦</div>
                     <div>
-                        <h3>KIDOA IA</h3>
+                        <h3>GoHappy IA</h3>
                         <div class="status-indicator"><span class="pulse-dot"></span> Online</div>
                     </div>
                 </div>
                 <div id="chat-messages" class="chat-messages premium-bg">
                     <div class="message bot entry-anim">
-                        <p>¡Hola! Soy tu asistente KIDOA. ¿En qué puedo ayudarte hoy?</p>
+                        <p>¡Hola! Soy tu asistente GoHappy. ¿En qué puedo ayudarte hoy?</p>
                     </div>
                 </div>
                 <div class="chat-input-area premium-glass">
@@ -42,13 +42,13 @@ window.KidoaChat = {
 
             // Real AI Response
             try {
-                const response = await window.KidoaAI.chat(text, chatHistory);
+                const response = await window.GoHappyAI.chat(text, chatHistory);
                 removeLoading(loadingId);
                 appendMessage(response, 'bot');
                 chatHistory.push({ role: 'assistant', content: response });
 
                 // Gana puntos por interactuar con la IA
-                window.KidoaPoints.addPoints('COMMENT');
+                window.GoHappyPoints.addPoints('COMMENT');
             } catch (e) {
                 removeLoading(loadingId);
                 appendMessage("Lo siento, estoy teniendo problemas para conectar. Inténtalo de nuevo.", 'bot');
@@ -85,3 +85,4 @@ window.KidoaChat = {
         }
     }
 };
+

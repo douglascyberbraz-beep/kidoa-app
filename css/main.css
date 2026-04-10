@@ -1,10 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Poppins:wght@600;700;800&display=swap');
+
 :root {
-    /* Premium "Kidoa" Palette */
-    --primary-navy: #002C77;
-    --primary-blue: #4CC9F0;
-    --primary-dark: #001A4A;
-    /* Deeper navy for rich gradients */
-    --secondary-blue: #E0F7FA;
+    /* Premium "GoHappy" Palette */
+    --primary-blue: #0047AB;    /* Azul Cobalto */
+    --accent-cyan: #00CED1;     /* Cian Eléctrico */
+    --bg-sky: #E0F7FA;          /* Azul Cielo Suave */
+    
+    --primary-dark: #002C77;    /* Deeper cobalt for rich gradients */
+    --secondary-blue: var(--bg-sky);
     --accent-pink: #F72585;
     --accent-yellow: #FFD60A;
     --accent-gray: #F8FAFC;
@@ -38,15 +41,17 @@
 
 body {
     font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, #E0F7FA 0%, #F0F3FA 100%);
+    background: linear-gradient(135deg, var(--bg-sky) 0%, #F0F3FA 100%);
     color: var(--text-dark);
     height: 100vh;
     height: 100dvh;
-    /* Dynamic Viewport Height for mobile */
     overflow: hidden;
     position: fixed;
-    /* Stop body bounce on iOS */
     width: 100%;
+}
+
+h1, h2, h3, .logo-text, .premium-header h2 {
+    font-family: 'Poppins', sans-serif;
 }
 
 #app {
@@ -71,7 +76,7 @@ body {
     width: 100%;
     height: 100%;
     height: 100dvh;
-    background: #ffffff;
+    background: linear-gradient(to top, var(--bg-sky) 0%, var(--white) 100%);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -312,11 +317,11 @@ body {
 }
 
 .leaflet-marker-icon,
-.kidoa-marker-3d-wrap {
+.GoHappy-marker-3d-wrap {
     animation: magical-float 3s infinite ease-in-out;
 }
 
-.kidoa-marker-pin {
+.GoHappy-marker-pin {
     width: 44px !important;
     height: 44px !important;
     border-radius: 50% !important;
@@ -423,7 +428,7 @@ body {
 }
 
 /* Branded Map Layer - Google-style */
-.kidoa-map-tiles.google-nav-mode {
+.GoHappy-map-tiles.google-nav-mode {
     filter: saturate(1.15) contrast(1.02);
     /* Slight pop to Google's standard colors */
 }
@@ -837,13 +842,13 @@ body {
 }
 
 /* User Marker Pulse */
-.kidoa-user-marker {
+.GoHappy-user-marker {
     position: relative;
     width: 45px;
     height: 45px;
 }
 
-.kidoa-user-pin {
+.GoHappy-user-pin {
     position: relative;
     z-index: 2;
 }
@@ -890,7 +895,7 @@ body {
     }
 }
 
-.highlight-poi .kidoa-marker-pin {
+.highlight-poi .GoHappy-marker-pin {
     animation: marker-pulse 2s infinite ease-in-out;
 }
 
@@ -1735,7 +1740,7 @@ body {
 }
 
 /* =========================================
-   KIDOA QUEST - Misiones Familiares
+   GoHappy QUEST - Misiones Familiares
    ========================================= */
 
 .quests-page {
@@ -1921,7 +1926,7 @@ body {
 }
 
 /* =========================================
-   KIDOA SAFE - Alertas de Seguridad
+   GoHappy SAFE - Alertas de Seguridad
    ========================================= */
 
 .safe-page {
@@ -1984,7 +1989,7 @@ body {
 }
 
 /* =========================================
-   KIDOA MEMORIES - Diario Familiar
+   GoHappy MEMORIES - Diario Familiar
    ========================================= */
 
 .memories-page {
@@ -2147,7 +2152,7 @@ body {
     transition: transform 0.5s ease;
 }
 
-.kidoa-map-tiles.nav-brand-mode {
+.GoHappy-map-tiles.nav-brand-mode {
     filter: saturate(1.2) contrast(1.05);
 }
 

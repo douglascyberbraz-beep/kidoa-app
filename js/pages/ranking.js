@@ -1,4 +1,4 @@
-window.KidoaRanking = {
+window.GoHappyRanking = {
     render: async (container) => {
         container.innerHTML = `
             <div class="page-header center-text">
@@ -31,7 +31,7 @@ window.KidoaRanking = {
 
         const renderSites = async () => {
             list.innerHTML = '<div class="center-text p-20"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
-            const locations = await window.KidoaData.getLocations();
+            const locations = await window.GoHappyData.getLocations();
             const sorted = [...locations].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 10);
 
             if (sorted.length === 0) {
@@ -55,7 +55,7 @@ window.KidoaRanking = {
                 const size = pos === 1 ? 'large' : 'medium';
 
                 html += `
-                    <div class="podium-card ${size} entry-anim" onclick="window.KidoaRanking.goToMap('${site.id}', ${site.lat}, ${site.lng})">
+                    <div class="podium-card ${size} entry-anim" onclick="window.GoHappyRanking.goToMap('${site.id}', ${site.lat}, ${site.lng})">
                         <div class="podium-rank">${medal}</div>
                         <div class="podium-image" style="background: ${site.image ? `url(${site.image})` : getPlaceholder(site.type)}; background-size: cover; background-position: center;">
                             ${!site.image ? '<span class="podium-icon">📍</span>' : ''}
@@ -73,7 +73,7 @@ window.KidoaRanking = {
             html += '<div class="ranking-rows">';
             others.forEach((site, i) => {
                 html += `
-                    <div class="ranking-row card-anim" onclick="window.KidoaRanking.goToMap('${site.id}', ${site.lat}, ${site.lng})">
+                    <div class="ranking-row card-anim" onclick="window.GoHappyRanking.goToMap('${site.id}', ${site.lat}, ${site.lng})">
                         <span class="row-rank">#${i + 4}</span>
                         <div class="row-thumb" style="background: ${site.image ? `url(${site.image})` : getPlaceholder(site.type)}; background-size: cover;"></div>
                         <div class="row-info">
@@ -91,8 +91,8 @@ window.KidoaRanking = {
 
         const renderContributors = async () => {
             list.innerHTML = '<div class="center-text p-20"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
-            let users = await window.KidoaData.getContributors();
-            const me = window.KidoaAuth.checkAuth();
+            let users = await window.GoHappyData.getContributors();
+            const me = window.GoHappyAuth.checkAuth();
             if (me && !me.isGuest) {
                 if (!users.find(u => u.name === (me.nickname || me.email))) {
                     users.push({ name: me.nickname || me.email, points: me.points, rank: me.level, role: "Tú", special: true, avatar: me.photo || '👤' });
@@ -152,16 +152,16 @@ window.KidoaRanking = {
                 e.target.classList.add('active');
                 if (tab === 'sites') await renderSites();
                 else await renderContributors();
-                window.KidoaSound.play('click');
+                window.GoHappySound.play('click');
             });
         });
     },
 
     goToMap: (id, lat, lng) => {
-        window.KidoaApp.navigate('map');
+        window.GoHappyApp.navigate('map');
         setTimeout(() => {
-            if (window.KidoaMap && window.KidoaMap.instance) {
-                window.KidoaMap.instance.flyTo({
+            if (window.GoHappyMap && window.GoHappyMap.instance) {
+                window.GoHappyMap.instance.flyTo({
                     center: [lng, lat],
                     zoom: 16,
                     pitch: 0,
@@ -171,7 +171,7 @@ window.KidoaRanking = {
 
                 // Wait for flyto to finish or markers to load
                 setTimeout(() => {
-                    const m = window.KidoaMap.markers.find(m =>
+                    const m = window.GoHappyMap.markers.find(m =>
                         (m.data && m.data.id && String(m.data.id) === String(id)) ||
                         (m.data && Math.abs(m.data.lat - lat) < 0.0001 && Math.abs(m.data.lng - lng) < 0.0001)
                     );
@@ -181,3 +181,4 @@ window.KidoaRanking = {
         }, 600);
     }
 };
+

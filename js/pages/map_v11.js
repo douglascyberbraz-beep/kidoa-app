@@ -1,5 +1,5 @@
-// Definitive Kidoa 3D Map Engine - v2.1.0 (MapLibre GL / Premium)
-window.KidoaMap = {
+// Definitive GoHappy 3D Map Engine - v2.1.0 (MapLibre GL / Premium)
+window.GoHappyMap = {
     instance: null,
     isInitialized: false,
     markers: [],
@@ -8,23 +8,23 @@ window.KidoaMap = {
     lastKnownCoords: "41.6520, -4.7286",
 
     render: async (container) => {
-        console.log("Rendering Kidoa 3D Map v2.1.0...");
+        console.log("Rendering GoHappy 3D Map v2.1.0...");
         container.style.display = 'block';
 
-        if (!window.KidoaMap.isInitialized) {
-            await window.KidoaMap.init(container);
+        if (!window.GoHappyMap.isInitialized) {
+            await window.GoHappyMap.init(container);
         } else {
-            window.KidoaMap.instance.resize();
+            window.GoHappyMap.instance.resize();
             // Refresh markers in case of data updates
-            window.KidoaMap.loadMarkers();
+            window.GoHappyMap.loadMarkers();
         }
     },
 
     init: async (container) => {
-        if (window.KidoaMap.isInitialized && window.KidoaMap.instance) return;
+        if (window.GoHappyMap.isInitialized && window.GoHappyMap.instance) return;
 
         try {
-            window.KidoaMap.instance = new maplibregl.Map({
+            window.GoHappyMap.instance = new maplibregl.Map({
                 container: container,
                 style: 'https://tiles.openfreemap.org/styles/liberty',
                 center: [-4.7286, 41.6520],
@@ -35,51 +35,51 @@ window.KidoaMap = {
                 hash: false
             });
 
-            window.KidoaMap.instance.on('load', async () => {
-                window.KidoaMap.isInitialized = true;
+            window.GoHappyMap.instance.on('load', async () => {
+                window.GoHappyMap.isInitialized = true;
 
-                // Kidoa Harmonious Palette - Flat layers
-                window.KidoaMap.instance.setPaintProperty('water', 'fill-color', '#4CC9F0'); // Kidoa Light Blue
-                window.KidoaMap.instance.setPaintProperty('landuse-natural', 'fill-color', '#C8E6C9'); // Soft Green
-                window.KidoaMap.instance.setPaintProperty('landuse-park', 'fill-color', '#A5D6A7'); // Park Green
-                window.KidoaMap.instance.setPaintProperty('land', 'fill-color', '#F8FAFC'); // Kidoa Grayish White
+                // GoHappy Harmonious Palette - Flat layers
+                window.GoHappyMap.instance.setPaintProperty('water', 'fill-color', '#4CC9F0'); // GoHappy Light Blue
+                window.GoHappyMap.instance.setPaintProperty('landuse-natural', 'fill-color', '#C8E6C9'); // Soft Green
+                window.GoHappyMap.instance.setPaintProperty('landuse-park', 'fill-color', '#A5D6A7'); // Park Green
+                window.GoHappyMap.instance.setPaintProperty('land', 'fill-color', '#F8FAFC'); // GoHappy Grayish White
 
                 // Remove 3D Buildings - Force them to be flat
-                if (window.KidoaMap.instance.getLayer('building')) {
+                if (window.GoHappyMap.instance.getLayer('building')) {
                     // If the style has 3D extrusion, we override it to be a simple flat fill
-                    window.KidoaMap.instance.setPaintProperty('building', 'fill-color', '#E2E8F0');
-                    window.KidoaMap.instance.setPaintProperty('building', 'fill-outline-color', '#CBD5E1');
-                    window.KidoaMap.instance.setPaintProperty('building', 'fill-opacity', 0.8);
+                    window.GoHappyMap.instance.setPaintProperty('building', 'fill-color', '#E2E8F0');
+                    window.GoHappyMap.instance.setPaintProperty('building', 'fill-outline-color', '#CBD5E1');
+                    window.GoHappyMap.instance.setPaintProperty('building', 'fill-opacity', 0.8);
                     
                     // Specific override for potential 3D extrusion properties to ensure flatness
                     try {
-                        window.KidoaMap.instance.setPaintProperty('building', 'fill-extrusion-height', 0);
-                        window.KidoaMap.instance.setPaintProperty('building', 'fill-extrusion-base', 0);
+                        window.GoHappyMap.instance.setPaintProperty('building', 'fill-extrusion-height', 0);
+                        window.GoHappyMap.instance.setPaintProperty('building', 'fill-extrusion-base', 0);
                     } catch (e) {
                         // Properties might not exist if it's already a fill layer
                     }
                 }
 
                 // Thicker, cleaner roads
-                if (window.KidoaMap.instance.getLayer('road-primary')) {
-                    window.KidoaMap.instance.setPaintProperty('road-primary', 'line-color', '#ffffff');
-                    window.KidoaMap.instance.setPaintProperty('road-primary', 'line-width', 4);
+                if (window.GoHappyMap.instance.getLayer('road-primary')) {
+                    window.GoHappyMap.instance.setPaintProperty('road-primary', 'line-color', '#ffffff');
+                    window.GoHappyMap.instance.setPaintProperty('road-primary', 'line-width', 4);
                 }
 
-                window.KidoaMap.injectUI(container);
-                await window.KidoaMap.loadMarkers();
-                window.KidoaMap.startGPSWatch();
+                window.GoHappyMap.injectUI(container);
+                await window.GoHappyMap.loadMarkers();
+                window.GoHappyMap.startGPSWatch();
 
                 // Auto-highlight parks near the initial view
-                window.KidoaMap.highlightParksOnLoad();
+                window.GoHappyMap.highlightParksOnLoad();
             });
 
-            window.KidoaMap.instance.on('dblclick', (e) => {
-                window.KidoaMap.showAddSiteModal(e.lngLat.lat, e.lngLat.lng);
+            window.GoHappyMap.instance.on('dblclick', (e) => {
+                window.GoHappyMap.showAddSiteModal(e.lngLat.lat, e.lngLat.lng);
             });
 
         } catch (e) {
-            console.error("KidoaMap Init Failed:", e);
+            console.error("GoHappyMap Init Failed:", e);
             container.innerHTML = `<div class="p-20 center-text"><h3>Cargando Mapa...</h3></div>`;
         }
     },
@@ -118,15 +118,15 @@ window.KidoaMap = {
 
         const input = document.getElementById('map-search-input');
         input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') window.KidoaMap.handleSearch(input.value);
+            if (e.key === 'Enter') window.GoHappyMap.handleSearch(input.value);
         });
 
         document.getElementById('locate-me-btn').addEventListener('click', () => {
-            if (window.KidoaMap.userMarker) {
-                const lngLat = window.KidoaMap.userMarker.getLngLat();
-                window.KidoaMap.instance.easeTo({ center: lngLat, zoom: 18, pitch: 0, speed: 1.2 });
+            if (window.GoHappyMap.userMarker) {
+                const lngLat = window.GoHappyMap.userMarker.getLngLat();
+                window.GoHappyMap.instance.easeTo({ center: lngLat, zoom: 18, pitch: 0, speed: 1.2 });
             } else {
-                window.KidoaMap.locateUser();
+                window.GoHappyMap.locateUser();
             }
         });
 
@@ -135,28 +135,28 @@ window.KidoaMap = {
             chip.addEventListener('click', () => {
                 chips.forEach(c => c.classList.remove('active'));
                 chip.classList.add('active');
-                window.KidoaMap.filterMarkers(chip.dataset.type);
+                window.GoHappyMap.filterMarkers(chip.dataset.type);
             });
         });
     },
 
     loadMarkers: async () => {
         let coords = window.lastKnownCoords || "41.6520, -4.7286";
-        const locations = await window.KidoaData.getLocations(coords);
-        window.KidoaMap.clearMarkers();
+        const locations = await window.GoHappyData.getLocations(coords);
+        window.GoHappyMap.clearMarkers();
 
         locations.forEach(loc => {
-            window.KidoaMap.createMarker(loc);
+            window.GoHappyMap.createMarker(loc);
         });
     },
 
     createMarker: (loc) => {
         const isHighRated = loc.rating >= 4.5;
         const el = document.createElement('div');
-        el.className = `kidoa-marker-3d-wrap ${isHighRated ? 'highlight-poi' : ''}`;
+        el.className = `GoHappy-marker-3d-wrap ${isHighRated ? 'highlight-poi' : ''}`;
         el.innerHTML = `
-            <div class="kidoa-marker-3d">
-                <div class="kidoa-marker-pin" style="background: ${isHighRated ? 'linear-gradient(135deg, var(--accent-pink), #ff758c)' : 'linear-gradient(135deg, var(--primary-blue), #4cc9f0)'};">
+            <div class="GoHappy-marker-3d">
+                <div class="GoHappy-marker-pin" style="background: ${isHighRated ? 'linear-gradient(135deg, var(--accent-pink), #ff758c)' : 'linear-gradient(135deg, var(--primary-blue), #4cc9f0)'};">
                     <img src="assets/logo.png" style="width: 130%; height: 130%; object-fit: contain; filter: brightness(100) grayscale(1);">
                 </div>
             </div>
@@ -170,7 +170,7 @@ window.KidoaMap = {
                 <div class="popup-body" style="padding: 12px; background: white;">
                     <h3 style="margin: 0 0 5px 0; font-size: 1rem; font-weight: 800; color: var(--primary-navy);">${loc.name}</h3>
                     <div style="font-size: 0.8rem; color: #666; margin-bottom: 10px;">⭐ ${loc.rating || 4.5} | ${loc.type}</div>
-                    <button class="btn-primary-gradient" style="padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 700; width: 100%; border:none; color:white; cursor:pointer;" onclick="window.KidoaMap.showAddSiteModal(${loc.lat}, ${loc.lng}, '${loc.name.replace(/'/g, "\\'")}')">
+                    <button class="btn-primary-gradient" style="padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 700; width: 100%; border:none; color:white; cursor:pointer;" onclick="window.GoHappyMap.showAddSiteModal(${loc.lat}, ${loc.lng}, '${loc.name.replace(/'/g, "\\'")}')">
                         📝 Escribir Reseña
                     </button>
                 </div>
@@ -182,19 +182,19 @@ window.KidoaMap = {
         const marker = new maplibregl.Marker({ element: el })
             .setLngLat([loc.lng, loc.lat])
             .setPopup(popup)
-            .addTo(window.KidoaMap.instance);
+            .addTo(window.GoHappyMap.instance);
 
-        window.KidoaMap.markers.push({ instance: marker, type: loc.type, data: loc });
+        window.GoHappyMap.markers.push({ instance: marker, type: loc.type, data: loc });
     },
 
     clearMarkers: () => {
-        window.KidoaMap.markers.forEach(m => m.instance.remove());
-        window.KidoaMap.markers = [];
+        window.GoHappyMap.markers.forEach(m => m.instance.remove());
+        window.GoHappyMap.markers = [];
     },
 
     filterMarkers: (type) => {
-        window.KidoaMap.markers.forEach(m => {
-            if (type === 'all' || m.type === type) m.instance.addTo(window.KidoaMap.instance);
+        window.GoHappyMap.markers.forEach(m => {
+            if (type === 'all' || m.type === type) m.instance.addTo(window.GoHappyMap.instance);
             else m.instance.remove();
         });
     },
@@ -206,18 +206,18 @@ window.KidoaMap = {
         input.disabled = true;
 
         try {
-            const results = await window.KidoaData.searchLocations(query, window.KidoaMap.lastKnownCoords);
+            const results = await window.GoHappyData.searchLocations(query, window.GoHappyMap.lastKnownCoords);
             if (results && results.length > 0) {
-                window.KidoaMap.clearMarkers();
-                results.forEach(loc => window.KidoaMap.createMarker(loc));
-                window.KidoaMap.instance.flyTo({ center: [results[0].lng, results[0].lat], zoom: 17, pitch: 0, speed: 1.0 });
+                window.GoHappyMap.clearMarkers();
+                results.forEach(loc => window.GoHappyMap.createMarker(loc));
+                window.GoHappyMap.instance.flyTo({ center: [results[0].lng, results[0].lat], zoom: 17, pitch: 0, speed: 1.0 });
             } else {
                 // geocoding fallback
                 const resp = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=1`);
                 const data = await resp.json();
                 if (data.features && data.features.length > 0) {
                     const c = data.features[0].geometry.coordinates;
-                    window.KidoaMap.instance.flyTo({ center: c, zoom: 17, pitch: 0 });
+                    window.GoHappyMap.instance.flyTo({ center: c, zoom: 17, pitch: 0 });
                 }
             }
         } catch (e) { console.warn("Search error:", e); }
@@ -240,7 +240,7 @@ window.KidoaMap = {
 
             if (window.lastKnownCoords !== newCoords) {
                 window.lastKnownCoords = newCoords;
-                window.dispatchEvent(new CustomEvent('kidoa-location-sync', { detail: newCoords }));
+                window.dispatchEvent(new CustomEvent('GoHappy-location-sync', { detail: newCoords }));
             }
 
             let heading = pos.coords.heading;
@@ -257,11 +257,11 @@ window.KidoaMap = {
             lastLat = lat;
             lastLng = lng;
 
-            window.KidoaMap.updateUserIcon(lat, lng, heading); // Pass the updated heading to the marker physically
+            window.GoHappyMap.updateUserIcon(lat, lng, heading); // Pass the updated heading to the marker physically
 
-            window.KidoaMap.instance.easeTo({
+            window.GoHappyMap.instance.easeTo({
                 center: [lng, lat],
-                bearing: heading || window.KidoaMap.instance.getBearing(),
+                bearing: heading || window.GoHappyMap.instance.getBearing(),
                 pitch: 0, // Flat view
                 zoom: 17.5,
                 duration: 1500,
@@ -271,10 +271,10 @@ window.KidoaMap = {
     },
 
     updateUserIcon: (lat, lng, heading = 0) => {
-        if (!window.KidoaMap.userMarker) {
+        if (!window.GoHappyMap.userMarker) {
             const el = document.createElement('div');
             el.innerHTML = `
-                <div class="user-kidoa-orb" style="
+                <div class="user-GoHappy-orb" style="
                     width: 50px; height: 50px;
                     background: radial-gradient(circle, rgba(76, 201, 240, 0.4) 0%, transparent 70%);
                     display: flex; justify-content: center; align-items: center;
@@ -305,12 +305,12 @@ window.KidoaMap = {
                     </div>
                 </div>
             `;
-            window.KidoaMap.userMarker = new maplibregl.Marker({ element: el, pitchAlignment: 'map', rotationAlignment: 'map' })
+            window.GoHappyMap.userMarker = new maplibregl.Marker({ element: el, pitchAlignment: 'map', rotationAlignment: 'map' })
                 .setLngLat([lng, lat])
-                .addTo(window.KidoaMap.instance);
+                .addTo(window.GoHappyMap.instance);
         } else {
-            window.KidoaMap.userMarker.setLngLat([lng, lat]);
-            const indicator = window.KidoaMap.userMarker.getElement().querySelector('[style*="border-bottom: 10px solid"]');
+            window.GoHappyMap.userMarker.setLngLat([lng, lat]);
+            const indicator = window.GoHappyMap.userMarker.getElement().querySelector('[style*="border-bottom: 10px solid"]');
             if (indicator) indicator.style.transform = `rotate(${heading}deg) translateY(-2px)`;
         }
     },
@@ -326,16 +326,16 @@ window.KidoaMap = {
         navigator.geolocation.getCurrentPosition((pos) => {
             const lat = pos.coords.latitude;
             const lng = pos.coords.longitude;
-            window.KidoaMap.instance.flyTo({ center: [lng, lat], zoom: 18, pitch: 0 });
-            window.KidoaMap.updateUserIcon(lat, lng);
+            window.GoHappyMap.instance.flyTo({ center: [lng, lat], zoom: 18, pitch: 0 });
+            window.GoHappyMap.updateUserIcon(lat, lng);
         });
     },
 
     showAddSiteModal: (lat, lng, name = "") => {
-        const user = window.KidoaAuth.checkAuth();
+        const user = window.GoHappyAuth.checkAuth();
         if (!user) {
             alert("Inicia sesión para contribuir con la Tribu.");
-            window.KidoaAuth.renderAuthModal();
+            window.GoHappyAuth.renderAuthModal();
             return;
         }
 
@@ -355,7 +355,7 @@ window.KidoaMap = {
 
                     <textarea id="review-text" class="review-input" placeholder="¿Qué tal el sitio? (Misión, limpieza, sombra...)" style="height:80px;"></textarea>
 
-                    <button id="post-review-btn" class="btn-primary full-width">Publicar en Kidoa</button>
+                    <button id="post-review-btn" class="btn-primary full-width">Publicar en GoHappy</button>
                     <button class="btn-text full-width" style="margin-top:10px;" onclick="this.closest('.modal').remove()">Cancelar</button>
                 </div>
             </div>
@@ -378,7 +378,7 @@ window.KidoaMap = {
 
             try {
                 // Save to Firestore
-                await window.KidoaDB.collection('reviews').add({
+                await window.GoHappyDB.collection('reviews').add({
                     userId: user.uid,
                     userName: user.nickname,
                     siteName: finalName,
@@ -390,10 +390,10 @@ window.KidoaMap = {
                 });
 
                 // Add points
-                await window.KidoaPoints.addPoints('REVIEW');
+                await window.GoHappyPoints.addPoints('REVIEW');
                 
                 // Visual feedback on map
-                window.KidoaMap.createMarker({ name: finalName, lat, lng, rating, type: 'new' });
+                window.GoHappyMap.createMarker({ name: finalName, lat, lng, rating, type: 'new' });
                 
                 alert("¡Gracias! Tu reseña ha sido publicada. Has ganado 100 puntos y ayudado a la comunidad. ✨");
                 modal.remove();
@@ -409,12 +409,12 @@ window.KidoaMap = {
         try {
             // Use Gemini to find real local parks/playgrounds if they aren't in fixed data
             const query = "parques infantiles y áreas de juego";
-            const parks = await window.KidoaData.searchLocations(query, coords);
+            const parks = await window.GoHappyData.searchLocations(query, coords);
             if (parks && parks.length > 0) {
                 parks.forEach(park => {
                     // Force type to 'park' for consistent coloring
                     park.type = 'park';
-                    window.KidoaMap.createMarker(park);
+                    window.GoHappyMap.createMarker(park);
                 });
             }
         } catch (e) {
@@ -422,3 +422,4 @@ window.KidoaMap = {
         }
     }
 };
+

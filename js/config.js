@@ -6,9 +6,9 @@
 
 const firebaseConfig = {
     apiKey: "AIzaSyDppR0-A8bEKT1sjJDst1N6uZV-EsTLSYo",
-    authDomain: "kidoa-8d660.firebaseapp.com",
-    projectId: "kidoa-8d660",
-    storageBucket: "kidoa-8d660.firebasestorage.app",
+    authDomain: "GoHappy-8d660.firebaseapp.com",
+    projectId: "GoHappy-8d660",
+    storageBucket: "GoHappy-8d660.firebasestorage.app",
     messagingSenderId: "552831875210",
     appId: "1:552831875210:web:1af5583c40e0d62bbf9573",
     measurementId: "G-2F3HNE2L5P"
@@ -30,9 +30,9 @@ const GEMINI_API_KEY = __gk1 + __gk2 + __gk3 + __gk4 + __gk5;
 // Inicializar Firebase (Versión Compat para ejecución local sin servidor)
 if (window.firebase) {
     firebase.initializeApp(firebaseConfig);
-    window.KidoaFirebaseApp = firebase.app();
-    window.KidoaAuthReal = firebase.auth();
-    window.KidoaDB = firebase.firestore();
+    window.GoHappyFirebaseApp = firebase.app();
+    window.GoHappyAuthReal = firebase.auth();
+    window.GoHappyDB = firebase.firestore();
     console.log("🔥 Firebase conectado correctamente");
 } else {
     console.error("❌ Error: Librerías de Firebase no cargadas.");
@@ -40,3 +40,4 @@ if (window.firebase) {
 
 // Exponer clave de Gemini globalmente para el chat
 window.GEMINI_KEY = GEMINI_API_KEY;
+

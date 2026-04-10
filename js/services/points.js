@@ -1,4 +1,4 @@
-window.KidoaPoints = {
+window.GoHappyPoints = {
     // Configuración de la tabla de puntos
     REWARDS: {
         REGISTER: 50,
@@ -15,20 +15,20 @@ window.KidoaPoints = {
         { min: 0, name: "Explorador Novato", icon: "🌱" },
         { min: 150, name: "Explorador Activo", icon: "🌿" },
         { min: 500, name: "Guía de la Tribu", icon: "🌳" },
-        { min: 1200, name: "Maestro Kidoa", icon: "⭐" },
-        { min: 2500, name: "Leyenda Kidoa", icon: "👑" }
+        { min: 1200, name: "Maestro GoHappy", icon: "⭐" },
+        { min: 2500, name: "Leyenda GoHappy", icon: "👑" }
     ],
 
     // Obtener información de nivel basada en puntos
     getLevelInfo: (points = 0) => {
         const pts = points || 0;
-        let currentLevel = window.KidoaPoints.LEVELS[0];
+        let currentLevel = window.GoHappyPoints.LEVELS[0];
         let nextLevel = null;
 
-        for (let i = 0; i < window.KidoaPoints.LEVELS.length; i++) {
-            if (pts >= window.KidoaPoints.LEVELS[i].min) {
-                currentLevel = window.KidoaPoints.LEVELS[i];
-                nextLevel = window.KidoaPoints.LEVELS[i + 1] || null;
+        for (let i = 0; i < window.GoHappyPoints.LEVELS.length; i++) {
+            if (pts >= window.GoHappyPoints.LEVELS[i].min) {
+                currentLevel = window.GoHappyPoints.LEVELS[i];
+                nextLevel = window.GoHappyPoints.LEVELS[i + 1] || null;
             }
         }
 
@@ -46,20 +46,20 @@ window.KidoaPoints = {
 
     // Otorgar puntos reales y sincronizar con Firestore
     addPoints: async (action, userId) => {
-        const pointsToAdd = window.KidoaPoints.REWARDS[action] || 0;
+        const pointsToAdd = window.GoHappyPoints.REWARDS[action] || 0;
         console.log(`Otorgando ${pointsToAdd} puntos por acción: ${action}`);
 
-        const user = window.KidoaAuth.checkAuth();
+        const user = window.GoHappyAuth.checkAuth();
         
         if (user && !user.isGuest) {
             try {
                 // Actualizar localmente para feedback inmediato
                 user.points = (user.points || 0) + pointsToAdd;
-                localStorage.setItem('kidoa_local_user', JSON.stringify(user));
+                localStorage.setItem('GoHappy_local_user', JSON.stringify(user));
                 
                 // Sincronizar con Firestore
-                const userRef = window.KidoaDB.collection('users').doc(user.uid);
-                await window.KidoaDB.runTransaction(async (transaction) => {
+                const userRef = window.GoHappyDB.collection('users').doc(user.uid);
+                await window.GoHappyDB.runTransaction(async (transaction) => {
                     const sfDoc = await transaction.get(userRef);
                     if (!sfDoc.exists) {
                         transaction.set(userRef, { points: pointsToAdd });
@@ -76,11 +76,12 @@ window.KidoaPoints = {
             }
         } else {
             // Fallback para invitados o local
-            let pts = parseInt(localStorage.getItem('kidoa_guest_points')) || 0;
+            let pts = parseInt(localStorage.getItem('GoHappy_guest_points')) || 0;
             pts += pointsToAdd;
-            localStorage.setItem('kidoa_guest_points', pts.toString());
+            localStorage.setItem('GoHappy_guest_points', pts.toString());
             window.dispatchEvent(new CustomEvent('pointsUpdated', { detail: pts }));
         }
         return pointsToAdd;
     }
 };
+

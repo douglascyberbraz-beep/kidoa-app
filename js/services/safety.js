@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
-// KidoaSafe - Safety Alerts Service
+// GoHappySafe - Safety Alerts Service
 // ------------------------------------------------------------------
-window.KidoaSafe = {
+window.GoHappySafe = {
 
     ALERT_TYPES: {
         DANGER: { icon: '🚨', label: 'Peligro', color: '#E74C3C' },
@@ -14,7 +14,7 @@ window.KidoaSafe = {
     // Obtener alertas cercanas
     getAlerts: async (coords) => {
         try {
-            const snap = await window.KidoaDB.collection('alerts')
+            const snap = await window.GoHappyDB.collection('alerts')
                 .where('active', '==', true)
                 .orderBy('createdAt', 'desc')
                 .limit(15)
@@ -70,7 +70,7 @@ window.KidoaSafe = {
 
     // Reportar una nueva alerta
     reportAlert: async (alertData) => {
-        const user = window.KidoaAuth.checkAuth();
+        const user = window.GoHappyAuth.checkAuth();
         if (!user) return false;
 
         try {
@@ -82,16 +82,16 @@ window.KidoaSafe = {
                 active: true,
                 votes: 0
             };
-            await window.KidoaDB.collection('alerts').add(alert);
+            await window.GoHappyDB.collection('alerts').add(alert);
 
             // Activity for Memories
-            await window.KidoaDB.collection('activity').add({
+            await window.GoHappyDB.collection('activity').add({
                 userId: user.uid,
                 type: 'safety_report',
                 timestamp: new Date()
             });
 
-            window.KidoaPoints.addPoints('REVIEW');
+            window.GoHappyPoints.addPoints('REVIEW');
             return true;
         } catch (e) {
             console.error("Error reportando alerta:", e);
@@ -102,7 +102,7 @@ window.KidoaSafe = {
     // Votar una alerta (confirmar que sigue vigente)
     voteAlert: async (alertId) => {
         try {
-            const ref = window.KidoaDB.collection('alerts').doc(alertId);
+            const ref = window.GoHappyDB.collection('alerts').doc(alertId);
             const doc = await ref.get();
             if (doc.exists) {
                 await ref.update({ votes: (doc.data().votes || 0) + 1 });
@@ -114,3 +114,4 @@ window.KidoaSafe = {
         return false;
     }
 };
+

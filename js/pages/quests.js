@@ -1,4 +1,4 @@
-window.KidoaQuestsPage = {
+window.GoHappyQuestsPage = {
     render: async (container) => {
         container.innerHTML = `
             <div class="quests-page">
@@ -35,7 +35,7 @@ window.KidoaQuestsPage = {
         const list = document.getElementById('quests-list');
 
         // Load active quests
-        const quests = await window.KidoaQuests.getActiveQuests();
+        const quests = await window.GoHappyQuests.getActiveQuests();
 
         // Update stats
         document.getElementById('q-active').textContent = quests.filter(q => q.status === 'active').length;
@@ -49,7 +49,7 @@ window.KidoaQuestsPage = {
             list.innerHTML = '<p class="center-text p-20" style="color: #888;">No tienes misiones activas. ¡Genera algunas!</p>';
         } else {
             quests.forEach(quest => {
-                const typeInfo = window.KidoaQuests.MISSION_TYPES[quest.type] || { icon: '🎯', label: 'Misión', color: '#666' };
+                const typeInfo = window.GoHappyQuests.MISSION_TYPES[quest.type] || { icon: '🎯', label: 'Misión', color: '#666' };
                 const progress = quest.progress || 0;
                 const total = quest.totalSteps || quest.objectives?.length || 1;
                 const pct = Math.round((progress / total) * 100);
@@ -117,17 +117,17 @@ window.KidoaQuestsPage = {
                     e.target.disabled = true;
                     e.target.textContent = '⌛...';
 
-                    const success = await window.KidoaQuests.updateQuestProgress(qId, newProgress, isComplete);
+                    const success = await window.GoHappyQuests.updateQuestProgress(qId, newProgress, isComplete);
 
                     if (success) {
                         if (isComplete) {
-                            window.KidoaSound.play('success');
+                            window.GoHappySound.play('success');
                             alert(`🎉 ¡Misión "${quest.title}" completada! +${quest.points} puntos`);
                         } else {
-                            window.KidoaSound.play('click');
+                            window.GoHappySound.play('click');
                         }
                         // Re-render
-                        window.KidoaQuestsPage.render(container);
+                        window.GoHappyQuestsPage.render(container);
                     } else {
                         e.target.disabled = false;
                         e.target.textContent = 'Error ⚠️';
@@ -152,17 +152,17 @@ window.KidoaQuestsPage = {
                 } catch (e) { }
             }
 
-            const newQuests = await window.KidoaQuests.generateQuests(coords);
+            const newQuests = await window.GoHappyQuests.generateQuests(coords);
             if (newQuests && newQuests.length > 0) {
                 list.innerHTML = '<p class="center-text p-20">💾 Guardando misiones en tu perfil...</p>';
 
                 // Save them to Firestore properly
                 for (const q of newQuests) {
-                    await window.KidoaQuests.saveQuest(q);
+                    await window.GoHappyQuests.saveQuest(q);
                 }
 
                 // Re-render to show new active quests from Firestore
-                window.KidoaQuestsPage.render(container);
+                window.GoHappyQuestsPage.render(container);
             } else {
                 alert("No se pudieron generar misiones en este momento. Inténtalo de nuevo.");
             }
@@ -172,3 +172,4 @@ window.KidoaQuestsPage = {
         });
     }
 };
+

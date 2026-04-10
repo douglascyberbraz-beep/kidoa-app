@@ -1,7 +1,7 @@
-window.KidoaAuth = {
+window.GoHappyAuth = {
     // Estado interno para evitar múltiples guardados
     _currentUser: (function () {
-        const stored = localStorage.getItem('kidoa_local_user');
+        const stored = localStorage.getItem('GoHappy_local_user');
         if (stored) {
             try { return JSON.parse(stored); } catch (e) { return null; }
         }
@@ -10,14 +10,14 @@ window.KidoaAuth = {
 
     init: (callback) => {
         // Escuchar cambios de estado de Firebase
-        window.KidoaAuthReal.onAuthStateChanged(async (user) => {
+        window.GoHappyAuthReal.onAuthStateChanged(async (user) => {
             if (user) {
                 try {
                     // Obtener perfil extendido de Firestore si existe
-                    const doc = await window.KidoaDB.collection('users').doc(user.uid).get();
+                    const doc = await window.GoHappyDB.collection('users').doc(user.uid).get();
                     const profile = doc.exists ? doc.data() : {};
 
-                    window.KidoaAuth._currentUser = {
+                    window.GoHappyAuth._currentUser = {
                         uid: user.uid,
                         email: user.email || "Invitado",
                         nickname: profile.nickname || "Explorador",
@@ -29,7 +29,7 @@ window.KidoaAuth = {
                     };
                 } catch (e) {
                     console.warn("Resilient Init: Error fetching firestore profile, using minimal local state", e);
-                    window.KidoaAuth._currentUser = {
+                    window.GoHappyAuth._currentUser = {
                         uid: user.uid,
                         email: user.email || "Invitado",
                         nickname: "Explorador",
@@ -41,21 +41,21 @@ window.KidoaAuth = {
                 }
             } else {
                 // Si no hay user en Firebase, buscar si hay una sesión local de "emergencia"
-                const localUser = window.KidoaAuth._checkLocalSession();
-                window.KidoaAuth._currentUser = localUser;
+                const localUser = window.GoHappyAuth._checkLocalSession();
+                window.GoHappyAuth._currentUser = localUser;
             }
-            if (callback) callback(window.KidoaAuth._currentUser);
+            if (callback) callback(window.GoHappyAuth._currentUser);
         });
     },
 
     checkAuth: () => {
-        return window.KidoaAuth._currentUser;
+        return window.GoHappyAuth._currentUser;
     },
 
     // Validar código de invitación en Firestore
     validateInvitation: async (code) => {
         if (!code) return false;
-        const snap = await window.KidoaDB.collection('invitations')
+        const snap = await window.GoHappyDB.collection('invitations')
             .where('code', '==', code.toUpperCase())
             .where('used', '==', false)
             .get();
@@ -64,7 +64,7 @@ window.KidoaAuth = {
 
     login: async (email, pass) => {
         try {
-            const res = await window.KidoaAuthReal.signInWithEmailAndPassword(email, pass);
+            const res = await window.GoHappyAuthReal.signInWithEmailAndPassword(email, pass);
             return res.user;
         } catch (e) {
             console.error("Login Error:", e);
@@ -75,7 +75,7 @@ window.KidoaAuth = {
     register: async (email, pass, nickname) => {
         try {
             // 1. Crear usuario en Auth
-            const res = await window.KidoaAuthReal.createUserWithEmailAndPassword(email, pass);
+            const res = await window.GoHappyAuthReal.createUserWithEmailAndPassword(email, pass);
             const user = res.user;
 
             // 3. Crear perfil en Firestore
@@ -88,7 +88,7 @@ window.KidoaAuth = {
                 referralCode: 'KNDR-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
                 createdAt: new Date()
             };
-            await window.KidoaDB.collection('users').doc(user.uid).set(profile);
+            await window.GoHappyDB.collection('users').doc(user.uid).set(profile);
 
             // 4. Marcar invitación como usada (opcional, depende de la lógica del beta)
             // Aquí podrías actualizar el doc de la invitación si fuera de un solo uso
@@ -101,14 +101,14 @@ window.KidoaAuth = {
     },
 
     logout: async () => {
-        localStorage.removeItem('kidoa_local_user');
-        await window.KidoaAuthReal.signOut();
+        localStorage.removeItem('GoHappy_local_user');
+        await window.GoHappyAuthReal.signOut();
         window.location.reload();
     },
 
     setGuestMode: async () => {
         try {
-            const res = await window.KidoaAuthReal.signInAnonymously();
+            const res = await window.GoHappyAuthReal.signInAnonymously();
             return res.user;
         } catch (e) {
             console.error("Guest Auth Error (Firebase):", e);
@@ -123,18 +123,18 @@ window.KidoaAuth = {
                 points: 0,
                 level: 'Bronce'
             };
-            window.KidoaAuth._saveLocalSession(mockUser);
-            window.KidoaAuth._currentUser = mockUser;
+            window.GoHappyAuth._saveLocalSession(mockUser);
+            window.GoHappyAuth._currentUser = mockUser;
             return mockUser;
         }
     },
 
     _saveLocalSession: (user) => {
-        localStorage.setItem('kidoa_local_user', JSON.stringify(user));
+        localStorage.setItem('GoHappy_local_user', JSON.stringify(user));
     },
 
     _checkLocalSession: () => {
-        const stored = localStorage.getItem('kidoa_local_user');
+        const stored = localStorage.getItem('GoHappy_local_user');
         if (stored) {
             try {
                 return JSON.parse(stored);
@@ -148,9 +148,9 @@ window.KidoaAuth = {
     googleLogin: async () => {
         try {
             const provider = new firebase.auth.GoogleAuthProvider();
-            const res = await window.KidoaAuthReal.signInWithPopup(provider);
+            const res = await window.GoHappyAuthReal.signInWithPopup(provider);
             // Si es nuevo usuario, crear perfil en Firestore
-            const doc = await window.KidoaDB.collection('users').doc(res.user.uid).get();
+            const doc = await window.GoHappyDB.collection('users').doc(res.user.uid).get();
             if (!doc.exists) {
                 const profile = {
                     uid: res.user.uid,
@@ -161,7 +161,7 @@ window.KidoaAuth = {
                     referralCode: 'KNDR-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
                     createdAt: new Date()
                 };
-                await window.KidoaDB.collection('users').doc(res.user.uid).set(profile);
+                await window.GoHappyDB.collection('users').doc(res.user.uid).set(profile);
             }
             return res.user;
         } catch (e) {
@@ -173,9 +173,9 @@ window.KidoaAuth = {
     appleLogin: async () => {
         try {
             const provider = new firebase.auth.OAuthProvider('apple.com');
-            const res = await window.KidoaAuthReal.signInWithPopup(provider);
+            const res = await window.GoHappyAuthReal.signInWithPopup(provider);
             // Lógica similar a Google para nuevo usuario
-            const doc = await window.KidoaDB.collection('users').doc(res.user.uid).get();
+            const doc = await window.GoHappyDB.collection('users').doc(res.user.uid).get();
             if (!doc.exists) {
                 const profile = {
                     uid: res.user.uid,
@@ -186,7 +186,7 @@ window.KidoaAuth = {
                     referralCode: 'KNDR-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
                     createdAt: new Date()
                 };
-                await window.KidoaDB.collection('users').doc(res.user.uid).set(profile);
+                await window.GoHappyDB.collection('users').doc(res.user.uid).set(profile);
             }
             return res.user;
         } catch (e) {
@@ -207,9 +207,9 @@ window.KidoaAuth = {
                 <div class="auth-card premium-glass">
                     <div class="auth-header">
                         <div class="premium-logo-wrap" style="margin-bottom: 30px; transform: scale(1.05);">
-                            <img src="assets/logo.png" alt="Kidoa" style="height: 115px; width: auto; object-fit: contain; mix-blend-mode: multiply;">
+                            <img src="assets/logo.png" alt="GoHappy" style="height: 115px; width: auto; object-fit: contain; mix-blend-mode: multiply;">
                         </div>
-                        <h2 style="color:var(--primary-navy); font-size: 1.9rem; font-weight: 900; margin-bottom: 8px; letter-spacing: -0.5px;">Bienvenido a KIDOA</h2>
+                        <h2 style="color:var(--primary-navy); font-size: 1.9rem; font-weight: 900; margin-bottom: 8px; letter-spacing: -0.5px;">Bienvenido a GoHappy</h2>
                         <p style="color: #64748b; font-size: 1rem; font-weight: 500;">Explora, comparte y crece con tu tribu</p>
                     </div>
                     
@@ -290,7 +290,7 @@ window.KidoaAuth = {
             if (isLoginMode) {
                 if (!email || !pass) return showError("Email y contraseña requeridos.");
                 try {
-                    await window.KidoaAuth.login(email, pass);
+                    await window.GoHappyAuth.login(email, pass);
                     modal.remove();
                     location.reload();
                 } catch (e) {
@@ -304,7 +304,7 @@ window.KidoaAuth = {
                 if (!termsAccepted) return showError("Debes aceptar los Términos y Condiciones.");
 
                 try {
-                    await window.KidoaAuth.register(email, pass, nick);
+                    await window.GoHappyAuth.register(email, pass, nick);
                     modal.remove();
                     location.reload();
                 } catch (e) {
@@ -321,7 +321,7 @@ window.KidoaAuth = {
 
         document.getElementById('do-google').addEventListener('click', async () => {
             try {
-                await window.KidoaAuth.googleLogin();
+                await window.GoHappyAuth.googleLogin();
                 modal.remove();
                 location.reload();
             } catch (e) {
@@ -331,7 +331,7 @@ window.KidoaAuth = {
 
         document.getElementById('do-apple').addEventListener('click', async () => {
             try {
-                await window.KidoaAuth.appleLogin();
+                await window.GoHappyAuth.appleLogin();
                 modal.remove();
                 location.reload();
             } catch (e) {
@@ -341,7 +341,7 @@ window.KidoaAuth = {
 
         document.getElementById('do-guest').addEventListener('click', async () => {
             try {
-                await window.KidoaAuth.setGuestMode();
+                await window.GoHappyAuth.setGuestMode();
                 modal.remove();
                 location.reload();
             } catch (e) {
@@ -351,7 +351,7 @@ window.KidoaAuth = {
 
         document.getElementById('show-terms-link').addEventListener('click', (e) => {
             e.preventDefault();
-            window.KidoaApp.loadPage('legal');
+            window.GoHappyApp.loadPage('legal');
             modal.remove();
 
             // Restore map elements
@@ -372,3 +372,4 @@ window.KidoaAuth = {
         const originalLogin = document.getElementById('main-auth-btn').onclick;
     }
 };
+

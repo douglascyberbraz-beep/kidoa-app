@@ -1,4 +1,4 @@
-window.KidoaNewsEvents = {
+window.GoHappyNewsEvents = {
     render: async (container) => {
         container.innerHTML = `
             <div class="page-header sticky-header" style="flex-direction: column; align-items: stretch; gap: 15px; padding-bottom: 5px;">
@@ -23,8 +23,8 @@ window.KidoaNewsEvents = {
         const locStatus = document.getElementById('loc-status');
 
         // Reactive Sync
-        window.addEventListener('kidoa-location-sync', (e) => {
-            if (window.KidoaApp.currentPage === 'news_events') {
+        window.addEventListener('GoHappy-location-sync', (e) => {
+            if (window.GoHappyApp.currentPage === 'news_events') {
                 locStatus.innerText = "📍 Información de tu zona sincronizada";
                 loadContent(currentTab || 'news');
             }
@@ -54,15 +54,15 @@ window.KidoaNewsEvents = {
             }
 
             if (tab === 'news') {
-                const news = await window.KidoaData.getNews(coords);
+                const news = await window.GoHappyData.getNews(coords);
                 if (news && news.length > 0) renderNews(news);
                 else content.innerHTML = '<div class="p-40 center-text text-light">No hemos encontrado noticias en tu zona hoy. 🏜️</div>';
             } else if (tab === 'events') {
-                const events = await window.KidoaData.getEvents(coords);
+                const events = await window.GoHappyData.getEvents(coords);
                 if (events && events.length > 0) renderEvents(events);
                 else content.innerHTML = '<div class="p-40 center-text text-light">No hay eventos próximos registrados cerca de ti. 🎭</div>';
             } else if (tab === 'becas') {
-                const becas = await window.KidoaData.getBecas(coords);
+                const becas = await window.GoHappyData.getBecas(coords);
                 if (becas && becas.length > 0) renderBecas(becas);
                 else content.innerHTML = '<div class="p-40 center-text text-light">No hay becas activas en este momento. 💎</div>';
             }
@@ -170,3 +170,4 @@ window.KidoaNewsEvents = {
         loadContent('news');
     }
 };
+

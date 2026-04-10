@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
-// KidoaQuests - Motor de Misiones Familiares
+// GoHappyQuests - Motor de Misiones Familiares
 // ------------------------------------------------------------------
-window.KidoaQuests = {
+window.GoHappyQuests = {
 
     // Tipos de misión disponibles
     MISSION_TYPES: {
@@ -15,11 +15,11 @@ window.KidoaQuests = {
 
     // Obtener misiones activas del usuario
     getActiveQuests: async () => {
-        const user = window.KidoaAuth.checkAuth();
-        if (!user) return window.KidoaQuests._getDefaultQuests();
+        const user = window.GoHappyAuth.checkAuth();
+        if (!user) return window.GoHappyQuests._getDefaultQuests();
 
         try {
-            const snap = await window.KidoaDB.collection('quests')
+            const snap = await window.GoHappyDB.collection('quests')
                 .where('userId', '==', user.uid)
                 .where('status', '==', 'active')
                 .orderBy('createdAt', 'desc')
@@ -33,12 +33,12 @@ window.KidoaQuests = {
         }
 
         // Si no hay misiones en Firestore, devolvemos las de demo solo si es invitado o primer login
-        return window.KidoaQuests._getDefaultQuests();
+        return window.GoHappyQuests._getDefaultQuests();
     },
 
     // Guardar una misión generada por IA en la cuenta del usuario
     saveQuest: async (questData) => {
-        const user = window.KidoaAuth.checkAuth();
+        const user = window.GoHappyAuth.checkAuth();
         if (!user) return null;
 
         try {
@@ -50,7 +50,7 @@ window.KidoaQuests = {
                 totalSteps: questData.objectives?.length || 1,
                 createdAt: new Date()
             };
-            const docRef = await window.KidoaDB.collection('quests').add(newQuest);
+            const docRef = await window.GoHappyDB.collection('quests').add(newQuest);
             return { id: docRef.id, ...newQuest };
         } catch (e) {
             console.error("Error saving quest:", e);
@@ -60,7 +60,7 @@ window.KidoaQuests = {
 
     // Actualizar progreso de una misión
     updateQuestProgress: async (questId, newProgress, isComplete) => {
-        const user = window.KidoaAuth.checkAuth();
+        const user = window.GoHappyAuth.checkAuth();
         if (!user) return false;
 
         try {
@@ -70,11 +70,11 @@ window.KidoaQuests = {
                 updateData.completedAt = new Date();
             }
 
-            await window.KidoaDB.collection('quests').doc(questId).update(updateData);
+            await window.GoHappyDB.collection('quests').doc(questId).update(updateData);
 
             if (isComplete) {
                 // Registrar actividad para Memories
-                await window.KidoaDB.collection('activity').add({
+                await window.GoHappyDB.collection('activity').add({
                     userId: user.uid,
                     type: 'quest_completed',
                     title: 'Misión completada',
@@ -82,7 +82,7 @@ window.KidoaQuests = {
                     timestamp: new Date(),
                     points: 100 // Puntos base por misión
                 });
-                window.KidoaPoints.addPoints('QUEST_COMPLETE');
+                window.GoHappyPoints.addPoints('QUEST_COMPLETE');
             }
             return true;
         } catch (e) {
@@ -95,35 +95,35 @@ window.KidoaQuests = {
     generateQuests: async (coords = "41.6520, -4.7286") => {
         try {
             if (window.GEMINI_KEY && !window.GEMINI_KEY.includes('PEGAR_AQUI')) {
-                return await window.KidoaAI.generateLocalQuests(coords);
+                return await window.GoHappyAI.generateLocalQuests(coords);
             }
-            return window.KidoaQuests._getDefaultQuests();
+            return window.GoHappyQuests._getDefaultQuests();
         } catch (e) {
             console.error("Error generando misiones:", e);
-            return window.KidoaQuests._getDefaultQuests();
+            return window.GoHappyQuests._getDefaultQuests();
         }
     },
 
     // Completar una misión
     completeQuest: async (questId) => {
-        const user = window.KidoaAuth.checkAuth();
+        const user = window.GoHappyAuth.checkAuth();
         if (!user) return false;
 
         try {
-            await window.KidoaDB.collection('quests').doc(questId).update({
+            await window.GoHappyDB.collection('quests').doc(questId).update({
                 status: 'completed',
                 completedAt: new Date()
             });
 
             // Registrar en el historial de actividad (para Memories)
-            await window.KidoaDB.collection('activity').add({
+            await window.GoHappyDB.collection('activity').add({
                 userId: user.uid,
                 type: 'quest_completed',
                 questId: questId,
                 timestamp: new Date()
             });
 
-            window.KidoaPoints.addPoints('QUEST_COMPLETE');
+            window.GoHappyPoints.addPoints('QUEST_COMPLETE');
             return true;
         } catch (e) {
             console.error("Error completando misión:", e);
@@ -187,3 +187,4 @@ window.KidoaQuests = {
         }
     ]
 };
+

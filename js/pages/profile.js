@@ -1,8 +1,8 @@
-window.KidoaProfile = {
+window.GoHappyProfile = {
     render: async (container) => {
         container.innerHTML = `<div class="p-20 center-text"><div class="typing-dots"><span></span><span></span><span></span></div><p>Sincronizando con la nube...</p></div>`;
 
-        const user = window.KidoaAuth.checkAuth();
+        const user = window.GoHappyAuth.checkAuth();
 
         if (!user) {
             container.innerHTML = `
@@ -10,17 +10,17 @@ window.KidoaProfile = {
                     <div style="font-size: 5rem; margin-bottom: 30px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">🕶️</div>
                     <h3 style="color: var(--primary-navy); font-size: 20px; font-weight: 800;">¿Quién eres?</h3>
                     <p style="color: #666; margin-top: 10px;">Identifícate para desbloquear tu nivel, puntos y premios exclusivos.</p>
-                    <button id="login-from-profile" class="btn-primary" style="margin-top: 30px; padding: 15px 40px; font-size: 16px;">Entrar a Kidoa</button>
+                    <button id="login-from-profile" class="btn-primary" style="margin-top: 30px; padding: 15px 40px; font-size: 16px;">Entrar a GoHappy</button>
                     <p style="font-size: 12px; color: #aaa; margin-top: 20px;">Únete a miles de familias 🌍</p>
                 </div>
             `;
             document.getElementById('login-from-profile').addEventListener('click', () => {
-                window.KidoaAuth.renderAuthModal();
+                window.GoHappyAuth.renderAuthModal();
             });
             return;
         }
 
-        const levelInfo = window.KidoaPoints.getLevelInfo(user.points);
+        const levelInfo = window.GoHappyPoints.getLevelInfo(user.points);
 
         container.innerHTML = `
             <div class="profile-page entry-anim">
@@ -30,7 +30,7 @@ window.KidoaProfile = {
                         <div class="level-label-bubble">Nivel ${user.level}</div>
                     </div>
                     <div class="profile-info-header">
-                        <h2 class="profile-name-premium">${user.nickname || 'Explorador Kidoa'}</h2>
+                        <h2 class="profile-name-premium">${user.nickname || 'Explorador GoHappy'}</h2>
                         <div class="profile-badge-row">
                             <span class="p-badge"><i class="icon">💎</i> Premium</span>
                             <span class="p-badge"><i class="icon">📍</i> ${user.city || 'España'}</span>
@@ -98,21 +98,21 @@ window.KidoaProfile = {
         `;
 
         // Interaction logic
-        document.getElementById('logout-btn').onclick = () => window.KidoaAuth.logout();
+        document.getElementById('logout-btn').onclick = () => window.GoHappyAuth.logout();
 
         document.getElementById('copy-ref-link').onclick = (e) => {
-            const link = `https://kidoa.app/invite/${user.referralCode}`;
+            const link = `https://GoHappy.app/invite/${user.referralCode}`;
             navigator.clipboard.writeText(link);
             e.target.innerText = "¡Copiado! ✅";
-            window.KidoaSound.play('success');
+            window.GoHappySound.play('success');
             setTimeout(() => e.target.innerText = "Copiar Enlace de Invitación", 2000);
         };
 
         document.getElementById('share-app-btn').onclick = () => {
             const shareData = {
-                title: 'Únete a Kidoa',
-                text: `¡Hola! Únete a Kidoa y explora planes increíbles en familia. Usa mi código: ${user.referralCode}`,
-                url: `https://kidoa.app/invite/${user.referralCode}`
+                title: 'Únete a GoHappy',
+                text: `¡Hola! Únete a GoHappy y explora planes increíbles en familia. Usa mi código: ${user.referralCode}`,
+                url: `https://GoHappy.app/invite/${user.referralCode}`
             };
             if (navigator.share) {
                 navigator.share(shareData).catch(() => {
@@ -124,15 +124,15 @@ window.KidoaProfile = {
         };
 
         document.getElementById('terms-link').onclick = () => {
-            window.KidoaApp.loadPage('legal');
+            window.GoHappyApp.loadPage('legal');
         };
 
         container.querySelectorAll('.quick-card[data-goto]').forEach(card => {
             card.onclick = () => {
                 const target = card.dataset.goto;
                 if (target) {
-                    window.KidoaSound.play('click');
-                    window.KidoaApp.loadPage(target);
+                    window.GoHappySound.play('click');
+                    window.GoHappyApp.loadPage(target);
                 }
             };
         });
@@ -142,7 +142,7 @@ window.KidoaProfile = {
             const qrContainer = document.getElementById('referral-qr');
             if (qrContainer && window.QRCode) {
                 new QRCode(qrContainer, {
-                    text: `https://kidoa.app/invite/${user.referralCode}`,
+                    text: `https://GoHappy.app/invite/${user.referralCode}`,
                     width: 100,
                     height: 100,
                     colorDark: "#002C77",
@@ -153,3 +153,4 @@ window.KidoaProfile = {
         }, 300);
     }
 };
+

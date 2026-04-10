@@ -1,4 +1,4 @@
-window.KidoaSafePage = {
+window.GoHappySafePage = {
     render: async (container) => {
         container.innerHTML = `
             <div class="safe-page">
@@ -8,7 +8,7 @@ window.KidoaSafePage = {
                 </div>
 
                 <div id="ai-safe-insight" class="info-alert" style="margin: 0 15px 15px 15px; padding: 12px; background: linear-gradient(135deg, rgba(74, 144, 217, 0.1), rgba(76, 201, 240, 0.1)); border-radius: 12px; border-left: 4px solid var(--primary-blue); font-size: 13px; color: var(--primary-navy); line-height: 1.4; display: none;">
-                    <span style="font-weight: 800;">✨ KIDOA IA:</span> <span id="ai-safe-text">Analizando tu zona...</span>
+                    <span style="font-weight: 800;">✨ GoHappy IA:</span> <span id="ai-safe-text">Analizando tu zona...</span>
                 </div>
 
                 <div class="safe-report-bar premium-glass" style="display: flex; justify-content: center; padding: 12px; margin-top: 10px;">
@@ -64,7 +64,7 @@ window.KidoaSafePage = {
                         if (pos) coords = `${pos.coords.latitude}, ${pos.coords.longitude}`;
                     } catch (e) { }
 
-                    const insight = await window.KidoaAI.getDailySafeInsight(coords);
+                    const insight = await window.GoHappyAI.getDailySafeInsight(coords);
                     if (insight && insight.length > 5) {
                         insightText.innerText = insight;
                     } else {
@@ -77,7 +77,7 @@ window.KidoaSafePage = {
         }, 300);
 
         // Load alerts
-        const alerts = await window.KidoaSafe.getAlerts();
+        const alerts = await window.GoHappySafe.getAlerts();
         alertsList.innerHTML = '';
 
         if (alerts.length === 0) {
@@ -90,7 +90,7 @@ window.KidoaSafePage = {
             `;
         } else {
             alerts.forEach(alert => {
-                const typeInfo = window.KidoaSafe.ALERT_TYPES[alert.type] || window.KidoaSafe.ALERT_TYPES.INFO;
+                const typeInfo = window.GoHappySafe.ALERT_TYPES[alert.type] || window.GoHappySafe.ALERT_TYPES.INFO;
                 const card = document.createElement('div');
                 card.className = 'alert-card entry-anim';
                 card.innerHTML = `
@@ -126,8 +126,8 @@ window.KidoaSafePage = {
                 const alertId = e.target.dataset.alert;
                 e.target.textContent = '✅';
                 e.target.disabled = true;
-                await window.KidoaSafe.voteAlert(alertId);
-                window.KidoaSound.play('click');
+                await window.GoHappySafe.voteAlert(alertId);
+                window.GoHappySound.play('click');
             });
         });
 
@@ -167,7 +167,7 @@ window.KidoaSafePage = {
             submitBtn.disabled = true;
             submitBtn.textContent = 'Enviando...';
 
-            const success = await window.KidoaSafe.reportAlert({
+            const success = await window.GoHappySafe.reportAlert({
                 type: selectedType,
                 title,
                 location,
@@ -177,7 +177,7 @@ window.KidoaSafePage = {
             if (success) {
                 modal.classList.add('hidden');
                 alert("✅ Alerta reportada. ¡Gracias por cuidar a la comunidad! +20 puntos");
-                window.KidoaSafePage.render(container);
+                window.GoHappySafePage.render(container);
             } else {
                 alert("Error al enviar. Inténtalo de nuevo.");
             }
@@ -187,3 +187,4 @@ window.KidoaSafePage = {
         });
     }
 };
+
