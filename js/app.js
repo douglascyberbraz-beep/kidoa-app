@@ -3,10 +3,10 @@
 window.GoHappySound = {
     play: (type) => {
         const sounds = {
-            click: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73268c2f16.mp3', // Pop/click
-            start: 'https://cdn.pixabay.com/audio/2021/08/04/audio_985536554b.mp3', // Magic chime
-            success: 'https://cdn.pixabay.com/audio/2022/03/24/audio_349d7936a7.mp3', // Win/Success
-            boop: 'https://cdn.pixabay.com/audio/2022/03/10/audio_f69168b449.mp3' // Subtle boop
+            click: 'https://actions.google.com/sounds/v1/water/water_drop.ogg', // Pop/click
+            start: 'https://actions.google.com/sounds/v1/cartoon/magic_chime.ogg', // Magic chime
+            success: 'https://actions.google.com/sounds/v1/cartoon/cartoon_sparkle_magic_twinkle.ogg', // Win/Success
+            boop: 'https://actions.google.com/sounds/v1/water/droplet_reverb.ogg' // Subtle boop
         };
         try {
             if (sounds[type]) {
