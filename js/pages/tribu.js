@@ -6,7 +6,7 @@ window.GoHappyTribu = {
     render: async (container) => {
         container.innerHTML = `
             <div class="page-header sticky-header">
-                <h2 id="tribu-title" style="color: var(--primary-navy); font-weight: 800;">🏘️ TRIBU</h2>
+                <h2 id="tribu-title" style="color: var(--primary-cobalt); font-weight: 800;">🏘️ TRIBU</h2>
             </div>
             
             <div id="tribu-content" class="content-list stagger-group" style="padding-bottom: 100px; width: 100%; display: flex; flex-direction: column; align-items: center;">
@@ -150,19 +150,19 @@ window.GoHappyTribu = {
             const card = document.createElement('div');
             card.className = `tribu-card entry-anim ${post.isAI ? 'ai-sponsored-card' : ''}`;
             if (post.isAI) {
-                card.style.background = 'linear-gradient(135deg, rgba(74, 144, 217, 0.05), rgba(76, 201, 240, 0.15))';
-                card.style.border = '1px solid var(--primary-blue)';
+                card.style.background = 'linear-gradient(135deg, rgba(11, 113, 252, 0.05), rgba(6, 254, 254, 0.15))';
+                card.style.border = '1px solid var(--accent-cyan)';
             }
 
             card.innerHTML = `
                 <div class="tribu-header">
-                    <div class="tribu-avatar" style="${post.isAI ? 'background: var(--primary-navy); box-shadow: 0 0 10px var(--primary-blue);' : ''}">${post.avatar}</div>
+                    <div class="tribu-avatar" style="${post.isAI ? 'background: var(--primary-cobalt); box-shadow: 0 0 10px var(--accent-cyan);' : ''}">${post.avatar}</div>
                     <div class="tribu-info">
-                        <span class="tribu-user" style="${post.isAI ? 'font-weight: 900; color: var(--primary-blue);' : ''}">${post.user} ${post.isAI ? '✨ (Oficial)' : ''}</span>
+                        <span class="tribu-user" style="${post.isAI ? 'font-weight: 900; color: var(--primary-cobalt);' : ''}">${post.user} ${post.isAI ? '✨ (Oficial)' : ''}</span>
                         <span class="tribu-time">${post.time}</span>
                     </div>
                 </div>
-                <p class="tribu-content" style="${post.isAI ? 'font-size: 14px; line-height: 1.5; color: var(--primary-navy);' : ''}">${post.content}</p>
+                <p class="tribu-content" style="${post.isAI ? 'font-size: 14px; line-height: 1.5; color: var(--primary-cobalt);' : ''}">${post.content}</p>
                 <div class="tribu-actions">
                     <button class="action-btn">❤️ ${post.likes}</button>
                     <button class="action-btn">💬 ${post.comments}</button>

@@ -3,11 +3,11 @@ window.GoHappySafePage = {
         container.innerHTML = `
             <div class="safe-page">
                 <div class="page-header center-text">
-                    <h2 style="color: var(--primary-navy); font-weight: 800;">🛡️ SAFE</h2>
+                    <h2 style="color: var(--primary-cobalt); font-weight: 800;">🛡️ SAFE</h2>
                     <p style="color: #888; font-size: 13px;">Alertas de seguridad en tu zona</p>
                 </div>
 
-                <div id="ai-safe-insight" class="info-alert" style="margin: 0 15px 15px 15px; padding: 12px; background: linear-gradient(135deg, rgba(74, 144, 217, 0.1), rgba(76, 201, 240, 0.1)); border-radius: 12px; border-left: 4px solid var(--primary-blue); font-size: 13px; color: var(--primary-navy); line-height: 1.4; display: none;">
+                <div id="ai-safe-insight" class="info-alert" style="margin: 0 15px 15px 15px; padding: 12px; background: linear-gradient(135deg, rgba(11, 113, 252, 0.05), rgba(6, 254, 254, 0.1)); border-radius: 12px; border-left: 4px solid var(--primary-cobalt); font-size: 13px; color: var(--primary-cobalt); line-height: 1.4; display: none;">
                     <span style="font-weight: 800;">✨ GoHappy IA:</span> <span id="ai-safe-text">Analizando tu zona...</span>
                 </div>
 
@@ -84,7 +84,7 @@ window.GoHappySafePage = {
             alertsList.innerHTML = `
                 <div class="center-text p-40" style="color:#aaa;">
                     <div style="font-size: 40px; margin-bottom: 15px;">🛡️</div>
-                    <h3 style="color: var(--primary-navy);">Todo despejado</h3>
+                    <h3 style="color: var(--primary-cobalt);">Todo despejado</h3>
                     <p style="font-size: 14px;">No hay alertas de seguridad activas en tu zona ahora mismo.</p>
                 </div>
             `;
@@ -104,7 +104,7 @@ window.GoHappySafePage = {
                             <span class="alert-type-label" style="color: ${typeInfo.color}; font-size: 11px; font-weight: 700;">${typeInfo.label.toUpperCase()}</span>
                             <span class="alert-time" style="color: #aaa; font-size: 11px;">${alert.timeAgo}</span>
                         </div>
-                        <h4 class="alert-title" style="margin: 4px 0; color: var(--primary-navy);">${alert.title}</h4>
+                        <h4 class="alert-title" style="margin: 4px 0; color: var(--primary-cobalt);">${alert.title}</h4>
                         <p class="alert-location" style="font-size: 12px; color: #888;">📍 ${alert.location}</p>
                         <p class="alert-desc" style="font-size: 13px; color: #555; margin-top: 6px; line-height: 1.4;">${alert.description}</p>
                         <div class="alert-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">

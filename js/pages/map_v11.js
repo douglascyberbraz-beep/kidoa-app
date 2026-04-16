@@ -15,8 +15,7 @@ window.GoHappyMap = {
             await window.GoHappyMap.init(container);
         } else {
             window.GoHappyMap.instance.resize();
-            // Refresh markers in case of data updates
-            window.GoHappyMap.loadMarkers();
+            // Markers removed as per user request for cleaner aesthetic
         }
     },
 
@@ -40,16 +39,17 @@ window.GoHappyMap = {
 
                 // Check if layers exist before modifying them to prevent Error: Layer does not exist
                 if (window.GoHappyMap.instance.getLayer('water')) {
-                    window.GoHappyMap.instance.setPaintProperty('water', 'fill-color', '#4CC9F0'); // GoHappy Light Blue
+                    window.GoHappyMap.instance.setPaintProperty('water', 'fill-color', '#06FEFE'); // Official Cyan Blue
+                    window.GoHappyMap.instance.setPaintProperty('water', 'fill-opacity', 0.4);
                 }
                 if (window.GoHappyMap.instance.getLayer('landuse-natural')) {
-                    window.GoHappyMap.instance.setPaintProperty('landuse-natural', 'fill-color', '#C8E6C9'); // Soft Green
+                    window.GoHappyMap.instance.setPaintProperty('landuse-natural', 'fill-color', '#DBEAFE'); // Soft Cobalt-White
                 }
                 if (window.GoHappyMap.instance.getLayer('landuse-park')) {
-                    window.GoHappyMap.instance.setPaintProperty('landuse-park', 'fill-color', '#A5D6A7'); // Park Green
+                    window.GoHappyMap.instance.setPaintProperty('landuse-park', 'fill-color', '#D1E8FF'); // Slightly deeper soft blue
                 }
                 if (window.GoHappyMap.instance.getLayer('land')) {
-                    window.GoHappyMap.instance.setPaintProperty('land', 'fill-color', '#F8FAFC'); // GoHappy Grayish White
+                    window.GoHappyMap.instance.setPaintProperty('land', 'fill-color', '#F8FAFC'); // High clarity white-gray
                 }
 
                 // Remove 3D Buildings - Force them to be flat
@@ -72,7 +72,8 @@ window.GoHappyMap = {
                 }
 
                 window.GoHappyMap.injectUI(container);
-                await window.GoHappyMap.loadMarkers();
+                // Markers disabled as per user request
+                // await window.GoHappyMap.loadMarkers();
                 window.GoHappyMap.startGPSWatch();
 
                 // Auto-highlight parks near the initial view
@@ -98,7 +99,7 @@ window.GoHappyMap = {
         overlay.className = 'map-search-container';
         overlay.style.zIndex = '5';
         overlay.innerHTML = `
-            <div class="map-search-bar" style="display:flex; align-items:center; background: white; border-radius: 25px; padding: 2px 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); flex:1; width: 100%;">
+            <div class="map-search-bar" style="display:flex; align-items:center; background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 30px; padding: 2px 20px; box-shadow: 0 10px 30px rgba(0, 210, 211, 0.1); flex:1; width: 100%; border: 1px solid rgba(255,255,255,0.5);">
                 <span class="gemini-sparkle" style="margin-right:8px; font-size:1.2rem;">✨</span>
                 <input type="text" id="map-search-input" class="map-search-input" placeholder="Pregunta a Gemini o busca un lugar..." style="background:transparent; border:none; color:var(--text-dark); flex:1; outline:none; padding:12px 0; font-size: 0.95rem;">
             </div>
@@ -160,7 +161,7 @@ window.GoHappyMap = {
         const el = document.createElement('div');
         el.className = `GoHappy-marker-3d-wrap ${isHighRated ? 'highlight-poi' : ''}`;
         el.innerHTML = `
-            <div class="GoHappy-marker-3d">
+            <div class="GoHappy-marker-3d" style="display:none;">
                 <div class="GoHappy-marker-pin" style="background: ${isHighRated ? 'linear-gradient(135deg, var(--accent-pink), #ff758c)' : 'linear-gradient(135deg, var(--primary-blue), #4cc9f0)'};">
                     <img src="assets/logo.png" style="width: 130%; height: 130%; object-fit: contain; filter: brightness(100) grayscale(1);">
                 </div>

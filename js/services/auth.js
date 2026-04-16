@@ -206,13 +206,10 @@ window.GoHappyAuth = {
             <div class="auth-container slide-up-anim">
                 <div class="auth-card premium-glass">
                     <div class="auth-header">
-                        <div class="premium-logo-wrap" style="margin-bottom: 20px;">
-                            <div class="pure-css-logo" style="transform: scale(0.6); margin: -40px 0;">
-                                <div class="logo-text-go">G<span class="winking-o">o</span></div>
-                                <div class="logo-text-happy">H<span class="smiling-a">a</span>ppy</div>
-                            </div>
+                        <div class="premium-logo-wrap" style="margin-bottom: 25px; display: flex; justify-content: center;">
+                            <img src="assets/logo_gohappy_official.svg" alt="GoHappy Logo" style="width: 150px; height: auto;">
                         </div>
-                        <h2 style="color:var(--primary-navy); font-size: 1.9rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px;">Bienvenido a GoHappy</h2>
+                        <h2 style="color:var(--primary-cobalt); font-size: 1.9rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px;">Bienvenido a GoHappy</h2>
                         <p style="color: #64748b; font-size: 1rem; font-weight: 500;">Explora, comparte y crece con tu tribu</p>
                     </div>
                     
@@ -227,8 +224,8 @@ window.GoHappyAuth = {
                         <input type="password" id="auth-pass" placeholder="Contraseña" class="auth-input">
                         
                         <label id="terms-label" style="display:none; align-items:center; justify-content: center; gap:8px; margin-top:12px; font-size:12px; color:#666; cursor:pointer;">
-                            <input type="checkbox" id="accept-terms" style="width:20px; height:20px; accent-color:var(--primary-blue);">
-                            <span>Acepto los <a href="#" id="show-terms-link" style="color:var(--primary-blue); font-weight:700; text-decoration:none;">Términos y Condiciones</a></span>
+                            <input type="checkbox" id="accept-terms" style="width:20px; height:20px; accent-color:var(--primary-cobalt);">
+                            <span>Acepto los <a href="#" id="show-terms-link" style="color:var(--primary-cobalt); font-weight:700; text-decoration:none;">Términos y Condiciones</a></span>
                         </label>
                         
                         <div style="display:flex; flex-direction:column; gap:12px; margin-top:20px;">

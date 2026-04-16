@@ -8,7 +8,7 @@ window.GoHappyProfile = {
             container.innerHTML = `
                 <div class="p-20 center-text entry-anim">
                     <div style="font-size: 5rem; margin-bottom: 30px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">🕶️</div>
-                    <h3 style="color: var(--primary-navy); font-size: 20px; font-weight: 800;">¿Quién eres?</h3>
+                    <h3 style="color: var(--primary-cobalt); font-size: 20px; font-weight: 800;">¿Quién eres?</h3>
                     <p style="color: #666; margin-top: 10px;">Identifícate para desbloquear tu nivel, puntos y premios exclusivos.</p>
                     <button id="login-from-profile" class="btn-primary" style="margin-top: 30px; padding: 15px 40px; font-size: 16px;">Entrar a GoHappy</button>
                     <p style="font-size: 12px; color: #aaa; margin-top: 20px;">Únete a miles de familias 🌍</p>
@@ -145,7 +145,7 @@ window.GoHappyProfile = {
                     text: `https://GoHappy.app/invite/${user.referralCode}`,
                     width: 100,
                     height: 100,
-                    colorDark: "#002C77",
+                    colorDark: "#0B71FC",
                     colorLight: "#ffffff",
                     correctLevel: QRCode.CorrectLevel.M
                 });

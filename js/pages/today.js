@@ -4,7 +4,7 @@ window.GoHappyToday = {
 
         container.innerHTML = `
             <div class="page-header sticky-header">
-                <h2 style="color: var(--primary-navy); font-weight: 800; letter-spacing: 1px;">TODAY</h2>
+                <h2 style="color: var(--primary-cobalt); font-weight: 800; letter-spacing: 1px;">TODAY</h2>
                 <div class="today-tagline" style="font-size: 0.9rem; color: var(--text-light); margin-top: 5px;">
                     ✨ Planes personalizados para hoy
                 </div>
@@ -74,7 +74,7 @@ window.GoHappyToday = {
                         <span style="font-size: 11px; font-weight: 700; color: ${isFree ? '#27AE60' : '#E67E22'};">${priceText}</span>
                     </div>
                     
-                    <h3 style="color: var(--primary-navy); margin: 0 0 10px 0; font-size: 1.25rem; line-height: 1.3; font-weight: 800;">${act.title}</h3>
+                    <h3 style="color: var(--primary-cobalt); margin: 0 0 10px 0; font-size: 1.25rem; line-height: 1.3; font-weight: 800;">${act.title}</h3>
                     <p style="font-size: 0.95rem; color: #475569; line-height: 1.5; margin-bottom: 18px;">${act.summary}</p>
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; background: #f8fafc; padding: 12px; border-radius: 16px;">
@@ -84,7 +84,7 @@ window.GoHappyToday = {
                         <div style="font-size: 12px; color: #64748b; display: flex; align-items: center; gap: 6px;">
                             <span>⏳</span> <strong>${act.duration || 'Flexible'}</strong>
                         </div>
-                        <div style="font-size: 12px; color: var(--primary-navy); display: flex; align-items: center; gap: 6px; grid-column: span 2;">
+                        <div style="font-size: 12px; color: var(--primary-cobalt); display: flex; align-items: center; gap: 6px; grid-column: span 2;">
                             <span>📍</span> <strong style="text-decoration: underline; cursor:pointer;" id="loc-link-${idx}">${act.location}</strong>
                         </div>
                     </div>
@@ -174,7 +174,7 @@ window.GoHappyToday = {
     renderQuestionnaire: (container) => {
         container.innerHTML = `
             <div class="questionnaire-container entry-anim">
-                <h3 style="color:var(--primary-navy); margin-bottom: 20px; font-weight:800;">¿Cómo es vuestro plan ideal? 👨‍👩‍👧‍👦</h3>
+                <h3 style="color:var(--primary-cobalt); margin-bottom: 20px; font-weight:800;">¿Cómo es vuestro plan ideal? 👨‍👩‍👧‍👦</h3>
                 
                 <div class="q-step" style="animation-delay: 0.1s">
                     <label class="q-label">¿Quiénes venís hoy?</label>
