@@ -27,8 +27,8 @@ window.GoHappyMap = {
                 container: container,
                 style: 'https://tiles.openfreemap.org/styles/liberty',
                 center: [-4.7286, 41.6520],
-                zoom: 16.5,
-                pitch: 60, // Premium 3D isometric view
+                zoom: 17.5,
+                pitch: 70, // Waze-style 3D navigator view
                 bearing: 0,
                 antialias: true,
                 hash: false
@@ -37,39 +37,54 @@ window.GoHappyMap = {
             window.GoHappyMap.instance.on('load', async () => {
                 window.GoHappyMap.isInitialized = true;
 
-                // Check if layers exist before modifying them to prevent Error: Layer does not exist
+                // Waze Style Colors
                 if (window.GoHappyMap.instance.getLayer('water')) {
-                    window.GoHappyMap.instance.setPaintProperty('water', 'fill-color', '#06FEFE'); // Official Cyan Blue
-                    window.GoHappyMap.instance.setPaintProperty('water', 'fill-opacity', 0.4);
+                    window.GoHappyMap.instance.setPaintProperty('water', 'fill-color', '#08FEFE'); // Official Cyan Blue
+                    window.GoHappyMap.instance.setPaintProperty('water', 'fill-opacity', 0.6);
                 }
                 if (window.GoHappyMap.instance.getLayer('landuse-natural')) {
-                    window.GoHappyMap.instance.setPaintProperty('landuse-natural', 'fill-color', '#DBEAFE'); // Soft Cobalt-White
+                    window.GoHappyMap.instance.setPaintProperty('landuse-natural', 'fill-color', '#E0F7FA'); // Soft Sky
                 }
                 if (window.GoHappyMap.instance.getLayer('landuse-park')) {
-                    window.GoHappyMap.instance.setPaintProperty('landuse-park', 'fill-color', '#D1E8FF'); // Slightly deeper soft blue
+                    window.GoHappyMap.instance.setPaintProperty('landuse-park', 'fill-color', '#C2F0F4'); // Slightly greener cyan
                 }
                 if (window.GoHappyMap.instance.getLayer('land')) {
-                    window.GoHappyMap.instance.setPaintProperty('land', 'fill-color', '#F8FAFC'); // High clarity white-gray
+                    window.GoHappyMap.instance.setPaintProperty('land', 'fill-color', '#F0F9FA'); // Base land color
                 }
 
-                // Remove 3D Buildings - Force them to be flat
+                // Waze-Style 3D Buildings
                 try {
-                    if (window.GoHappyMap.instance.getLayer('building')) {
-                        // 3D GoHappy Glass Buildings
-                        window.GoHappyMap.instance.setPaintProperty('building', 'fill-color', 'rgba(0, 150, 255, 0.15)'); // Very soft azure glass
-                        window.GoHappyMap.instance.setPaintProperty('building', 'fill-outline-color', 'rgba(0, 150, 255, 0.3)');
-                        window.GoHappyMap.instance.setPaintProperty('building', 'fill-opacity', 0.8);
-                        // Extrude based on heights
-                        window.GoHappyMap.instance.setPaintProperty('building', 'fill-extrusion-height', ['coalesce', ['get', 'render_height'], 15]);
-                        window.GoHappyMap.instance.setPaintProperty('building', 'fill-extrusion-base', ['coalesce', ['get', 'render_min_height'], 0]);
+                    const buildingLayer = window.GoHappyMap.instance.getLayer('building');
+                    if (buildingLayer) {
+                        // Hide original 2D flat building layer
+                        window.GoHappyMap.instance.setPaintProperty('building', 'fill-opacity', 0);
+                        
+                        // Inject true 3D extrusion layer using the same data source
+                        window.GoHappyMap.instance.addLayer({
+                            'id': 'waze-3d-buildings',
+                            'source': buildingLayer.source,
+                            'source-layer': buildingLayer.sourceLayer,
+                            'type': 'fill-extrusion',
+                            'minzoom': 15,
+                            'paint': {
+                                'fill-extrusion-color': '#0B4C8F',
+                                'fill-extrusion-height': ['coalesce', ['get', 'render_height'], 20],
+                                'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
+                                'fill-extrusion-opacity': 0.4
+                            }
+                        });
                     }
-                } catch (e) {}
-
-                // Thicker, cleaner roads
-                if (window.GoHappyMap.instance.getLayer('road-primary')) {
-                    window.GoHappyMap.instance.setPaintProperty('road-primary', 'line-color', '#ffffff');
-                    window.GoHappyMap.instance.setPaintProperty('road-primary', 'line-width', 4);
+                } catch (e) {
+                    console.warn("Could not inject 3D buildings:", e);
                 }
+
+                // Waze-Style Roads (Thick, Cobalt blue with bright contrast)
+                ['road-primary', 'road-secondary', 'road-street'].forEach(layer => {
+                    if (window.GoHappyMap.instance.getLayer(layer)) {
+                        window.GoHappyMap.instance.setPaintProperty(layer, 'line-color', layer === 'road-primary' ? '#0B4C8F' : '#ffffff');
+                        window.GoHappyMap.instance.setPaintProperty(layer, 'line-width', ['interpolate', ['linear'], ['zoom'], 12, 2, 18, layer === 'road-primary' ? 16 : 8]);
+                    }
+                });
 
                 window.GoHappyMap.injectUI(container);
                 // Markers disabled as per user request
@@ -268,8 +283,8 @@ window.GoHappyMap = {
             window.GoHappyMap.instance.easeTo({
                 center: [lng, lat],
                 bearing: heading || window.GoHappyMap.instance.getBearing(),
-                pitch: 60, // 3D driving view
-                zoom: 17.5,
+                pitch: 70, // Waze-style driving view
+                zoom: 18.5, // Closer zoom for Waze feel
                 duration: 1500,
                 easing: (t) => t * (2 - t) // Smooth deceleration
             });
