@@ -51,32 +51,7 @@ window.GoHappySafePage = {
         const insightBox = document.getElementById('ai-safe-insight');
         const insightText = document.getElementById('ai-safe-text');
 
-        // Load AI Insight asynchronously
-        setTimeout(async () => {
-            if (window.GEMINI_KEY && !window.GEMINI_KEY.includes('PEGAR_AQUI')) {
-                insightBox.style.display = 'block';
-                insightText.innerHTML = '<span class="typing-dots"><span></span><span></span><span></span></span>';
-                
-                try {
-                    let coords = "41.6520, -4.7286";
-                    try {
-                        const pos = await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 3000 }));
-                        if (pos) coords = `${pos.coords.latitude}, ${pos.coords.longitude}`;
-                    } catch (e) { }
-
-                    const insight = await window.GoHappyAI.getDailySafeInsight(coords);
-                    if (insight && insight.length > 5) {
-                        insightText.innerText = insight;
-                    } else {
-                        insightBox.style.display = 'none';
-                    }
-                } catch (e) {
-                    insightBox.style.display = 'none';
-                }
-            }
-        }, 300);
-
-        // Load alerts
+        // Load alerts first
         const alerts = await window.GoHappySafe.getAlerts();
         alertsList.innerHTML = '';
 
@@ -102,7 +77,7 @@ window.GoHappySafePage = {
                     <div class="alert-card-body">
                         <div class="alert-header-row">
                             <span class="alert-type-label" style="color: ${typeInfo.color}; font-size: 11px; font-weight: 700;">${typeInfo.label.toUpperCase()}</span>
-                            <span class="alert-time" style="color: #aaa; font-size: 11px;">${alert.timeAgo}</span>
+                            <span class="alert-time" style="color: #aaa; font-size: 11px;">${alert.timeAgo || 'Reciente'}</span>
                         </div>
                         <h4 class="alert-title" style="margin: 4px 0; color: var(--primary-cobalt);">${alert.title}</h4>
                         <p class="alert-location" style="font-size: 12px; color: #888;">📍 ${alert.location}</p>
@@ -110,7 +85,7 @@ window.GoHappySafePage = {
                         <div class="alert-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
                             <span style="font-size: 11px; color: #aaa;">👤 ${alert.reportedBy}</span>
                             <div style="display: flex; gap: 8px; align-items: center;">
-                                <span style="font-size: 12px; color: #888;">👍 ${alert.votes}</span>
+                                <span style="font-size: 12px; color: #888;">👍 ${alert.votes || 0}</span>
                                 <button class="btn-vote" data-alert="${alert.id}" style="font-size: 11px; padding: 4px 10px; border-radius: 8px; border: 1px solid #ddd; background: #f9f9f9; cursor: pointer;">Confirmar</button>
                             </div>
                         </div>
@@ -119,6 +94,31 @@ window.GoHappySafePage = {
                 alertsList.appendChild(card);
             });
         }
+
+        // Load AI Insight asynchronously AFTER alerts are loaded
+        setTimeout(async () => {
+            if (window.GEMINI_KEY && !window.GEMINI_KEY.includes('PEGAR_AQUI')) {
+                insightBox.style.display = 'block';
+                insightText.innerHTML = '<span class="typing-dots"><span></span><span></span><span></span></span>';
+                
+                try {
+                    let coords = "41.6520, -4.7286";
+                    try {
+                        const pos = await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 3000 }));
+                        if (pos) coords = `${pos.coords.latitude}, ${pos.coords.longitude}`;
+                    } catch (e) { }
+
+                    const insight = await window.GoHappyAI.getDailySafeInsight(coords, alerts);
+                    if (insight && insight.length > 5) {
+                        insightText.innerText = insight;
+                    } else {
+                        insightBox.style.display = 'none';
+                    }
+                } catch (e) {
+                    insightBox.style.display = 'none';
+                }
+            }
+        }, 100);
 
         // Vote handlers
         alertsList.querySelectorAll('.btn-vote').forEach(btn => {

@@ -27,32 +27,33 @@ window.GoHappyMap = {
                 container: container,
                 style: 'https://tiles.openfreemap.org/styles/liberty',
                 center: [-4.7286, 41.6520],
-                zoom: 17.5,
-                pitch: 70, // Waze-style 3D navigator view
+                zoom: 16,
+                pitch: 60,
                 bearing: 0,
-                antialias: true,
-                hash: false
+                antialias: true
             });
+
+            // Pedir ubicación inmediatamente para centrar
+            window.GoHappyMap.locateUser(true); // true = animate flyTo
 
             window.GoHappyMap.instance.on('load', async () => {
                 window.GoHappyMap.isInitialized = true;
+                // Waze Style Colors - More Premium and Clean
+                const layersToColor = [
+                    { id: 'water', color: '#B3E5FC', opacity: 0.8 },
+                    { id: 'landuse-natural', color: '#E8F5E9', opacity: 1 },
+                    { id: 'landuse-park', color: '#C8E6C9', opacity: 1 },
+                    { id: 'land', color: '#F5F5F5', opacity: 1 }
+                ];
 
-                // Waze Style Colors
-                if (window.GoHappyMap.instance.getLayer('water')) {
-                    window.GoHappyMap.instance.setPaintProperty('water', 'fill-color', '#08FEFE'); // Official Cyan Blue
-                    window.GoHappyMap.instance.setPaintProperty('water', 'fill-opacity', 0.6);
-                }
-                if (window.GoHappyMap.instance.getLayer('landuse-natural')) {
-                    window.GoHappyMap.instance.setPaintProperty('landuse-natural', 'fill-color', '#E0F7FA'); // Soft Sky
-                }
-                if (window.GoHappyMap.instance.getLayer('landuse-park')) {
-                    window.GoHappyMap.instance.setPaintProperty('landuse-park', 'fill-color', '#C2F0F4'); // Slightly greener cyan
-                }
-                if (window.GoHappyMap.instance.getLayer('land')) {
-                    window.GoHappyMap.instance.setPaintProperty('land', 'fill-color', '#F0F9FA'); // Base land color
-                }
+                layersToColor.forEach(l => {
+                    if (window.GoHappyMap.instance.getLayer(l.id)) {
+                        window.GoHappyMap.instance.setPaintProperty(l.id, 'fill-color', l.color);
+                        window.GoHappyMap.instance.setPaintProperty(l.id, 'fill-opacity', l.opacity);
+                    }
+                });
 
-                // Waze-Style 3D Buildings
+                // Waze-Style 3D Buildings - Transparent Cobalt
                 try {
                     const buildingLayer = window.GoHappyMap.instance.getLayer('building');
                     if (buildingLayer) {
@@ -153,10 +154,21 @@ window.GoHappyMap = {
 
         const chips = document.querySelectorAll('.filter-chip');
         chips.forEach(chip => {
-            chip.addEventListener('click', () => {
+            chip.addEventListener('click', async () => {
                 chips.forEach(c => c.classList.remove('active'));
                 chip.classList.add('active');
-                window.GoHappyMap.filterMarkers(chip.dataset.type);
+                
+                const type = chip.dataset.type;
+                const label = chip.innerText;
+                
+                if (type === 'all') {
+                    window.GoHappyMap.filterMarkers('all');
+                } else {
+                    // IA Search for category if not enough local markers
+                    input.value = `Buscar ${label}...`;
+                    await window.GoHappyMap.handleSearch(`mejores ${label} para ir con niños`);
+                    input.value = "";
+                }
             });
         });
     },
@@ -172,14 +184,30 @@ window.GoHappyMap = {
     },
 
     createMarker: (loc) => {
-        const isHighRated = loc.rating >= 4.5;
+        const hasReview = loc.isCommunity || loc.rating >= 4.7;
         const el = document.createElement('div');
-        el.className = `GoHappy-marker-3d-wrap ${isHighRated ? 'highlight-poi' : ''}`;
+        el.className = `gohappy-marker-wrap ${hasReview ? 'has-badge' : ''}`;
+        
+        // Determinar icono por tipo
+        let icon = "📍";
+        if (loc.type === 'park') icon = "🌳";
+        if (loc.type === 'museum' || loc.type === 'school') icon = "🎓";
+        if (loc.type === 'food') icon = "🍎";
+        if (loc.type === 'theater') icon = "🎭";
+        if (loc.type === 'kidzone') icon = "🏰";
+
         el.innerHTML = `
-            <div class="GoHappy-marker-3d" style="display:none;">
-                <div class="GoHappy-marker-pin" style="background: ${isHighRated ? 'linear-gradient(135deg, var(--accent-pink), #ff758c)' : 'linear-gradient(135deg, var(--primary-blue), #4cc9f0)'};">
-                    <img src="assets/logo.png" style="width: 130%; height: 130%; object-fit: contain; filter: brightness(100) grayscale(1);">
-                </div>
+            <div class="marker-pin-premium" style="
+                background: white; 
+                width: 40px; height: 40px; 
+                border-radius: 50% 50% 50% 0; 
+                transform: rotate(-45deg); 
+                display: flex; align-items: center; justify-content: center;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+                border: 3px solid var(--primary-cobalt);
+            ">
+                <div style="transform: rotate(45deg); font-size: 20px;">${icon}</div>
+                ${hasReview ? `<div class="tribe-insignia" style="position: absolute; top: -10px; right: -10px; background: var(--accent-pink); color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; transform: rotate(45deg); font-weight: 800; border: 2px solid white;">TRIBU</div>` : ''}
             </div>
         `;
 
@@ -295,13 +323,27 @@ window.GoHappyMap = {
         if (!window.GoHappyMap.userMarker) {
             const el = document.createElement('div');
             el.innerHTML = `
-                <div class="user-GoHappy-orb star-mode" style="
-                    width: 60px; height: 60px;
-                    background: radial-gradient(circle, rgba(0, 206, 209, 0.4) 0%, transparent 60%);
-                    display: flex; justify-content: center; align-items: center;
-                    border-radius: 50%;
-                ">
-                    <div style="font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 28px; background: linear-gradient(135deg, #0B4C8F, #08FEFE); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 2px 4px rgba(11, 76, 143, 0.5));">GO</div>
+                <div class="user-orb-container" style="position: relative; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    <div class="user-orb-glow" style="position: absolute; width: 100%; height: 100%; background: radial-gradient(circle, rgba(11, 76, 143, 0.4) 0%, transparent 70%); animation: pulse 2s infinite;"></div>
+                    <div class="user-orb-core" style="
+                        width: 24px; height: 24px; 
+                        background: white; 
+                        border: 4px solid var(--primary-cobalt); 
+                        border-radius: 50%; 
+                        box-shadow: 0 0 15px rgba(11, 76, 143, 0.5);
+                        z-index: 2;
+                    "></div>
+                    <div class="user-direction-cone" style="
+                        position: absolute; 
+                        width: 0; height: 0; 
+                        border-left: 10px solid transparent; 
+                        border-right: 10px solid transparent; 
+                        border-bottom: 25px solid var(--primary-cobalt); 
+                        top: -15px; 
+                        opacity: 0.8;
+                        transform-origin: center 45px;
+                        transform: rotate(${heading}deg);
+                    "></div>
                 </div>
             `;
             window.GoHappyMap.userMarker = new maplibregl.Marker({ element: el, pitchAlignment: 'map', rotationAlignment: 'map' })
@@ -309,8 +351,8 @@ window.GoHappyMap = {
                 .addTo(window.GoHappyMap.instance);
         } else {
             window.GoHappyMap.userMarker.setLngLat([lng, lat]);
-            const indicator = window.GoHappyMap.userMarker.getElement().querySelector('[style*="border-bottom: 10px solid"]');
-            if (indicator) indicator.style.transform = `rotate(${heading}deg) translateY(-2px)`;
+            const cone = window.GoHappyMap.userMarker.getElement().querySelector('.user-direction-cone');
+            if (cone) cone.style.transform = `rotate(${heading}deg)`;
         }
     },
 
@@ -321,13 +363,19 @@ window.GoHappyMap = {
         }
     },
 
-    locateUser: () => {
+    locateUser: (animate = false) => {
         navigator.geolocation.getCurrentPosition((pos) => {
             const lat = pos.coords.latitude;
             const lng = pos.coords.longitude;
-            window.GoHappyMap.instance.flyTo({ center: [lng, lat], zoom: 18, pitch: 0 });
+            const options = animate ? { center: [lng, lat], zoom: 17, pitch: 45, duration: 3000 } : { center: [lng, lat] };
+            
+            if (animate) window.GoHappyMap.instance.flyTo(options);
+            else window.GoHappyMap.instance.setCenter([lng, lat]);
+            
             window.GoHappyMap.updateUserIcon(lat, lng);
-        });
+        }, (err) => {
+            console.warn("Location denied:", err);
+        }, { enableHighAccuracy: true });
     },
 
     showAddSiteModal: (lat, lng, name = "") => {
@@ -339,23 +387,32 @@ window.GoHappyMap = {
         }
 
         const modal = document.createElement('div');
-        modal.className = 'modal';
+        modal.className = 'modal entry-anim';
         modal.innerHTML = `
-            <div class="auth-container slide-up-anim">
-                <div class="auth-card premium-glass" style="max-height: 85vh; overflow-y: auto;">
-                    <h3 style="color:var(--primary-navy);">${name ? `Reseñar ${name}` : 'Añadir Lugar 📍'}</h3>
-                    <p style="font-size:12px; color:#666; margin-bottom:15px;">Suma puntos y ayuda a otras familias.</p>
-
-                    ${name ? '' : '<input type="text" id="new-site-name" placeholder="Nombre (Ej: Parque Sol)..." class="review-input">'}
-
-                    <div class="star-rating" style="font-size: 2rem; margin: 10px 0;">
-                        <span class="star" data-val="1">★</span><span class="star" data-val="2">★</span><span class="star" data-val="3">★</span><span class="star" data-val="4">★</span><span class="star" data-val="5">★</span>
+            <div class="auth-container" style="padding: 20px;">
+                <div class="auth-card premium-glass" style="max-height: 85vh; overflow-y: auto; border-radius: 30px; border: 1px solid rgba(255,255,255,0.4); padding: 25px;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <span style="font-size: 40px; display: block; margin-bottom: 10px;">🌟</span>
+                        <h3 style="color:var(--primary-cobalt); font-weight: 900; font-size: 1.5rem; margin: 0;">${name ? `Reseñar ${name}` : 'Añadir a la Tribu'}</h3>
+                        <p style="font-size:13px; color:#64748b; margin-top: 5px;">Tu experiencia ayuda a cientos de familias.</p>
                     </div>
 
-                    <textarea id="review-text" class="review-input" placeholder="¿Qué tal el sitio? (Misión, limpieza, sombra...)" style="height:80px;"></textarea>
+                    ${name ? '' : '<div style="margin-bottom: 15px;"><label style="font-size: 11px; font-weight: 700; color: var(--primary-cobalt); text-transform: uppercase; margin-bottom: 5px; display: block;">Nombre del lugar</label><input type="text" id="new-site-name" placeholder="Ej: Parque Los Pinos" class="review-input" style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #eee; background: #f8fafc;"></div>'}
 
-                    <button id="post-review-btn" class="btn-primary full-width">Publicar en GoHappy</button>
-                    <button class="btn-text full-width" style="margin-top:10px;" onclick="this.closest('.modal').remove()">Cancelar</button>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <label style="font-size: 11px; font-weight: 700; color: var(--primary-cobalt); text-transform: uppercase; margin-bottom: 5px; display: block;">¿Qué nota le das?</label>
+                        <div class="star-rating" style="font-size: 2.5rem; color: #ddd; cursor: pointer;">
+                            <span class="star" data-val="1">★</span><span class="star" data-val="2">★</span><span class="star" data-val="3">★</span><span class="star" data-val="4">★</span><span class="star" data-val="5">★</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-size: 11px; font-weight: 700; color: var(--primary-cobalt); text-transform: uppercase; margin-bottom: 5px; display: block;">Tu opinión (Breve)</label>
+                        <textarea id="review-text" class="review-input" placeholder="Limpieza, columpios, zona de sombra..." style="width: 100%; height:100px; padding: 14px; border-radius: 12px; border: 1px solid #eee; background: #f8fafc; font-size: 14px; resize: none;"></textarea>
+                    </div>
+
+                    <button id="post-review-btn" class="btn-primary-gradient" style="width: 100%; height: 55px; border-radius: 16px; font-size: 1.1rem; font-weight: 800; border: none; box-shadow: 0 10px 20px rgba(11, 113, 252, 0.2);">🚀 Publicar en el Mapa</button>
+                    <button class="btn-text full-width" style="margin-top:15px; color: #888; font-size: 13px; text-decoration: underline;" onclick="this.closest('.modal').remove()">Ahora no, gracias</button>
                 </div>
             </div>
         `;

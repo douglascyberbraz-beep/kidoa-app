@@ -16,7 +16,7 @@ window.GoHappyQuests = {
     // Obtener misiones activas del usuario
     getActiveQuests: async () => {
         const user = window.GoHappyAuth.checkAuth();
-        if (!user) return window.GoHappyQuests._getDefaultQuests();
+        if (!user) return window.GoHappyQuests._getDefaultQuests().slice(0, 2);
 
         try {
             const snap = await window.GoHappyDB.collection('quests')
@@ -25,15 +25,33 @@ window.GoHappyQuests = {
                 .orderBy('createdAt', 'desc')
                 .get();
 
+            let activeQuests = [];
             if (!snap.empty) {
-                return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                activeQuests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             }
+
+            // Asegurar que siempre haya 2 misiones comunes (por defecto) activas si es posible
+            const defaultCount = activeQuests.filter(q => q.isDefault).length;
+            if (defaultCount < 2) {
+                const allDefaults = window.GoHappyQuests._getDefaultQuests();
+                // Evitar duplicar las que ya están activas
+                const availableDefaults = allDefaults.filter(d => !activeQuests.find(a => a.templateId === d.id));
+                
+                let needed = 2 - defaultCount;
+                for (let i = 0; i < needed && i < availableDefaults.length; i++) {
+                    const newDef = { ...availableDefaults[i], isDefault: true, templateId: availableDefaults[i].id };
+                    delete newDef.id; // Para que Firebase o saveQuest le asigne uno
+                    const saved = await window.GoHappyQuests.saveQuest(newDef);
+                    if (saved) activeQuests.push(saved);
+                }
+            }
+
+            return activeQuests;
         } catch (e) {
             console.warn("Firestore quests fetch error:", e);
         }
 
-        // Si no hay misiones en Firestore, devolvemos las de demo solo si es invitado o primer login
-        return window.GoHappyQuests._getDefaultQuests();
+        return window.GoHappyQuests._getDefaultQuests().slice(0, 2);
     },
 
     // Guardar una misión generada por IA en la cuenta del usuario
@@ -73,16 +91,24 @@ window.GoHappyQuests = {
             await window.GoHappyDB.collection('quests').doc(questId).update(updateData);
 
             if (isComplete) {
+                // Necesitamos los puntos de la misión
+                const questDoc = await window.GoHappyDB.collection('quests').doc(questId).get();
+                const questData = questDoc.exists ? questDoc.data() : { points: 100, title: 'Misión' };
+
                 // Registrar actividad para Memories
                 await window.GoHappyDB.collection('activity').add({
                     userId: user.uid,
                     type: 'quest_completed',
                     title: 'Misión completada',
-                    description: `Has terminado la misión "${questId}"`, // Sería mejor el título pero necesitamos pasarlo
+                    description: `Has terminado la misión "${questData.title || questId}"`, 
                     timestamp: new Date(),
-                    points: 100 // Puntos base por misión
+                    points: questData.points || 100
                 });
-                window.GoHappyPoints.addPoints('QUEST_COMPLETE');
+                
+                // Otorgar los puntos dinámicamente
+                if (window.GoHappyPoints && window.GoHappyPoints.addPoints) {
+                    window.GoHappyPoints.addPoints('QUEST_COMPLETE', user.uid, questData.points || 100);
+                }
             }
             return true;
         } catch (e) {
@@ -95,12 +121,14 @@ window.GoHappyQuests = {
     generateQuests: async (coords = "41.6520, -4.7286") => {
         try {
             if (window.GEMINI_KEY && !window.GEMINI_KEY.includes('PEGAR_AQUI')) {
-                return await window.GoHappyAI.generateLocalQuests(coords);
+                const aiQuests = await window.GoHappyAI.generateLocalQuests(coords);
+                return aiQuests.map(q => ({ ...q, isDefault: false }));
             }
-            return window.GoHappyQuests._getDefaultQuests();
+            // Fallback mock
+            return window.GoHappyQuests._getDefaultQuests().slice(2, 4).map(q => ({ ...q, isDefault: false }));
         } catch (e) {
             console.error("Error generando misiones:", e);
-            return window.GoHappyQuests._getDefaultQuests();
+            return [];
         }
     },
 

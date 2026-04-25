@@ -2,12 +2,14 @@ window.GoHappyPoints = {
     // Configuración de la tabla de puntos
     REWARDS: {
         REGISTER: 50,
-        REVIEW: 30,         // Increased
-        PHOTO_VIDEO: 50,    // Increased for value
-        COMMENT: 10,        // Increased
-        REFERRAL: 150,      // Increased
-        QUEST_COMPLETE: 200, // Increased
-        QUEST_PHOTO: 50,
+        REVIEW: 30,
+        PHOTO_VIDEO: 50,
+        COMMENT: 10,
+        REFERRAL: 500,
+        QUEST_EASY: 50,
+        QUEST_MEDIUM: 100,
+        QUEST_HARD: 200,
+        SAFETY_REPORT: 20,
         DAILY_LOGIN: 5
     },
 
@@ -16,7 +18,8 @@ window.GoHappyPoints = {
         { min: 150, name: "Explorador Activo", icon: "🌿" },
         { min: 500, name: "Guía de la Tribu", icon: "🌳" },
         { min: 1200, name: "Maestro GoHappy", icon: "⭐" },
-        { min: 2500, name: "Leyenda GoHappy", icon: "👑" }
+        { min: 2500, name: "Leyenda GoHappy", icon: "👑" },
+        { min: 5000, name: "Héroe de la Tribu", icon: "🛡️" }
     ],
 
     // Obtener información de nivel basada en puntos
@@ -45,8 +48,8 @@ window.GoHappyPoints = {
     },
 
     // Otorgar puntos reales y sincronizar con Firestore
-    addPoints: async (action, userId) => {
-        const pointsToAdd = window.GoHappyPoints.REWARDS[action] || 0;
+    addPoints: async (action, userId, customPoints = null) => {
+        const pointsToAdd = customPoints !== null ? customPoints : (window.GoHappyPoints.REWARDS[action] || 0);
         console.log(`Otorgando ${pointsToAdd} puntos por acción: ${action}`);
 
         const user = window.GoHappyAuth.checkAuth();
@@ -61,11 +64,38 @@ window.GoHappyPoints = {
                 const userRef = window.GoHappyDB.collection('users').doc(user.uid);
                 await window.GoHappyDB.runTransaction(async (transaction) => {
                     const sfDoc = await transaction.get(userRef);
+                    const now = new Date();
+                    
+                    const getWeek = (d) => {
+                        const date = new Date(d.getTime());
+                        date.setHours(0, 0, 0, 0);
+                        date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+                        const week1 = new Date(date.getFullYear(), 0, 4);
+                        return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+                    };
+
                     if (!sfDoc.exists) {
-                        transaction.set(userRef, { points: pointsToAdd });
+                        transaction.set(userRef, { 
+                            points: pointsToAdd,
+                            weeklyPoints: pointsToAdd,
+                            lastPointUpdate: now.toISOString()
+                        });
                     } else {
-                        const newPoints = (sfDoc.data().points || 0) + pointsToAdd;
-                        transaction.update(userRef, { points: newPoints });
+                        const data = sfDoc.data();
+                        const newPoints = (data.points || 0) + pointsToAdd;
+                        
+                        let currentWeekly = data.weeklyPoints || 0;
+                        let lastUpdate = data.lastPointUpdate ? new Date(data.lastPointUpdate) : new Date(0);
+                        
+                        if (getWeek(now) !== getWeek(lastUpdate) || now.getFullYear() !== lastUpdate.getFullYear()) {
+                            currentWeekly = 0;
+                        }
+                        
+                        transaction.update(userRef, { 
+                            points: newPoints,
+                            weeklyPoints: currentWeekly + pointsToAdd,
+                            lastPointUpdate: now.toISOString()
+                        });
                     }
                 });
                 

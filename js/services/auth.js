@@ -34,7 +34,7 @@ window.GoHappyAuth = {
                         email: user.email || "Invitado",
                         nickname: "Explorador",
                         points: 0,
-                        level: "Bronce",
+                        level: "Semilla",
                         isGuest: user.isAnonymous,
                         photo: "👤"
                     };
@@ -72,7 +72,7 @@ window.GoHappyAuth = {
         }
     },
 
-    register: async (email, pass, nickname) => {
+    register: async (email, pass, nickname, firstName = "", lastName = "", photo = "👤") => {
         try {
             // 1. Crear usuario en Auth
             const res = await window.GoHappyAuthReal.createUserWithEmailAndPassword(email, pass);
@@ -83,15 +83,15 @@ window.GoHappyAuth = {
                 uid: user.uid,
                 email,
                 nickname,
+                firstName,
+                lastName,
+                photo,
                 points: 50, // Bono de bienvenida
-                level: "Semilla",
-                referralCode: 'KNDR-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
+                level: "Explorador Novato",
+                referralCode: 'GH-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
                 createdAt: new Date()
             };
             await window.GoHappyDB.collection('users').doc(user.uid).set(profile);
-
-            // 4. Marcar invitación como usada (opcional, depende de la lógica del beta)
-            // Aquí podrías actualizar el doc de la invitación si fuera de un solo uso
 
             return user;
         } catch (e) {
@@ -157,8 +157,8 @@ window.GoHappyAuth = {
                     email: res.user.email,
                     nickname: res.user.displayName || "Explorador",
                     points: 50,
-                    level: "Semilla",
-                    referralCode: 'KNDR-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
+                    level: "Explorador Novato",
+                    referralCode: 'GH-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
                     createdAt: new Date()
                 };
                 await window.GoHappyDB.collection('users').doc(res.user.uid).set(profile);
@@ -203,53 +203,67 @@ window.GoHappyAuth = {
         modal.id = 'auth-modal';
         modal.className = 'modal auth-modal';
         modal.innerHTML = `
-            <div class="auth-container slide-up-anim">
-                <div class="auth-card premium-glass">
+            <div class="auth-container entry-anim">
+                <div class="auth-card premium-glass" style="max-height: 90vh; overflow-y: auto;">
                     <div class="auth-header">
-                        <div class="premium-logo-wrap" style="margin-bottom: 25px; display: flex; justify-content: center;">
-                            <img src="assets/logo_gohappy_official.svg" alt="GoHappy Logo" style="width: 150px; height: auto;">
+                        <div class="premium-logo-wrap" style="margin-bottom: 20px; display: flex; justify-content: center;">
+                            <img src="assets/logo_gohappy_official.svg" alt="GoHappy Logo" style="width: 140px; height: auto;">
                         </div>
-                        <h2 style="color:var(--primary-cobalt); font-size: 1.9rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px;">Bienvenido a GoHappy</h2>
-                        <p style="color: #64748b; font-size: 1rem; font-weight: 500;">Explora, comparte y crece con tu tribu</p>
+                        <h2 style="color:var(--primary-cobalt); font-size: 1.8rem; font-weight: 900; margin-bottom: 5px; letter-spacing: -1px;">Bienvenido a la Tribu</h2>
+                        <p style="color: #64748b; font-size: 0.95rem; font-weight: 500;">Crea recuerdos inolvidables en familia</p>
                     </div>
                     
-                    <div id="auth-form">
-                        <div id="auth-error-msg" style="color: #ff4d4d; font-size: 12px; margin-bottom: 15px; display:none; background: rgba(255,77,77,0.1); padding: 10px; border-radius: 12px;"></div>
+                    <div id="auth-form" style="margin-top: 20px;">
+                        <div id="auth-error-msg" style="color: #ff4d4d; font-size: 12px; margin-bottom: 15px; display:none; background: rgba(255,77,77,0.1); padding: 12px; border-radius: 14px; font-weight: 600;"></div>
                         
                         <div id="register-fields" style="display:none;">
-                            <input type="text" id="reg-nickname" placeholder="Tu Apodo / Nickname" class="auth-input">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                                <input type="text" id="reg-name" placeholder="Nombre" class="auth-input">
+                                <input type="text" id="reg-surname" placeholder="Apellidos" class="auth-input">
+                            </div>
+                            <input type="text" id="reg-nickname" placeholder="Tu Apodo (Nickname)" class="auth-input">
+                            
+                            <div style="margin: 15px 0;">
+                                <label style="font-size: 11px; font-weight: 800; color: var(--primary-cobalt); text-transform: uppercase; display: block; margin-bottom: 10px;">Elige tu Avatar</label>
+                                <div id="avatar-selector" style="display: flex; gap: 10px; overflow-x: auto; padding: 5px; scrollbar-width: none;">
+                                    <div class="avatar-option selected" data-emoji="👤">👤</div>
+                                    <div class="avatar-option" data-emoji="🦁">🦁</div>
+                                    <div class="avatar-option" data-emoji="🐼">🐼</div>
+                                    <div class="avatar-option" data-emoji="🦄">🦄</div>
+                                    <div class="avatar-option" data-emoji="🦊">🦊</div>
+                                    <div class="avatar-option" data-emoji="🤖">🤖</div>
+                                    <div class="avatar-option" data-emoji="👩‍🚀">👩‍🚀</div>
+                                    <div class="avatar-option" data-emoji="🦒">🦒</div>
+                                </div>
+                            </div>
                         </div>
 
-                        <input type="email" id="auth-email" placeholder="Email" class="auth-input">
+                        <input type="email" id="auth-email" placeholder="Correo electrónico" class="auth-input">
                         <input type="password" id="auth-pass" placeholder="Contraseña" class="auth-input">
                         
-                        <label id="terms-label" style="display:none; align-items:center; justify-content: center; gap:8px; margin-top:12px; font-size:12px; color:#666; cursor:pointer;">
-                            <input type="checkbox" id="accept-terms" style="width:20px; height:20px; accent-color:var(--primary-cobalt);">
-                            <span>Acepto los <a href="#" id="show-terms-link" style="color:var(--primary-cobalt); font-weight:700; text-decoration:none;">Términos y Condiciones</a></span>
+                        <label id="terms-label" style="display:none; align-items:center; justify-content: center; gap:8px; margin-top:12px; font-size:12px; color:#64748b; cursor:pointer;">
+                            <input type="checkbox" id="accept-terms" style="width:18px; height:18px; accent-color:var(--primary-cobalt);">
+                            <span>Acepto los <a href="#" id="show-terms-link" style="color:var(--primary-cobalt); font-weight:700;">Términos</a></span>
                         </label>
                         
-                        <div style="display:flex; flex-direction:column; gap:12px; margin-top:20px;">
-                            <button id="main-auth-btn" class="btn-primary" style="height: 54px; font-size: 1.1rem;">Entrar</button>
-                            <button id="toggle-auth-mode" class="btn-text" style="font-size: 14px; margin-top: 5px;">¿No tienes cuenta? Regístrate</button>
-                        </div>
+                        <button id="main-auth-btn" class="btn-primary-gradient full-width" style="height: 55px; margin-top: 20px; font-size: 1.1rem; font-weight: 800; border: none; border-radius: 16px; box-shadow: 0 10px 20px rgba(11, 113, 252, 0.2);">Entrar</button>
                         
-                        <div class="social-divider"><span>o continúa con</span></div>
+                        <button id="toggle-auth-mode" class="btn-text full-width" style="margin-top: 10px; font-size: 14px; font-weight: 600; color: #64748b;">¿No tienes cuenta? Regístrate gratis</button>
                         
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:15px;">
-                            <button id="do-google" class="btn-outline" style="display:flex; align-items:center; justify-content:center; gap:10px; height: 50px; border-radius: 15px; background: white; border: 1px solid #e2e8f0; font-weight: 600;">
-                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18"> Google
+                        <div class="social-divider" style="margin: 25px 0;"><span>O CONECTA CON</span></div>
+                        
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                            <button id="do-google" class="social-btn-premium">
+                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"> Google
                             </button>
-                            <button id="do-apple" class="btn-outline" style="display:flex; align-items:center; justify-content:center; gap:10px; height: 50px; border-radius: 15px; background: #000; color: white; border: none; font-weight: 600; cursor: pointer;">
-                                <svg width="20" height="20" viewBox="0 0 384 512" style="fill:white;">
-                                    <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/>
-                                </svg> Apple
+                            <button id="do-apple" class="social-btn-premium" style="background: #000; color: white; border: none;">
+                                <svg width="18" height="18" viewBox="0 0 384 512" style="fill:white;"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg> Apple
                             </button>
-
                         </div>
 
-                        <div style="text-align: center; margin-top: 10px;">
-                            <button id="do-guest" class="btn-outline" style="font-weight: 700; color: var(--text-main); font-size: 0.9rem; border: 1px solid #e2e8f0; background: #f8fafc; width: 100%; height: 50px; border-radius: 15px; cursor: pointer;">
-                                Explorar como invitado
+                        <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #f1f5f9;">
+                            <button id="do-guest" style="background: none; border: none; color: #94a3b8; font-weight: 700; font-size: 14px; cursor: pointer; text-decoration: underline;">
+                                Seguir como invitado
                             </button>
                         </div>
                     </div>
@@ -277,9 +291,18 @@ window.GoHappyAuth = {
             isLoginMode = !isLoginMode;
             document.getElementById('register-fields').style.display = isLoginMode ? 'none' : 'block';
             document.getElementById('terms-label').style.display = isLoginMode ? 'none' : 'flex';
-            document.getElementById('main-auth-btn').textContent = isLoginMode ? 'Entrar' : 'Registrarse';
-            document.getElementById('toggle-auth-mode').textContent = isLoginMode ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión';
+            document.getElementById('main-auth-btn').textContent = isLoginMode ? 'Entrar' : 'Crear Cuenta Gratis';
+            document.getElementById('toggle-auth-mode').textContent = isLoginMode ? '¿No tienes cuenta? Regístrate gratis' : '¿Ya tienes cuenta? Inicia sesión';
         };
+
+        let selectedEmoji = "👤";
+        document.querySelectorAll('.avatar-option').forEach(opt => {
+            opt.addEventListener('click', () => {
+                document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                selectedEmoji = opt.dataset.emoji;
+            });
+        });
 
         document.getElementById('toggle-auth-mode').addEventListener('click', toggleMode);
 
@@ -298,13 +321,15 @@ window.GoHappyAuth = {
                 }
             } else {
                 const nick = document.getElementById('reg-nickname').value;
+                const name = document.getElementById('reg-name').value;
+                const surname = document.getElementById('reg-surname').value;
                 const termsAccepted = document.getElementById('accept-terms').checked;
 
-                if (!email || !pass || !nick) return showError("Todos los campos son obligatorios.");
-                if (!termsAccepted) return showError("Debes aceptar los Términos y Condiciones.");
+                if (!email || !pass || !nick || !name) return showError("Nombre, Apodo, Email y Contraseña requeridos.");
+                if (!termsAccepted) return showError("Debes aceptar los Términos.");
 
                 try {
-                    await window.GoHappyAuth.register(email, pass, nick);
+                    await window.GoHappyAuth.register(email, pass, nick, name, surname, selectedEmoji);
                     modal.remove();
                     location.reload();
                 } catch (e) {

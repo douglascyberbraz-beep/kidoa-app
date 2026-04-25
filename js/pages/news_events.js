@@ -82,15 +82,18 @@ window.GoHappyNewsEvents = {
                 card.style.boxShadow = 'var(--shadow-soft)';
 
                 card.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span style="font-size: 10px; color: var(--primary-blue); font-weight: 800; text-transform: uppercase;">Noticia Regional</span>
-                        <span style="font-size: 10px; color: #888;">${item.date || 'Reciente'}</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <span style="font-size: 10px; color: var(--primary-cobalt); font-weight: 800; text-transform: uppercase; background: rgba(11, 113, 252, 0.1); padding: 4px 10px; border-radius: 20px;">📰 Noticia Local</span>
+                        <span style="font-size: 10px; color: #94a3b8; font-weight: 600;">${item.date || 'Hoy'}</span>
                     </div>
-                    <h3 style="color: var(--primary-navy); margin: 0 0 10px 0; font-size: 1.1rem; line-height: 1.3;">${item.title}</h3>
-                    <p style="font-size: 0.9rem; color: #555; line-height: 1.5; margin-bottom: 15px;">${item.summary}</p>
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f0f0f0; padding-top: 12px;">
-                        <small style="color: #999; font-style: italic;">Fuente: ${item.sourceName || item.source || 'GoHappy Local Info'}</small>
-                        <a href="${item.link}" target="_blank" class="btn-text" style="color: var(--primary-blue); font-weight: 700; text-decoration: none; font-size: 12px;">Leer noticia completa →</a>
+                    <h3 style="color: var(--primary-cobalt); margin: 0 0 12px 0; font-size: 1.25rem; line-height: 1.3; font-weight: 800;">${item.title}</h3>
+                    <p style="font-size: 0.95rem; color: #475569; line-height: 1.5; margin-bottom: 18px;">${item.summary}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 15px;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="font-size: 12px;">🔗</span>
+                            <small style="color: #64748b; font-weight: 600;">Fuente: ${item.sourceName || 'Oficial'}</small>
+                        </div>
+                        <a href="${item.link && item.link !== '#' ? item.link : 'javascript:void(0)'}" target="_blank" class="btn-text" style="color: var(--primary-cobalt); font-weight: 700; text-decoration: none; font-size: 13px;">Leer más →</a>
                     </div>
                 `;
                 content.appendChild(card);
@@ -135,11 +138,24 @@ window.GoHappyNewsEvents = {
                 card.style.border = '1px solid #eee';
 
                 card.innerHTML = `
-                    <h4 style="color: var(--primary-navy); margin-bottom: 5px;">${item.title}</h4>
-                    <p style="font-size: 12px; color: #666; margin-bottom: 10px;">${item.description}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="color: ${item.statusColor === 'green' ? '#27AE60' : '#E67E22'}; font-weight: 800; font-size: 10px; background: ${item.statusColor === 'green' ? 'rgba(39,174,96,0.1)' : 'rgba(230,126,34,0.1)'}; padding: 4px 10px; border-radius: 20px;">
+                            ${item.status || 'PLAZO ABIERTO'}
+                        </span>
+                        <span style="font-size: 11px; color: #94a3b8; font-weight: 600;">⏳ ${item.deadline || 'Consultar'}</span>
+                    </div>
+                    <h4 style="color: var(--primary-cobalt); margin: 0 0 8px 0; font-size: 1.1rem; font-weight: 800;">${item.title}</h4>
+                    <p style="font-size: 13px; color: #475569; margin-bottom: 15px; line-height: 1.4;">${item.description}</p>
+                    
+                    <div class="beca-details" style="background: rgba(255,255,255,0.5); border-radius: 12px; padding: 12px; margin-bottom: 15px; font-size: 12px; border: 1px solid rgba(0,0,0,0.03);">
+                        <div style="margin-bottom: 8px;"><strong style="color: var(--primary-cobalt);">📋 Requisitos:</strong> ${item.requirements || 'Consultar bases oficiales.'}</div>
+                        <div><strong style="color: var(--primary-cobalt);">🚀 Cómo pedirla:</strong> ${item.howToApply || 'A través de la sede electrónica.'}</div>
+                    </div>
+
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="color: ${item.statusColor || '#27AE60'}; font-weight: 800; font-size: 11px;">${item.status}</span>
-                        <button id="beca-btn-${idx}" class="btn-text" style="color: var(--primary-blue); font-weight: 700;">${item.linkText || 'Ver Bases'}</button>
+                        <button id="beca-btn-${idx}" class="btn-primary-gradient" style="padding: 10px 20px; border-radius: 12px; font-size: 12px; font-weight: 700; border: none; width: 100%; box-shadow: 0 4px 10px rgba(11, 113, 252, 0.1);">
+                            ${item.linkText || 'Ver Detalles y Web Oficial'}
+                        </button>
                     </div>
                 `;
                 listContainer.appendChild(card);

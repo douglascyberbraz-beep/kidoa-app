@@ -2,11 +2,11 @@ window.GoHappyRanking = {
     render: async (container) => {
         container.innerHTML = `
             <div class="page-header center-text">
-                <h2 style="color: var(--primary-cobalt); font-weight: 800; font-size: 24px;">🏆 RANKING</h2>
-                <p style="font-size: 13px; color: #888; margin-top: -5px; margin-bottom: 15px;">Los mejores de la comunidad</p>
-                <div class="tab-scroller">
-                    <button class="tab-btn active" data-tab="sites">Top Sitios</button>
-                    <button class="tab-btn" data-tab="users">Contribuidores</button>
+                <h2 style="color: var(--primary-cobalt); font-weight: 900; font-size: 26px; letter-spacing: -0.5px;">🏆 EL TOP DE LA TRIBU</h2>
+                <p style="font-size: 13px; color: #64748b; margin-top: 5px; margin-bottom: 20px;">Los que más ayudan a la comunidad GoHappy</p>
+                <div class="tab-scroller" style="background: rgba(255,255,255,0.5); padding: 5px; border-radius: 30px; border: 1px solid rgba(0,0,0,0.05); display: inline-flex; margin-bottom: 10px;">
+                    <button class="tab-btn active" data-tab="sites" style="padding: 10px 25px; border-radius: 25px; font-weight: 700; font-size: 13px;">🌟 Mejores Sitios</button>
+                    <button class="tab-btn" data-tab="users" style="padding: 10px 25px; border-radius: 25px; font-weight: 700; font-size: 13px;">🤝 Colaboradores</button>
                 </div>
             </div>
             
@@ -90,12 +90,13 @@ window.GoHappyRanking = {
         };
 
         const renderContributors = async () => {
-            list.innerHTML = '<div class="center-text p-20"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
+            list.innerHTML = '<div class="center-text p-40"><div class="magic-loader">✨</div><p style="margin-top:10px; color:#64748b;">Calculando los puntos de la semana...</p></div>';
             let users = await window.GoHappyData.getContributors();
             const me = window.GoHappyAuth.checkAuth();
             if (me && !me.isGuest) {
-                if (!users.find(u => u.name === (me.nickname || me.email))) {
-                    users.push({ name: me.nickname || me.email, points: me.points, rank: me.level, role: "Tú", special: true, avatar: me.photo || '👤' });
+                const myName = me.nickname || (me.email ? me.email.split('@')[0] : "Tú");
+                if (!users.find(u => u.name === myName)) {
+                    users.push({ name: myName, points: me.weeklyPoints || me.points || 0, rank: me.level || "Explorador", role: "Tú", special: true, avatar: me.photo || '👤' });
                 }
             }
             users.sort((a, b) => b.points - a.points);
@@ -127,18 +128,25 @@ window.GoHappyRanking = {
             html += '<div class="ranking-rows">';
             others.forEach((user, i) => {
                 html += `
-                    <div class="ranking-row card-anim ${user.special ? 'is-me' : ''}">
-                        <span class="row-rank">#${i + 4}</span>
-                        <div class="row-avatar gradient-bg small">${user.avatar || '👤'}</div>
+                    <div class="ranking-row card-anim ${user.special ? 'is-me' : ''}" style="border-radius: 18px; margin-bottom: 10px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+                        <span class="row-rank" style="font-weight: 800; color: #94a3b8; width: 35px;">#${i + 4}</span>
+                        <div class="row-avatar gradient-bg small" style="width: 40px; height: 40px; font-size: 16px;">${user.avatar || '👤'}</div>
                         <div class="row-info">
-                            <h4 class="truncate">${user.name}</h4>
-                            <span class="row-type">${user.rank || 'Nivel 1'}</span>
+                            <h4 class="truncate" style="font-weight: 700; color: var(--primary-cobalt);">${user.name}</h4>
+                            <span class="row-type" style="font-size: 11px;">${user.rank || 'Explorador'}</span>
                         </div>
-                        <div class="row-score">${user.points} pts</div>
+                        <div class="row-score" style="font-weight: 800; color: var(--accent-pink);">${user.points} <small>pts</small></div>
                     </div>
                 `;
             });
             html += '</div>';
+
+            html += `
+                <div class="motivation-box entry-anim" style="background: linear-gradient(135deg, rgba(11, 113, 252, 0.05), rgba(11, 113, 252, 0.1)); padding: 20px; border-radius: 24px; margin-top: 30px; text-align: center; border: 1px dashed var(--primary-cobalt);">
+                    <h4 style="color: var(--primary-cobalt); margin: 0 0 5px 0;">¡Tú puedes ser el próximo! 🚀</h4>
+                    <p style="font-size: 12px; color: #64748b;">Reporta peligros en SAFE, haz reseñas en el MAPA o completa QUESTS para sumar puntos semanales.</p>
+                </div>
+            `;
 
             list.innerHTML = html;
         };

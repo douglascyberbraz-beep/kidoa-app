@@ -148,13 +148,15 @@ window.GoHappyData = {
     // -- RANKING / CONTRIBUTORS --
     getContributors: async () => {
         try {
-            const snap = await window.GoHappyDB.collection('users').orderBy('points', 'desc').limit(10).get();
+            const snap = await window.GoHappyDB.collection('users').orderBy('weeklyPoints', 'desc').limit(10).get();
             if (!snap.empty) {
                 return snap.docs.map(d => {
                     const data = d.data();
                     return {
-                        name: data.nickname || "Desconocido",
-                        points: data.points || 0,
+                    const name = data.nickname || (data.name ? data.name.split(' ')[0] + ' ' + (data.name.split(' ')[1] ? data.name.split(' ')[1][0] + '.' : '') : "Explorador");
+                    return {
+                        name: name,
+                        points: data.weeklyPoints || data.points || 0,
                         rank: data.level || "Explorador",
                         contributions: data.contributions || 0,
                         role: "🎖️"
@@ -164,12 +166,12 @@ window.GoHappyData = {
         } catch (e) {
             console.warn("Firestore getContributors fallback:", e);
         }
-        // Fallback estático
+        // Fallback estático con nombres protegidos
         return [
-            { name: "Elena Ramos", points: 1250, rank: "Maestro GoHappy", contributions: 45, role: "🥇 Top" },
-            { name: "Carlos Ruiz", points: 980, rank: "Guía Tribu", contributions: 32, role: "🥈 Pro" },
-            { name: "Marta Sanz", points: 750, rank: "Guía Tribu", contributions: 28, role: "🥉 Social" },
-            { name: "Javier López", points: 420, rank: "Explorador", contributions: 15, role: "🎖️ Activo" }
+            { name: "Elena R.", points: 1250, rank: "Maestro GoHappy", contributions: 45, role: "🥇 Top" },
+            { name: "Carlos R.", points: 980, rank: "Guía Tribu", contributions: 32, role: "🥈 Pro" },
+            { name: "Marta S.", points: 750, rank: "Guía Tribu", contributions: 28, role: "🥉 Social" },
+            { name: "Javier L.", points: 420, rank: "Explorador", contributions: 15, role: "🎖️ Activo" }
         ];
     }
 };

@@ -23,17 +23,17 @@ window.GoHappyProfile = {
         const levelInfo = window.GoHappyPoints.getLevelInfo(user.points);
 
         container.innerHTML = `
-            <div class="profile-page entry-anim">
-                <div class="profile-hero-premium">
-                    <div class="profile-avatar-wrapper">
-                        <div class="profile-avatar-large profile-glow">${user.photo || '👤'}</div>
-                        <div class="level-label-bubble">Nivel ${user.level}</div>
+            <div class="profile-page entry-anim" style="padding-bottom: 120px;">
+                <div class="profile-hero-premium" style="background: linear-gradient(180deg, var(--primary-cobalt) 0%, #1e293b 100%); padding-top: 40px; border-radius: 0 0 40px 40px; margin-bottom: -30px;">
+                    <div class="profile-avatar-wrapper" id="open-avatar-editor" style="cursor: pointer;">
+                        <div class="profile-avatar-large profile-glow" style="font-size: 60px; background: white; border: 4px solid var(--accent-pink);">${user.photo || '👤'}</div>
+                        <div class="level-label-bubble" style="background: var(--accent-pink); font-weight: 800; padding: 4px 15px; border-radius: 20px; bottom: -10px;">Nivel ${user.level || '1'}</div>
                     </div>
-                    <div class="profile-info-header">
-                        <h2 class="profile-name-premium">${user.nickname || 'Explorador GoHappy'}</h2>
-                        <div class="profile-badge-row">
-                            <span class="p-badge"><i class="icon">💎</i> Premium</span>
-                            <span class="p-badge"><i class="icon">📍</i> ${user.city || 'España'}</span>
+                    <div class="profile-info-header" style="margin-top: 15px;">
+                        <h2 class="profile-name-premium" style="color: white; font-weight: 900; font-size: 1.8rem; margin: 0;">${user.nickname || 'Explorador'}</h2>
+                        <div class="profile-badge-row" style="justify-content: center; margin-top: 5px;">
+                            <span class="p-badge" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">💎 Miembro Oro</span>
+                            <span class="p-badge" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">📍 ${user.city || 'Comunidad'}</span>
                         </div>
                     </div>
                 </div>
@@ -73,16 +73,20 @@ window.GoHappyProfile = {
                     </div>
                 </div>
 
-                <div class="referral-premium-box premium-glass">
-                    <div class="ref-header">
-                        <div class="ref-texts">
-                            <h3>Tu Código Mágico</h3>
-                            <p>Cópialo y envíalo a tus grupos de WhatsApp</p>
-                        </div>
-                        <div id="ref-code-display" class="ref-code-big">${user.referralCode || 'AMIGOS2025'}</div>
+                <div class="referral-premium-box premium-glass" style="margin: 20px 0; padding: 25px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.4);">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h3 style="color: var(--primary-cobalt); font-weight: 900; margin: 0;">¡Invita y Gana! 🎁</h3>
+                        <p style="font-size: 13px; color: #64748b; margin-top: 5px;">Gana 500 puntos por cada amigo que se una.</p>
                     </div>
-                    <button id="copy-ref-link" class="btn-primary-gradient full-width">Copiar Enlace de Invitación</button>
-                    <div id="referral-qr" class="qr-preview"></div>
+                    
+                    <div style="display: flex; gap: 20px; align-items: center; background: white; padding: 15px; border-radius: 20px; box-shadow: var(--shadow-soft);">
+                        <div id="referral-qr" style="width: 100px; height: 100px; background: #f8fafc; border-radius: 12px; display: flex; align-items: center; justify-content: center;"></div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Tu código personal</div>
+                            <div id="ref-code-display" style="font-size: 1.5rem; font-weight: 900; color: var(--primary-cobalt); letter-spacing: 1px;">${user.referralCode || 'GH-123'}</div>
+                            <button id="copy-ref-link" style="margin-top: 10px; background: var(--primary-cobalt); color: white; border: none; padding: 8px 15px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer;">Copiar Enlace</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="account-actions-list">
@@ -125,6 +129,52 @@ window.GoHappyProfile = {
 
         document.getElementById('terms-link').onclick = () => {
             window.GoHappyApp.loadPage('legal');
+        };
+
+        document.getElementById('open-avatar-editor').onclick = () => {
+            const modal = document.createElement('div');
+            modal.className = 'modal entry-anim';
+            modal.innerHTML = `
+                <div class="auth-container" style="padding: 20px;">
+                    <div class="auth-card premium-glass" style="padding: 30px; border-radius: 35px;">
+                        <h3 style="color:var(--primary-cobalt); text-align:center; font-weight:900; margin-bottom:20px;">Cambiar Avatar</h3>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px;">
+                            ${['👤', '🦁', '🐼', '🦄', '🦊', '🤖', '👩‍🚀', '🦒'].map(emoji => `
+                                <div class="avatar-option" data-emoji="${emoji}" style="font-size: 35px; background: white; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; border: 2px solid transparent; ${user.photo === emoji ? 'border-color: var(--primary-cobalt); background: rgba(11, 113, 252, 0.1);' : ''}">${emoji}</div>
+                            `).join('')}
+                        </div>
+                        <button id="save-avatar-btn" class="btn-primary-gradient full-width" style="height: 55px; font-weight: 800;">Guardar Cambios</button>
+                        <button class="btn-text full-width" style="margin-top:15px;" onclick="this.closest('.modal').remove()">Cancelar</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            let selected = user.photo;
+            modal.querySelectorAll('.avatar-option').forEach(opt => {
+                opt.onclick = () => {
+                    modal.querySelectorAll('.avatar-option').forEach(o => {
+                        o.style.borderColor = 'transparent';
+                        o.style.background = 'white';
+                    });
+                    opt.style.borderColor = 'var(--primary-cobalt)';
+                    opt.style.background = 'rgba(11, 113, 252, 0.1)';
+                    selected = opt.dataset.emoji;
+                };
+            });
+
+            document.getElementById('save-avatar-btn').onclick = async () => {
+                try {
+                    await window.GoHappyDB.collection('users').doc(user.uid).update({ photo: selected });
+                    user.photo = selected;
+                    localStorage.setItem('GoHappy_local_user', JSON.stringify(user));
+                    modal.remove();
+                    window.GoHappyProfile.render(container);
+                    window.GoHappySound.play('success');
+                } catch (e) {
+                    alert("Error al guardar el avatar.");
+                }
+            };
         };
 
         container.querySelectorAll('.quick-card[data-goto]').forEach(card => {

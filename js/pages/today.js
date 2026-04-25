@@ -38,7 +38,13 @@ window.GoHappyToday = {
             }
 
             console.log("TODAY: Fetching for", coords, preferences);
-            content.innerHTML = '<div class="center-text p-40"><div class="typing-dots"><span></span><span></span><span></span></div><p style="margin-top:15px; color:var(--text-light);">GoHappy IA está analizando planes reales cerca de ti...</p></div>';
+            content.innerHTML = `
+                <div class="center-text p-40 entry-anim">
+                    <div class="magic-loader" style="font-size: 45px; margin-bottom: 20px; animation: float 3s ease-in-out infinite;">✨</div>
+                    <div class="typing-dots"><span></span><span></span><span></span></div>
+                    <p style="margin-top:15px; font-weight:600; color:var(--primary-cobalt);">GoHappy IA está diseñando magia...</p>
+                    <p style="font-size: 13px; color:var(--text-light); margin-top:5px;">Creando planes 'Done for You' basados en tu familia</p>
+                </div>`;
 
             try {
                 const activities = await window.GoHappyAI.getTodayActivities(coords, preferences);
@@ -67,17 +73,42 @@ window.GoHappyToday = {
 
                 const priceText = act.price || 'Gratis';
                 const isFree = priceText.toLowerCase().includes('grat');
+                
+                let highlightsHtml = '';
+                if (act.highlights && act.highlights.length > 0) {
+                    highlightsHtml = `<ul style="margin: 0 0 15px 0; padding-left: 20px; font-size: 13px; color: #334155; list-style-type: '⭐ ';">
+                        ${act.highlights.map(h => `<li style="margin-bottom: 4px;">${h}</li>`).join('')}
+                    </ul>`;
+                }
+
+                let packingHtml = '';
+                if (act.packingList && act.packingList.length > 0) {
+                    packingHtml = `<div style="background: rgba(11, 113, 252, 0.05); padding: 12px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid var(--primary-cobalt);">
+                        <strong style="font-size: 12px; color: var(--primary-cobalt); display: block; margin-bottom: 6px;">🎒 Qué echar en la mochila:</strong>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            ${act.packingList.map(item => `<span style="background: white; padding: 4px 10px; border-radius: 20px; font-size: 11px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); color: #555;">✓ ${item}</span>`).join('')}
+                        </div>
+                    </div>`;
+                }
 
                 card.innerHTML = `
-                    <div class="card-top">
-                        <span class="age-badge">${act.age || 'Familiar'}</span>
-                        <span style="font-size: 11px; font-weight: 700; color: ${isFree ? '#27AE60' : '#E67E22'};">${priceText}</span>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <span class="age-badge" style="background: var(--primary-cobalt); color: white;">${act.age || 'Familiar'}</span>
+                            ${act.typeLabel ? `<span class="age-badge" style="background: rgba(39, 174, 96, 0.1); color: #27AE60;">${act.typeLabel}</span>` : ''}
+                        </div>
+                        <span style="font-size: 13px; font-weight: 800; color: ${isFree ? '#27AE60' : '#E67E22'}; background: ${isFree ? 'rgba(39, 174, 96, 0.1)' : 'rgba(230, 126, 34, 0.1)'}; padding: 4px 10px; border-radius: 20px;">
+                            ${priceText}
+                        </span>
                     </div>
                     
-                    <h3 style="color: var(--primary-cobalt); margin: 0 0 10px 0; font-size: 1.25rem; line-height: 1.3; font-weight: 800;">${act.title}</h3>
-                    <p style="font-size: 0.95rem; color: #475569; line-height: 1.5; margin-bottom: 18px;">${act.summary}</p>
+                    <h3 style="color: var(--primary-cobalt); margin: 0 0 8px 0; font-size: 1.4rem; line-height: 1.25; font-weight: 900;">${act.title}</h3>
+                    <p style="font-size: 0.95rem; color: #475569; line-height: 1.5; margin-bottom: 15px;">${act.summary}</p>
                     
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; background: #f8fafc; padding: 12px; border-radius: 16px;">
+                    ${highlightsHtml}
+                    ${packingHtml}
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; background: rgba(255,255,255,0.6); padding: 12px; border-radius: 12px; box-shadow: inset 0 0 10px rgba(0,0,0,0.02);">
                         <div style="font-size: 12px; color: #64748b; display: flex; align-items: center; gap: 6px;">
                             <span>🕒</span> <strong>${act.time}</strong>
                         </div>
@@ -86,14 +117,17 @@ window.GoHappyToday = {
                         </div>
                         <div style="font-size: 12px; color: var(--primary-cobalt); display: flex; align-items: center; gap: 6px; grid-column: span 2;">
                             <span>📍</span> <strong style="text-decoration: underline; cursor:pointer;" id="loc-link-${idx}">${act.location}</strong>
+                            ${act.distanceDesc ? `<span style="color: #888; font-weight: normal; margin-left: 5px;">(${act.distanceDesc})</span>` : ''}
                         </div>
                     </div>
 
-                    ${act.tip ? `<div style="background: rgba(255, 214, 10, 0.1); padding: 10px 15px; border-radius: 12px; font-size: 12px; color: #856404; margin-bottom: 20px; display: flex; gap: 8px; align-items: center;">✨ <i>${act.tip}</i></div>` : ''}
+                    ${act.tip ? `<div style="background: linear-gradient(135deg, rgba(255, 214, 10, 0.1), rgba(255, 165, 0, 0.1)); padding: 12px 15px; border-radius: 12px; font-size: 12px; color: #856404; margin-bottom: 20px; display: flex; gap: 10px; align-items: center; border: 1px solid rgba(255, 214, 10, 0.3);">
+                        <span style="font-size: 18px;">💡</span> <i>${act.tip}</i>
+                    </div>` : ''}
                     
                     <div style="display: flex; gap: 10px;">
-                        <button id="action-btn-${idx}" class="btn-primary-gradient" style="flex: 2;">${act.link ? 'Ver Entradas / Info' : '¡Me apunto!'}</button>
-                        <button id="map-btn-${idx}" class="btn-secondary" style="flex: 1; padding: 12px; border-radius: 14px; font-size: 13px; background: #f1f5f9; border:none; display:flex; align-items:center; justify-content:center;">🗺️ Mapa</button>
+                        <button id="action-btn-${idx}" class="btn-primary-gradient" style="flex: 2; font-size: 14px; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(11, 113, 252, 0.3);">${act.link ? '🎫 Ver Entradas Oficiales' : '✨ ¡Guardar Plan!'}</button>
+                        <button id="map-btn-${idx}" class="btn-secondary" style="flex: 1; padding: 12px; border-radius: 14px; font-size: 13px; background: white; border: 1px solid #e2e8f0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display:flex; align-items:center; justify-content:center; color: var(--primary-cobalt); font-weight: 700;">🗺️ Ruta</button>
                     </div>
                 `;
 

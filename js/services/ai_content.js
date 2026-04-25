@@ -46,35 +46,29 @@ window.GoHappyAI = {
             prefsContext = `
             CONTEXTO DE LA FAMILIA:
             - Miembros: ${preferences.adults} adultos y ${preferences.kids} niños (edades: ${preferences.ages}).
-            - Preferencia: ${preferences.environment} (${preferences.environment === 'Indoor' ? 'Sitios cerrados/resguardados' : preferences.environment === 'Outdoor' ? 'Al aire libre' : 'Ambos'}).
+            - Preferencia de entorno: ${preferences.environment === 'Indoor' ? 'Sitios cerrados/resguardados' : preferences.environment === 'Outdoor' ? 'Al aire libre' : 'Ambos'}.
             - Presupuesto: ${preferences.budget === 'Free' ? 'Solo planes gratuitos' : 'Cualquier presupuesto'}.
             - Distancia: ${preferences.distance === 'Walking' ? 'Cerca, para ir andando' : preferences.distance === 'ShortDrive' ? 'A poca distancia en coche' : 'Cualquier distancia'}.
             `;
         }
 
-        const prompt = `Actúa como un planificador de ocio familiar experto y creativo. Ubicación del usuario: ${coordinates}.
+        const prompt = `Actúa como un 'Concierge' Premium de ocio familiar. Ubicación GPS: ${coordinates}.
         ${prefsContext}
-        Tu misión es generar el hub "TODAY" (¿Qué hacer hoy?) totalmente personalizado.
-        1. Identifica la CIUDAD y PROVINCIA de estas coordenadas.
-        2. Genera 3-4 actividades para HOY mismo que encajen con el contexto familiar arriba descrito.
-        3. IMPORTANTE: Sé muy específico con el clima. Si es invierno o llueve, prioriza ${preferences?.environment === 'Outdoor' ? 'sitios con encanto pero protegidos' : 'interiores'}. 
-        4. No te limites solo a eventos oficiales. CREA PLANES basados en la geografía local:
-           - "Picnic familiar en el Parque [Nombre]" (detallando qué llevar y mejor zona).
-           - "Ruta de exploración de estatuas/fuentes por el centro".
-           - "Tarde de juegos tradicionales en la Plaza [Nombre]".
-           - Museos, cine o talleres REALES de la zona.
-        5. Para cada actividad, necesito: 
-           - Título MUY ATRACTIVO y EMOCIONANTE.
-           - Resumen breve inspirador que explique POR QUÉ es ideal para niños de esas edades.
-           - Horarios sugeridos para HOY.
-           - Ubicación exacta (nombre del sitio real).
-           - Coordenadas REALES (lat, lng).
-           - Precio detallado (ej: "Gratis", "12€/adulto, 5€/niño", "Desde 10€").
-           - Enlace oficial para comprar entradas o ver info (si existe, si no, vacío).
-           - Edad recomendada específica.
-           - DURACIÓN estimada (ej: "2 horas", "Toda la tarde").
-           - CONSEJO CLAVE (ej: "Llevad calzado cómodo", "Reservad antes de ir").
-        6. Formato JSON estricto: [ { "title": "", "summary": "", "time": "", "location": "", "lat": NUM, "lng": NUM, "price": "", "link": "", "age": "", "duration": "", "tip": "" } ]`;
+        Tu misión es generar planes "Done for you" (completos, listos para hacer hoy mismo). Eres el servicio estrella de la app.
+        1. Identifica la CIUDAD de estas coordenadas y el clima de hoy.
+        2. Diseña 3 PLANES INOLVIDABLES reales en esa ciudad que encajen perfectamente con la familia descrita.
+        3. Si la familia busca 'Outdoor' pero hace mal clima, busca refugios creativos.
+        4. Necesitamos datos altamente estructurados y premium para cada plan:
+           - Título: Creativo y magnético.
+           - Resumen: Breve introducción de por qué es perfecto para sus edades.
+           - typeLabel: "🌳 Al aire libre", "🏠 A cubierto", o "⛅ Mixto".
+           - distanceDesc: Estimación descriptiva (ej. "A 10 min en coche", "Paseo de 5 min").
+           - highlights: Array de 2 o 3 frases cortas sobre qué lo hace especial.
+           - packingList: Array de 2 a 4 cosas esenciales para llevar (ej. "Agua", "Calcetines antideslizantes", "Gorra").
+           - Horarios sugeridos, duración y precios detallados.
+           - Enlace oficial (si requiere tickets o info), si no, "".
+           - Tip/Consejo experto para padres.
+        Formato JSON estricto: [ { "title": "", "summary": "", "typeLabel": "", "distanceDesc": "", "location": "", "lat": NUM, "lng": NUM, "time": "", "duration": "", "price": "", "age": "", "highlights": ["", ""], "packingList": ["", ""], "tip": "", "link": "" } ]`;
 
         return await window.GoHappyAI._callGemini(prompt);
     },
@@ -127,24 +121,33 @@ window.GoHappyAI = {
         return await window.GoHappyAI._callGemini(prompt);
     },
 
-    // Generar Misiones Contextuales
+    // Generar Misiones Contextuales (IA)
     generateLocalQuests: async (coordinates = "41.6520, -4.7286") => {
         const prompt = `Crea 2 'Misiones Familiares' (Quests) divertidas y muy específicas para jugar hoy basadas en lugares REALES cerca de estas coordenadas GPS: ${coordinates}.
-        Ejemplo: "Encuentra la estatua en la Plaza de Zorrilla", "Haz un mini picnic en el Parque Ribera de Castilla".
-        Ten en cuenta el clima actual típico de la zona.
-        Formato JSON estricto: [ { "id": "q_ai_1", "title": "Nombre divertido", "description": "Breve descripción", "type": "EXPLORATION"|"CREATIVITY", "category": "Misión", "difficulty": "fácil"|"media", "points": 100, "objectives": ["Paso 1", "Paso 2"], "totalSteps": 2, "status": "active" } ]`;
+        IMPORTANTE: 
+        1. Las misiones deben tener niveles de dificultad diferentes. Elige entre: "fácil", "media", "difícil".
+        2. Los puntos otorgados DEBEN coincidir exactamente con la dificultad: fácil = 50 pts, media = 100 pts, difícil = 200 pts.
+        3. Ten en cuenta el clima actual típico de la zona (si llueve, busca interiores).
+        Formato JSON estricto: [ { "id": "q_ai_1", "title": "Nombre divertido", "description": "Breve descripción", "type": "EXPLORE"|"PHOTO"|"GASTRO"|"SOCIAL"|"TRIVIA"|"ADVENTURE", "category": "Misión", "difficulty": "fácil"|"media"|"difícil", "points": 100, "objectives": ["Paso 1", "Paso 2"], "totalSteps": 2, "status": "active" } ]`;
 
         return await window.GoHappyAI._callGemini(prompt);
     },
 
-    // Generar Alerta/Consejo de Seguridad (Clima o Noticias)
-    getDailySafeInsight: async (coordinates = "41.6520, -4.7286") => {
+    // Generar Alerta/Consejo de Seguridad basado en Comunidad y Clima
+    getDailySafeInsight: async (coordinates = "41.6520, -4.7286", activeAlerts = []) => {
+        let alertsContext = "No hay alertas comunitarias reportadas cerca en este momento.";
+        if (activeAlerts && activeAlerts.length > 0) {
+            const alertsText = activeAlerts.map(a => `- ${a.title} en ${a.location}: ${a.description}`).join('\n');
+            alertsContext = `ALERTAS COMUNITARIAS ACTUALES EN LA ZONA:\n${alertsText}`;
+        }
+
         const prompt = `Actúa como asesor de seguridad familiar de GoHappy. Ubicación: ${coordinates}.
         1. Identifica la CIUDAD y el CLIMA ACTUAL REAL de esa zona.
-        2. Genera un consejo de seguridad o meteorología infantil MUY ESPECÍFICO para HOY.
-        3. Si hay avisos meteorológicos reales (AEMET o similar), menciónalos.
-        4. Si no hay avisos, da un consejo de salud estacional (ej: polen, protección solar, abrigo).
-        No uses frases genéricas como "Analizando tu zona". Da información directa y útil en 1 o 2 frases.`;
+        2. Tienes la siguiente información de incidentes reportada por otros padres en la app:
+        ${alertsContext}
+        3. Genera un breve y útil resumen de precaución para HOY. Combina el clima con estas alertas de la comunidad (si las hay).
+        4. Si no hay alertas, da un consejo de salud estacional (ej: polen, abrigo).
+        No uses frases genéricas como "Analizando tu zona". Da información directa y útil en 2 o 3 frases.`;
 
         return await window.GoHappyAI._callGemini(prompt, false); // False = Devuelve texto, no JSON
     },
@@ -154,6 +157,43 @@ window.GoHappyAI = {
         const prompt = `Genera un post para un foro de padres ('La Tribu') en la ciudad correspondiente a las coordenadas GPS: ${coordinates}.
         Debe ser un debate o consejo interesante sobre crianza y la vida en esa ciudad específica.
         Formato JSON estricto: { "authorKey": "GoHappy_IA", "title": "El Debate del Día 🤖", "content": "Contenido del debate..." }`;
+        return await window.GoHappyAI._callGemini(prompt, true);
+    },
+
+    // Obtener Noticias Locales (IA)
+    getNews: async (coordinates = "41.6520, -4.7286") => {
+        const prompt = `Actúa como redactor jefe de un diario local familiar. Ubicación GPS: ${coordinates}.
+        Busca y resume 3-4 NOTICIAS REALES Y RECIENTES de esa ciudad o provincia.
+        Temas: Educación, parques, sanidad infantil, avisos municipales o cultura para familias.
+        Para cada noticia necesito:
+        - Título: Conciso y real.
+        - Resumen: 2 frases informativas.
+        - Fuente: Nombre del medio (ej. El Norte de Castilla, Ayto Madrid).
+        - Link: URL real de la noticia si existe.
+        Formato JSON estricto: [ { "title": "", "summary": "", "sourceName": "", "link": "", "date": "Hoy" } ]`;
+        return await window.GoHappyAI._callGemini(prompt, true);
+    },
+
+    // Obtener Eventos Culturales (IA)
+    getEvents: async (coordinates = "41.6520, -4.7286") => {
+        const prompt = `Actúa como agenda cultural infantil. Ubicación GPS: ${coordinates}.
+        Busca 3 eventos reales para familias en esa zona esta semana.
+        Formato JSON estricto: [ { "title": "", "date": "", "location": "", "price": "", "lat": NUM, "lng": NUM } ]`;
+        return await window.GoHappyAI._callGemini(prompt, true);
+    },
+
+    // Obtener Becas y Ayudas (IA)
+    getBecas: async (coordinates = "41.6520, -4.7286") => {
+        const prompt = `Actúa como asesor administrativo experto en familias. Ubicación GPS: ${coordinates}.
+        Identifica 3 AYUDAS O BECAS REALES (estatales de España, autonómicas o locales de esa provincia).
+        Necesito detalles específicos:
+        - title: Nombre de la ayuda.
+        - description: Para qué sirve.
+        - deadline: Plazo máximo (ej. 'Hasta el 30 de Mayo').
+        - requirements: Requisitos principales.
+        - howToApply: Pasos para solicitar (ej. 'Sede electrónica con Clave').
+        - status: 'PLAZO ABIERTO' o 'PRÓXIMAMENTE'.
+        Formato JSON estricto: [ { "title": "", "description": "", "deadline": "", "requirements": "", "howToApply": "", "status": "", "statusColor": "green"| "orange", "link": "" } ]`;
         return await window.GoHappyAI._callGemini(prompt, true);
     },
 
@@ -238,9 +278,9 @@ window.GoHappyAI = {
         const lowerPrompt = prompt.toLowerCase();
         // Fallback robusto para demos sin internet/clave - Centrado en Valladolid/Castilla y León
         if (lowerPrompt.includes('today') || lowerPrompt.includes('activities') || lowerPrompt.includes('hoy')) return [
-            { id: 1, title: "Pícnic en el Campo Grande", summary: "Disfruta de una tarde entre pavos reales y patos en el corazón de Valladolid. ¡Llevad pan para los patos!", time: "16:00 - 19:00", location: "Parque Campo Grande", lat: 41.6444, lng: -4.7303, price: "Gratis", age: "Todas las edades" },
-            { id: 2, title: "Ruta de Fuentes Monumentales", summary: "Explora las fuentes más famosas del centro: desde la Fuente de Cervantes hasta la Plaza Mayor.", time: "Mañana o Tarde", location: "Plaza Mayor", lat: 41.6525, lng: -4.7286, price: "Gratis", age: "6-12 años" },
-            { id: 3, title: "Visita al Museo de la Ciencia", summary: "Descubre el planetario y las salas interactivas. Ideal para un día nublado.", time: "10:00 - 18:00", location: "Museo de la Ciencia", lat: 41.6385, lng: -4.7431, price: "5€", age: "4-15 años" }
+            { id: 1, title: "Pícnic de Lujo en el Campo Grande", summary: "Una tarde entre pavos reales y patos en el corazón verde de la ciudad.", time: "16:00 - 19:00", duration: "3 horas", location: "Parque Campo Grande", lat: 41.6444, lng: -4.7303, price: "Gratis", age: "Todas las edades", typeLabel: "🌳 Al aire libre", distanceDesc: "A 5 min andando", highlights: ["Ver a los pavos reales en libertad", "Alquilar una barca en el lago"], packingList: ["Pan seco para los patos", "Mantel de cuadros", "Cámara de fotos"], tip: "Llegad antes de las 17h para coger buen sitio en la sombra." },
+            { id: 2, title: "Exploradores de la Ciencia", summary: "Un viaje interactivo al universo en el planetario.", time: "Mañana o Tarde", duration: "2 horas", location: "Museo de la Ciencia", lat: 41.6385, lng: -4.7431, price: "Desde 5€", age: "4-15 años", typeLabel: "🏠 A cubierto", distanceDesc: "A 10 min en coche", highlights: ["Proyección especial en el planetario", "Sala de los sentidos para los más peques"], packingList: ["Entradas digitales", "Ganas de aprender"], tip: "Comprad las entradas del planetario online para evitar colas." },
+            { id: 3, title: "Ruta de los Reyes y Leyendas", summary: "Paseo por el centro histórico descubriendo secretos y fuentes.", time: "Flexible", duration: "1.5 horas", location: "Plaza Mayor", lat: 41.6525, lng: -4.7286, price: "Gratis", age: "6-12 años", typeLabel: "⛅ Mixto", distanceDesc: "A 2 min andando", highlights: ["Descubrir el pasadizo secreto", "Helado en la plaza Mayor"], packingList: ["Calzado cómodo", "Agua", "Gorra"], tip: "Empezad en la estatua del Conde Ansúrez." }
         ];
 
         if (lowerPrompt.includes('news') || lowerPrompt.includes('noticias')) return [

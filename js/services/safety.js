@@ -91,7 +91,7 @@ window.GoHappySafe = {
                 timestamp: new Date()
             });
 
-            window.GoHappyPoints.addPoints('REVIEW');
+            window.GoHappyPoints.addPoints('SAFETY_REPORT');
             return true;
         } catch (e) {
             console.error("Error reportando alerta:", e);
