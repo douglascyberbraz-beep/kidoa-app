@@ -8,14 +8,22 @@ window.GoHappyMap = {
     lastKnownCoords: "41.6520, -4.7286",
 
     render: async (container) => {
-        console.log("Rendering GoHappy 3D Map v2.1.0...");
+        console.log("Rendering GoHappy 3D Map v2.1.2...");
         container.style.display = 'block';
 
         if (!window.GoHappyMap.isInitialized) {
+            // Mostrar loader inicial
+            container.innerHTML = `
+                <div id="map-loader" class="center-text" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #eef2f7; z-index: 10;">
+                    <div class="magic-loader">✨</div>
+                    <p style="margin-top: 15px; color: var(--primary-cobalt); font-weight: 700;">Invocando mapa 3D...</p>
+                </div>
+            `;
             await window.GoHappyMap.init(container);
         } else {
+            const loader = document.getElementById('map-loader');
+            if (loader) loader.style.display = 'none';
             window.GoHappyMap.instance.resize();
-            // Markers removed as per user request for cleaner aesthetic
         }
     },
 
@@ -36,8 +44,24 @@ window.GoHappyMap = {
             // Pedir ubicación inmediatamente para centrar
             window.GoHappyMap.locateUser(true); // true = animate flyTo
 
+            window.GoHappyMap.instance.on('error', (e) => {
+                console.warn("Mapbox/MapLibre error:", e);
+                const loader = document.getElementById('map-loader');
+                if (loader) {
+                    loader.innerHTML = `
+                        <div style="padding:20px;">
+                            <p style="color:#64748b; font-size:14px;">El servidor de mapas está tardando más de lo habitual.</p>
+                            <button onclick="location.reload()" class="btn-primary-gradient" style="margin-top:15px; padding:10px 20px; border-radius:12px; border:none; color:white;">Reintentar</button>
+                        </div>
+                    `;
+                }
+            });
+
             window.GoHappyMap.instance.on('load', async () => {
                 window.GoHappyMap.isInitialized = true;
+                const loader = document.getElementById('map-loader');
+                if (loader) loader.style.display = 'none';
+                
                 // Waze Style Colors - More Premium and Clean
                 const layersToColor = [
                     { id: 'water', color: '#B3E5FC', opacity: 0.8 },
@@ -381,8 +405,13 @@ window.GoHappyMap = {
             
             window.GoHappyMap.updateUserIcon(lat, lng);
         }, (err) => {
-            console.warn("Location denied:", err);
-        }, { enableHighAccuracy: true });
+            console.warn("Location denied or timeout:", err);
+            // Fallback to defaults if it fails
+            if (!window.GoHappyMap.isInitialized) {
+                 const loader = document.getElementById('map-loader');
+                 if (loader) loader.style.display = 'none';
+            }
+        }, { enableHighAccuracy: true, timeout: 5000 });
     },
 
     showAddSiteModal: (lat, lng, name = "") => {

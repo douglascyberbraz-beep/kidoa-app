@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gohappy-cache-v2.1.1';
+const CACHE_NAME = 'gohappy-cache-v2.1.2';
 const TILE_CACHE = 'gohappy-tiles-v1.2.9';
 const ASSETS = [
     './',
@@ -62,24 +62,20 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
 
-    // Map Tiles Strategy: Network-First with Cache Fallback
-    if (url.hostname.includes('google.com') && url.pathname.includes('vt')) {
+    // OpenFreeMap Tiles Strategy: Cache-First with Network Update (Stale-While-Revalidate)
+    if (url.hostname.includes('openfreemap.org')) {
         event.respondWith(
-            fetch(event.request)
-                .then((networkResponse) => {
-                    // Only cache successful requests
-                    if (networkResponse.ok) {
-                        const responseClone = networkResponse.clone();
-                        caches.open(TILE_CACHE).then((cache) => {
-                            cache.put(event.request, responseClone);
-                        });
-                    }
-                    return networkResponse;
-                })
-                .catch(() => {
-                    // If network fails, try cache
-                    return caches.match(event.request);
-                })
+            caches.open(TILE_CACHE).then((cache) => {
+                return cache.match(event.request).then((response) => {
+                    const fetchPromise = fetch(event.request).then((networkResponse) => {
+                        if (networkResponse.ok) {
+                            cache.put(event.request, networkResponse.clone());
+                        }
+                        return networkResponse;
+                    });
+                    return response || fetchPromise;
+                });
+            })
         );
         return;
     }
