@@ -23,18 +23,15 @@ window.GoHappyProfile = {
         const levelInfo = window.GoHappyPoints.getLevelInfo(user.points);
 
         container.innerHTML = `
-            <div class="profile-page entry-anim" style="padding-bottom: 120px;">
-                <div class="profile-hero-premium" style="background: linear-gradient(180deg, var(--primary-cobalt) 0%, #1e293b 100%); padding-top: 40px; border-radius: 0 0 40px 40px; margin-bottom: -30px;">
-                    <div class="profile-avatar-wrapper" id="open-avatar-editor" style="cursor: pointer;">
-                        <div class="profile-avatar-large profile-glow" style="font-size: 60px; background: white; border: 4px solid var(--accent-pink);">${user.photo || '👤'}</div>
-                        <div class="level-label-bubble" style="background: var(--accent-pink); font-weight: 800; padding: 4px 15px; border-radius: 20px; bottom: -10px;">Nivel ${user.level || '1'}</div>
+            <div class="profile-page entry-anim" style="padding-bottom: 120px; background: #f8fafc;">
+                <div class="profile-hero-premium" style="background: white; padding: 40px 20px; border-radius: 0 0 50px 50px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%; display: flex; flex-direction: column; align-items: center;">
+                    <div class="profile-avatar-wrapper" id="open-avatar-editor" style="cursor: pointer; position: relative; margin-bottom: 20px;">
+                        <div class="profile-avatar-large profile-glow" style="width: 110px; height: 110px; border-radius: 50%; font-size: 60px; background: white; border: 4px solid var(--primary-cobalt); display: flex; align-items: center; justify-content: center; box-shadow: 0 15px 35px rgba(11, 113, 252, 0.2);">${user.photo || '👤'}</div>
+                        <div class="level-label-bubble" style="background: var(--primary-cobalt); color: white; font-weight: 800; padding: 6px 18px; border-radius: 20px; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); font-size: 12px; box-shadow: 0 5px 15px rgba(11, 113, 252, 0.3);">Nivel ${user.level || '1'}</div>
                     </div>
-                    <div class="profile-info-header" style="margin-top: 15px;">
-                        <h2 class="profile-name-premium" style="color: white; font-weight: 900; font-size: 1.8rem; margin: 0;">${user.nickname || 'Explorador'}</h2>
-                        <div class="profile-badge-row" style="justify-content: center; margin-top: 5px;">
-                            <span class="p-badge" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">💎 Miembro Oro</span>
-                            <span class="p-badge" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">📍 ${user.city || 'Comunidad'}</span>
-                        </div>
+                    <div class="profile-info-header" style="text-align: center;">
+                        <h2 class="profile-name-premium" style="color: var(--primary-navy); font-weight: 900; font-size: 1.8rem; margin: 0;">${user.nickname || 'Explorador'}</h2>
+                        <p style="color: #64748b; font-size: 13px; font-weight: 600; margin-top: 5px;">${user.email || 'Miembro de la Tribu'}</p>
                     </div>
                 </div>
 

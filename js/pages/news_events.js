@@ -53,18 +53,23 @@ window.GoHappyNewsEvents = {
                 locStatus.innerText = "📍 Información de tu zona";
             }
 
-            if (tab === 'news') {
-                const news = await window.GoHappyData.getNews(coords);
-                if (news && news.length > 0) renderNews(news);
-                else content.innerHTML = '<div class="p-40 center-text text-light">No hemos encontrado noticias en tu zona hoy. 🏜️</div>';
-            } else if (tab === 'events') {
-                const events = await window.GoHappyData.getEvents(coords);
-                if (events && events.length > 0) renderEvents(events);
-                else content.innerHTML = '<div class="p-40 center-text text-light">No hay eventos próximos registrados cerca de ti. 🎭</div>';
-            } else if (tab === 'becas') {
-                const becas = await window.GoHappyData.getBecas(coords);
-                if (becas && becas.length > 0) renderBecas(becas);
-                else content.innerHTML = '<div class="p-40 center-text text-light">No hay becas activas en este momento. 💎</div>';
+            try {
+                if (tab === 'news') {
+                    const news = await window.GoHappyData.getNews(coords);
+                    if (news && news.length > 0) renderNews(news);
+                    else content.innerHTML = '<div class="p-40 center-text text-light">No hemos encontrado noticias en tu zona hoy. 🏜️</div>';
+                } else if (tab === 'events') {
+                    const events = await window.GoHappyData.getEvents(coords);
+                    if (events && events.length > 0) renderEvents(events);
+                    else content.innerHTML = '<div class="p-40 center-text text-light">No hay eventos próximos registrados cerca de ti. 🎭</div>';
+                } else if (tab === 'becas') {
+                    const becas = await window.GoHappyData.getBecas(coords);
+                    if (becas && becas.length > 0) renderBecas(becas);
+                    else content.innerHTML = '<div class="p-40 center-text text-light">No hay becas activas en este momento. 💎</div>';
+                }
+            } catch (e) {
+                console.error("Error loading news content:", e);
+                content.innerHTML = '<div class="p-40 center-text text-light" style="color:red;">Error al cargar información personalizada.</div>';
             }
         };
 

@@ -19,11 +19,17 @@ window.GoHappyQuests = {
         if (!user) return window.GoHappyQuests._getDefaultQuests().slice(0, 2);
 
         try {
-            const snap = await window.GoHappyDB.collection('quests')
+            const fetchPromise = window.GoHappyDB.collection('quests')
                 .where('userId', '==', user.uid)
                 .where('status', '==', 'active')
                 .orderBy('createdAt', 'desc')
                 .get();
+
+            // Timeout after 5s to avoid hanging
+            const snap = await Promise.race([
+                fetchPromise,
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
+            ]);
 
             let activeQuests = [];
             if (!snap.empty) {

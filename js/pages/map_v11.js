@@ -79,11 +79,18 @@ window.GoHappyMap = {
                     console.warn("Could not inject 3D buildings:", e);
                 }
 
-                // Waze-Style Roads (Thick, Cobalt blue with bright contrast)
-                ['road-primary', 'road-secondary', 'road-street'].forEach(layer => {
+                // Waze-Style Roads (Clean & Premium)
+                const roadLayers = window.GoHappyMap.instance.getStyle().layers
+                    .filter(l => l.id.includes('road') || l.id.includes('street') || l.id.includes('way') || l.id.includes('bridge') || l.id.includes('tunnel'))
+                    .map(l => l.id);
+
+                roadLayers.forEach(layer => {
                     if (window.GoHappyMap.instance.getLayer(layer)) {
-                        window.GoHappyMap.instance.setPaintProperty(layer, 'line-color', layer === 'road-primary' ? '#0B4C8F' : '#ffffff');
-                        window.GoHappyMap.instance.setPaintProperty(layer, 'line-width', ['interpolate', ['linear'], ['zoom'], 12, 2, 18, layer === 'road-primary' ? 16 : 8]);
+                        try {
+                            const isPrimary = layer.includes('primary') || layer.includes('motorway') || layer.includes('trunk');
+                            window.GoHappyMap.instance.setPaintProperty(layer, 'line-color', isPrimary ? '#ffffff' : '#f0f0f0');
+                            window.GoHappyMap.instance.setPaintProperty(layer, 'line-opacity', 1);
+                        } catch(e){}
                     }
                 });
 

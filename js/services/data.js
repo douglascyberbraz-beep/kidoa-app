@@ -152,14 +152,14 @@ window.GoHappyData = {
             if (!snap.empty) {
                 return snap.docs.map(d => {
                     const data = d.data();
-                    return {
                     const name = data.nickname || (data.name ? data.name.split(' ')[0] + ' ' + (data.name.split(' ')[1] ? data.name.split(' ')[1][0] + '.' : '') : "Explorador");
                     return {
                         name: name,
                         points: data.weeklyPoints || data.points || 0,
                         rank: data.level || "Explorador",
                         contributions: data.contributions || 0,
-                        role: "🎖️"
+                        role: "🎖️",
+                        avatar: data.photo || '👤'
                     };
                 });
             }
