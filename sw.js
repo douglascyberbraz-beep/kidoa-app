@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gohappy-cache-v2.2.0';
+const CACHE_NAME = 'gohappy-cache-v2.3.0';
 const TILE_CACHE = 'gohappy-tiles-v1.2.9';
 const ASSETS = [
     './',
@@ -12,6 +12,7 @@ const ASSETS = [
     'js/services/auth.js',
     'js/services/quests.js',
     'js/services/safety.js',
+    'js/services/families.js',
     'js/pages/map_v11.js',
     'js/pages/news_events.js',
     'js/pages/today.js',
@@ -23,6 +24,7 @@ const ASSETS = [
     'js/pages/safe.js',
     'js/pages/memories.js',
     'js/pages/legal.js',
+    'js/pages/family_onboarding.js',
     'js/lib/qrcode.min.js',
     'assets/logo_gohappy_official.svg',
     'assets/logo.png',

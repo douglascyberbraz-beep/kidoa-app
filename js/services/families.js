@@ -71,6 +71,14 @@ window.GoHappyFamilies = {
         localStorage.setItem('GoHappy_local_user', JSON.stringify(window.GoHappyAuth._currentUser));
 
         console.log(`✅ Familia "${nombre}" creada con ID ${familyId} y código ${codigoInvitacion}`);
+
+        // Crear las 10 quests iniciales para esta familia
+        if (window.GoHappyQuests && window.GoHappyQuests.bootstrapFamilyQuests) {
+            window.GoHappyQuests.bootstrapFamilyQuests(familyId).catch(e =>
+                console.warn('Bootstrap quests error (no crítico):', e)
+            );
+        }
+
         return { familyId, codigoInvitacion, nombre };
     },
 
