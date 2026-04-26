@@ -33,7 +33,17 @@ if (window.firebase) {
     window.GoHappyFirebaseApp = firebase.app();
     window.GoHappyAuthReal = firebase.auth();
     window.GoHappyDB = firebase.firestore();
-    console.log("🔥 Firebase conectado correctamente");
+    
+    // Activar Persistencia Offline
+    window.GoHappyDB.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+        if (err.code == 'failed-precondition') {
+            console.warn('Persistencia fallida: Múltiples pestañas.');
+        } else if (err.code == 'unimplemented') {
+            console.warn('El navegador no soporta persistencia.');
+        }
+    });
+
+    console.log("🔥 Firebase conectado correctamente (Modo Offline Activo)");
 } else {
     console.error("❌ Error: Librerías de Firebase no cargadas.");
 }

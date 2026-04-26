@@ -8,8 +8,10 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if request.auth != null;
       allow create: if request.auth.uid == uid;
-      allow update: if request.auth.uid == uid;
-      allow delete: if false; // Nunca eliminar perfiles
+      allow update: if request.auth.uid == uid 
+                    && !request.resource.data.diff(resource.data).affectedKeys()
+                        .intersects(['points', 'familyId', 'rol', 'weeklyPoints', 'email']);
+      allow delete: if false;
     }
 
     // ---------- QUESTS (Catálogo) ----------

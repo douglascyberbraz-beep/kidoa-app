@@ -15,9 +15,7 @@ window.GoHappyQuestsPage = {
             <div class="quests-page" style="background:#f8fafc; min-height:100vh; padding-bottom:120px;">
 
                 <!-- HEADER con racha -->
-                <div style="background:linear-gradient(135deg,#0B71FC,#0B4C8F); padding:30px 20px 50px; position:relative; overflow:hidden;">
-                    <div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;background:rgba(255,255,255,0.06);border-radius:50%;"></div>
-                    <div style="position:absolute;bottom:-40px;left:-30px;width:180px;height:180px;background:rgba(255,255,255,0.04);border-radius:50%;"></div>
+                <div class="q-header-premium">
                     <div style="position:relative; z-index:1;">
                         <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                             <div>
@@ -102,39 +100,97 @@ window.GoHappyQuestsPage = {
             </div>
         `;
 
-        // Estilos para los filtros (inline para no depender del CSS global)
+        // Estilos para los filtros y tarjetas (Sincronizados con la paleta oficial)
         const style = document.createElement('style');
+        style.id = 'quests-v2-styles';
+        const oldStyle = document.getElementById('quests-v2-styles');
+        if (oldStyle) oldStyle.remove();
+
         style.textContent = `
+            .quests-page {
+                background: #f8fafc;
+                min-height: 100vh;
+                margin-top: -20px; /* Compensa el padding del contenedor global */
+            }
+
+            .q-header-premium {
+                background: linear-gradient(135deg, var(--primary-cobalt, #0B4C8F) 0%, #003666 100%);
+                padding: 40px 20px 60px;
+                position: relative;
+                overflow: hidden;
+                border-radius: 0 0 40px 40px;
+                box-shadow: 0 10px 30px rgba(11, 76, 143, 0.2);
+            }
+
+            .q-header-premium::before {
+                content: '';
+                position: absolute;
+                top: -50px; right: -50px;
+                width: 200px; height: 200px;
+                background: var(--accent-cyan, #08FEFE);
+                opacity: 0.1;
+                border-radius: 50%;
+            }
+
             .q-filter-btn {
-                background: white; border: 1.5px solid #e2e8f0; color: #64748b;
-                padding: 8px 16px; border-radius: 50px; font-size: 12px; font-weight: 700;
-                cursor: pointer; transition: all 0.2s; white-space: nowrap;
+                background: white; 
+                border: 1px solid rgba(11, 76, 143, 0.1); 
+                color: #64748B;
+                padding: 10px 18px; 
+                border-radius: 20px; 
+                font-size: 13px; 
+                font-weight: 700;
+                cursor: pointer; 
+                transition: all 0.3s ease; 
+                white-space: nowrap;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.03);
             }
+            
             .q-filter-btn.active {
-                background: var(--primary-cobalt); border-color: var(--primary-cobalt);
-                color: white; box-shadow: 0 4px 12px rgba(11,113,252,0.3);
+                background: var(--primary-cobalt, #0B4C8F); 
+                color: white; 
+                border-color: var(--primary-cobalt, #0B4C8F);
+                box-shadow: 0 8px 15px rgba(11, 76, 143, 0.25);
             }
+
             .quest-card-v2 {
-                background: white; border-radius: 24px; margin-bottom: 14px;
-                box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden;
-                transition: transform 0.15s, box-shadow 0.15s;
+                background: white; 
+                border-radius: 28px; 
+                margin-bottom: 20px;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.05); 
+                overflow: hidden;
+                border: 1px solid rgba(0,0,0,0.02);
+                margin-left: 5px;
+                margin-right: 5px;
             }
-            .quest-card-v2:active { transform: scale(0.98); }
-            .quest-card-v2.completada { opacity: 0.75; }
-            .quest-card-v2.completada .quest-v2-body { background: #fafffe; }
+            
+            .quest-v2-body { 
+                padding: 20px;
+            }
+
+            .btn-completar-quest {
+                background: linear-gradient(135deg, var(--primary-cobalt, #0B4C8F), #2A9DF4);
+                color: white;
+                border: none;
+                padding: 14px;
+                border-radius: 16px;
+                font-weight: 800;
+                font-size: 14px;
+                box-shadow: 0 6px 15px rgba(11, 76, 143, 0.2);
+                cursor: pointer;
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
 
             @keyframes quest-celebrate {
                 0%   { transform: scale(1); }
-                30%  { transform: scale(1.08); }
-                60%  { transform: scale(0.96); }
+                50%  { transform: scale(1.03); }
                 100% { transform: scale(1); }
             }
-            .quest-celebrating { animation: quest-celebrate 0.5s ease; }
-
-            @keyframes confetti-drop {
-                0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
-                100% { transform: translateY(80px) rotate(360deg); opacity: 0; }
-            }
+            .quest-celebrating { animation: quest-celebrate 0.4s ease-out; }
         `;
         document.head.appendChild(style);
 

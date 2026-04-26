@@ -164,6 +164,17 @@ function updateNavStyles(pageName) {
 async function loadPage(pageName) {
     try {
         console.log(`Cargando página: ${pageName}`);
+        
+        // --- ROUTE GUARD (Protección) ---
+        const user = window.GoHappyAuth.checkAuth();
+        const paginasPublicas = ['legal', 'map'];
+        
+        if (!user && !paginasPublicas.includes(pageName)) {
+            console.warn(`[Guard] Acceso denegado a ${pageName}. Redirigiendo a Auth.`);
+            window.GoHappyAuth.renderAuthModal();
+            return;
+        }
+
         appState.currentPage = pageName;
         const container = document.getElementById('main-content');
         const mapViewport = document.getElementById('map-viewport-v11');
