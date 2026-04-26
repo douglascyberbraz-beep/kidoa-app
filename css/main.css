@@ -99,14 +99,41 @@ h1, h2, h3, .logo-text, .premium-header h2 { font-family: 'Poppins', sans-serif;
 }
 
 @keyframes splashLogoScale {
-    0% { transform: scale(0.85); opacity: 0; filter: blur(10px); }
+    0% { transform: scale(0.9); opacity: 0; filter: blur(15px); }
     100% { transform: scale(1); opacity: 1; filter: blur(0); }
 }
 
 @keyframes breathing {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-    100% { transform: scale(1); }
+    0% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.03); filter: brightness(1.1); }
+    100% { transform: scale(1); filter: brightness(1); }
+}
+
+.logo-container {
+    background: transparent !important;
+    position: relative;
+    overflow: hidden;
+    animation: splashLogoScale 2s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+               breathing 4s ease-in-out infinite 2s;
+}
+
+/* Efecto de brillo premium que recorre el logo */
+.logo-container::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -150%;
+    width: 20%;
+    height: 200%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transform: rotate(30deg);
+    animation: premiumSweep 6s infinite linear 3s;
+}
+
+@keyframes premiumSweep {
+    0% { left: -150%; }
+    20% { left: 250%; }
+    100% { left: 250%; }
 }
 
 .maplibregl-ctrl, .maplibregl-ctrl-bottom-right, .maplibregl-ctrl-bottom-left {
