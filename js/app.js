@@ -195,9 +195,7 @@ async function loadPage(pageName) {
                 'legal':       window.GoHappyLegal,
                 'quests':      window.GoHappyQuestsPage,
                 'safe':        window.GoHappySafePage,
-                'memories':    window.GoHappyMemories,
-                'tribu':       window.GoHappyTribu,
-                'chat':        window.GoHappyChat
+                'memories':    window.GoHappyMemories
             };
 
             const renderer = renderers[pageName];
