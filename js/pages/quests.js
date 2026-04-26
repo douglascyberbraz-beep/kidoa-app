@@ -167,8 +167,17 @@ window.GoHappyQuestsPage = {
         
         const res = await window.GoHappyQuests.completarQuest(user.uid, user.familyId, questId, puntos);
         if (res.ok) {
-            window.GoHappyToast.success(`¡Genial! +${puntos} puntos para la familia`);
-            // Recargar para ver el cambio
+            window.GoHappyToast.success(`¡Misión cumplida! +${puntos} pts`);
+            
+            // --- INTEGRACIÓN INVISIBLE: RECUPERAR MEMORIA ---
+            setTimeout(() => {
+                const wantsMemory = confirm("🌟 ¿Quieres guardar una foto de este momento en tu historia familiar?");
+                if (wantsMemory) {
+                    window.GoHappyToast.info("📸 Abre la cámara para tu recuerdo...");
+                    // Aquí se dispararía el input file de Capacitor o Web
+                }
+            }, 1500);
+
             window.GoHappyQuestsPage.loadQuests();
         } else {
             window.GoHappyToast.error(res.error || "No se pudo completar");

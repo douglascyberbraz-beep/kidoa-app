@@ -93,6 +93,23 @@ window.GoHappyProfile = {
                         <div id="family-loading" style="font-size:12px; color:#94a3b8;">Cargando...</div>
                     </div>
                     <div id="family-content"></div>
+                    
+                    <!-- INTEGRACIÓN INVISIBLE: OBJETIVOS FAMILIARES -->
+                    <div style="margin-top: 24px; padding-top: 20px; border-top: 1px dashed #f1f5f9;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                            <h4 style="font-size:13px; font-weight:800; color:var(--text-dark); margin:0;">🎁 Objetivo Familiar</h4>
+                            <span style="font-size:11px; font-weight:700; color:var(--primary-cobalt);">+1.500 pts</span>
+                        </div>
+                        <div style="background:#f8fafc; border-radius:14px; padding:12px; display:flex; align-items:center; gap:12px; border:1px solid #f1f5f9;">
+                            <span style="font-size:24px;">🍕</span>
+                            <div style="flex:1;">
+                                <div style="font-size:12px; font-weight:700; color:#1e293b;">Tarde de Pizza & Cine</div>
+                                <div style="height:6px; background:#e2e8f0; border-radius:3px; margin-top:6px; overflow:hidden;">
+                                    <div style="width:65%; height:100%; background:var(--primary-cobalt); border-radius:3px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="account-actions-list">

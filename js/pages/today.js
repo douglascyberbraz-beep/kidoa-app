@@ -11,6 +11,23 @@ window.GoHappyToday = {
             </div>
             
             <div id="today-content" class="stagger-group" style="padding: 0 20px 110px 20px;">
+                <!-- TARJETA ASISTENTE MÁGICO (Integración Invisible) -->
+                <div class="card premium-shadow" style="background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%); border: 1.5px solid rgba(11, 76, 143, 0.1); margin-bottom: 25px; padding: 20px; border-radius: 28px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="font-size: 32px; animation: breathing 3s infinite;">🤖</div>
+                        <div style="flex: 1;">
+                            <h3 style="font-size: 15px; margin: 0; color: var(--primary-cobalt);">¿Qué hacemos hoy?</h3>
+                            <p style="font-size: 12px; margin: 4px 0 0; color: var(--text-light);">Pregúntale a GoHappy IA por un plan express</p>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; display: flex; gap: 8px;">
+                        <input id="ai-quick-input" type="text" placeholder="Dime algo divertido..." style="flex: 1; padding: 10px 15px; border-radius: 15px; border: 1px solid #e2e8f0; font-size: 13px; outline: none;">
+                        <button id="btn-ai-magic" style="background: var(--primary-cobalt); color: white; border: none; padding: 0 15px; border-radius: 12px; font-weight: 700; cursor: pointer;">🪄</button>
+                    </div>
+                    <div id="ai-quick-response" style="margin-top: 12px; font-size: 12px; color: var(--text-dark); line-height: 1.4; display: none; padding: 10px; background: rgba(11, 76, 143, 0.05); border-radius: 12px; border-left: 3px solid var(--primary-cobalt);">
+                    </div>
+                </div>
+
                 ${storedPrefs ? '<div class="center-text p-40"><div class="typing-dots"><span></span><span></span><span></span></div><p style="margin-top:15px; color:var(--text-light);">Buscando los mejores planes...</p></div>' : ''}
             </div>
         `;
@@ -200,7 +217,34 @@ window.GoHappyToday = {
             };
         };
 
-        // Initial attempt
+        // Lógica Asistente Mágico Quick Chat
+        setTimeout(() => {
+            const aiBtn = document.getElementById('btn-ai-magic');
+            const aiInput = document.getElementById('ai-quick-input');
+            const aiResponse = document.getElementById('ai-quick-response');
+
+            if (aiBtn) {
+                aiBtn.onclick = async () => {
+                    const prompt = aiInput.value.trim();
+                    if (!prompt) return;
+
+                    aiBtn.innerHTML = '⏳';
+                    aiResponse.style.display = 'block';
+                    aiResponse.innerHTML = '<i>GoHappy IA está pensando...</i>';
+
+                    try {
+                        const response = await window.GoHappyAI.askAI(prompt);
+                        aiResponse.innerHTML = `✨ ${response}`;
+                    } catch (e) {
+                        aiResponse.innerHTML = "❌ No he podido conectar con la magia ahora mismo.";
+                    } finally {
+                        aiBtn.innerHTML = '🪄';
+                    }
+                };
+            }
+        }, 500);
+
+        // Get user location for context
         const initialCoords = window.lastKnownCoords || "41.6520, -4.7286";
         fetchAndRender(initialCoords, storedPrefs);
     },
