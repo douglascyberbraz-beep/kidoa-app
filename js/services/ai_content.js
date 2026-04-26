@@ -6,39 +6,12 @@ window.GoHappyAI = {
     - Geografía: Identifica SIEMPRE la ciudad y provincia de las coordenadas proporcionadas y limita la información a esa zona.
     - Seguridad: Si detectas consultas médicas críticas, ofrece consejos de calma pero siempre recomienda visitar al pediatra.`,
 
-    // Buscar Noticias Regionales
-    getNews: async (coordinates = "41.6520, -4.7286") => {
-        const prompt = `Actúa como periodista local. Ubicación del usuario: ${coordinates}.
-        1. Identifica la CIUDAD y PROVINCIA de estas coordenadas.
-        2. Busca 3 noticias o avisos oficiales REALES de HOY sobre crianza, parques, colegios o vida familiar específicos de esa ciudad o provincia.
-        3. Prioriza fuentes oficiales (ayuntamientos, juntas regionales, diarios locales).
-        4. No menciones otras regiones. Solo información de su zona o provincia autonoma.
-        Formato JSON: [ { "title": "", "summary": "", "link": "url", "sourceName": "Fuente Local", "date": "Hoy" } ]`;
 
-        return await window.GoHappyAI._callGemini(prompt);
-    },
+    // ---
+    // Las funciones getNews, getEvents y getBecas están definidas más abajo
+    // con sus versiones PREMIUM (fuentes reales, datos detallados).
+    // ---
 
-    // Buscar Eventos Infantiles (0-15 años)
-    getEvents: async (coordinates = "41.6520, -4.7286") => {
-        const prompt = `Busca eventos infantiles (0-15 años) cerca de ${coordinates}.
-        1. Identifica la CIUDAD de estas coordenadas.
-        2. Busca eventos REALES para los próximos 7 días: teatro infantil, música, aire libre, talleres.
-        3. Solo eventos en su municipio o municipios colindantes (su zona).
-        Formato JSON: [ { "title": "", "date": "", "location": "Sitio Real", "price": "", "lat": NUM, "lng": NUM } ]`;
-
-        return await window.GoHappyAI._callGemini(prompt);
-    },
-
-    // Buscar Becas y Ayudas
-    getBecas: async (coordinates = "41.6520, -4.7286") => {
-        const prompt = `Ubicación: ${coordinates}.
-        1. Identifica la PROVINCIA y COMUNIDAD AUTÓNOMA.
-        2. Busca 3 becas o ayudas familiares activas en el boletín oficial de esa comunidad (ej: BOCYL, DOGC, BOCM, etc.) o del ayuntamiento local.
-        3. Keywords: niños, crianza, infantil, educación.
-        Formato JSON: [ { "title": "", "description": "", "status": "PLAZO ABIERTO", "statusColor": "green", "linkText": "Ver bases oficiales" } ]`;
-
-        return await window.GoHappyAI._callGemini(prompt);
-    },
 
     getTodayActivities: async (coordinates = "41.6520, -4.7286", preferences = null) => {
         let prefsContext = "";

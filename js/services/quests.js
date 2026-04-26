@@ -14,11 +14,14 @@ window.GoHappyQuests = {
     },
 
     // Obtener misiones activas del usuario
+    // FIX PRINCIPAL: Si no hay misiones en Firestore, guardar las defaults con IDs reales
     getActiveQuests: async () => {
         const user = window.GoHappyAuth.checkAuth();
-        const defaults = window.GoHappyQuests._getDefaultQuests().slice(0, 2);
         
-        if (!user || user.isGuest) return defaults;
+        // Modo invitado o sin sesión: devolver defaults locales (no necesitan Firestore)
+        if (!user || user.isGuest) {
+            return window.GoHappyQuests._getDefaultQuests().slice(0, 2);
+        }
 
         try {
             const fetchPromise = window.GoHappyDB.collection('quests')
@@ -26,21 +29,28 @@ window.GoHappyQuests = {
                 .where('status', '==', 'active')
                 .get();
 
+            // FIX: Aumentado timeout a 8s para conexiones lentas
             const snap = await Promise.race([
                 fetchPromise,
-                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 4000))
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 8000))
             ]);
 
-            let activeQuests = [];
-            if (snap && !snap.empty) {
-                activeQuests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            // FIX PRINCIPAL: Si el usuario está logueado pero sin misiones, creamos las defaults en Firestore
+            if (!snap || snap.empty) {
+                console.log('🎯 Creando misiones iniciales en Firestore para:', user.uid);
+                const defaultQuests = window.GoHappyQuests._getDefaultQuests().slice(0, 2);
+                const savedQuests = [];
+                for (const q of defaultQuests) {
+                    const saved = await window.GoHappyQuests.saveQuest(q);
+                    if (saved) savedQuests.push(saved);
+                }
+                return savedQuests.length > 0 ? savedQuests : defaultQuests;
             }
 
-            if (activeQuests.length === 0) return defaults;
-            return activeQuests;
+            return snap.docs.map(d => ({ id: d.id, ...d.data() }));
         } catch (e) {
-            console.warn("Firestore fetch fallback:", e);
-            return defaults;
+            console.warn("Firestore quests fallback (timeout o error):", e.message);
+            return window.GoHappyQuests._getDefaultQuests().slice(0, 2);
         }
     },
 
@@ -71,6 +81,12 @@ window.GoHappyQuests = {
         const user = window.GoHappyAuth.checkAuth();
         if (!user) return false;
 
+        // FIX: Si el ID es local (no tiene el formato de Firestore), no intentar actualizar
+        if (!questId || questId.startsWith('q-')) {
+            console.warn('Quest ID local detectado, no se puede actualizar en Firestore:', questId);
+            return true; // Retornar true para que la UI muestre el progreso igualmente
+        }
+
         try {
             const updateData = { progress: newProgress };
             if (isComplete) {
@@ -81,7 +97,7 @@ window.GoHappyQuests = {
             await window.GoHappyDB.collection('quests').doc(questId).update(updateData);
 
             if (isComplete) {
-                // Necesitamos los puntos de la misión
+                // Obtener los puntos de la misión
                 const questDoc = await window.GoHappyDB.collection('quests').doc(questId).get();
                 const questData = questDoc.exists ? questDoc.data() : { points: 100, title: 'Misión' };
 
@@ -95,9 +111,10 @@ window.GoHappyQuests = {
                     points: questData.points || 100
                 });
                 
-                // Otorgar los puntos dinámicamente
+                // FIX CRITICO: Usar puntos dinámicos del quest, no la clave fija inexistente
                 if (window.GoHappyPoints && window.GoHappyPoints.addPoints) {
-                    window.GoHappyPoints.addPoints('QUEST_COMPLETE', user.uid, questData.points || 100);
+                    const pts = questData.points || 100;
+                    await window.GoHappyPoints.addPoints('QUEST_MEDIUM', user.uid, pts);
                 }
             }
             return true;
@@ -122,10 +139,16 @@ window.GoHappyQuests = {
         }
     },
 
-    // Completar una misión
+    // Completar una misión directamente
     completeQuest: async (questId) => {
         const user = window.GoHappyAuth.checkAuth();
         if (!user) return false;
+
+        // FIX: No intentar actualizar IDs locales en Firestore
+        if (!questId || questId.startsWith('q-')) {
+            console.warn('completeQuest: ID local, no se actualiza en Firestore');
+            return true;
+        }
 
         try {
             await window.GoHappyDB.collection('quests').doc(questId).update({
@@ -141,7 +164,10 @@ window.GoHappyQuests = {
                 timestamp: new Date()
             });
 
-            window.GoHappyPoints.addPoints('QUEST_COMPLETE');
+            // FIX: QUEST_COMPLETE no existe en REWARDS, usar QUEST_MEDIUM como fallback
+            if (window.GoHappyPoints && window.GoHappyPoints.addPoints) {
+                window.GoHappyPoints.addPoints('QUEST_MEDIUM', null, 100);
+            }
             return true;
         } catch (e) {
             console.error("Error completando misión:", e);

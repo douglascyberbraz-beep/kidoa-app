@@ -17,26 +17,37 @@ window.GoHappyAuth = {
                     const doc = await window.GoHappyDB.collection('users').doc(user.uid).get();
                     const profile = doc.exists ? doc.data() : {};
 
+                    // FIX: Cargar TODOS los campos del perfil en _currentUser (incluyendo firstName, lastName)
                     window.GoHappyAuth._currentUser = {
                         uid: user.uid,
                         email: user.email || "Invitado",
                         nickname: profile.nickname || "Explorador",
+                        firstName: profile.firstName || "",
+                        lastName: profile.lastName || "",
                         points: profile.points || 0,
-                        level: profile.level || "Bronce",
+                        weeklyPoints: profile.weeklyPoints || 0,
+                        level: profile.level || "Explorador Novato",
                         isGuest: user.isAnonymous,
                         photo: profile.photo || "👤",
-                        referralCode: profile.referralCode || ""
+                        referralCode: profile.referralCode || "",
+                        familyId: profile.familyId || null
                     };
+                    // Persistir localmente para acceso offline
+                    localStorage.setItem('GoHappy_local_user', JSON.stringify(window.GoHappyAuth._currentUser));
                 } catch (e) {
-                    console.warn("Resilient Init: Error fetching firestore profile, using minimal local state", e);
-                    window.GoHappyAuth._currentUser = {
+                    console.warn("Resilient Init: Error fetching firestore profile, usando sesión local", e);
+                    const local = window.GoHappyAuth._checkLocalSession();
+                    window.GoHappyAuth._currentUser = local || {
                         uid: user.uid,
                         email: user.email || "Invitado",
                         nickname: "Explorador",
+                        firstName: "",
+                        lastName: "",
                         points: 0,
-                        level: "Semilla",
+                        level: "Explorador Novato",
                         isGuest: user.isAnonymous,
-                        photo: "👤"
+                        photo: "👤",
+                        familyId: null
                     };
                 }
             } else {
@@ -52,14 +63,48 @@ window.GoHappyAuth = {
         return window.GoHappyAuth._currentUser;
     },
 
-    // Validar código de invitación en Firestore
+    // Validar código de invitación en Firestore y devolver datos del referidor
     validateInvitation: async (code) => {
-        if (!code) return false;
-        const snap = await window.GoHappyDB.collection('invitations')
-            .where('code', '==', code.toUpperCase())
-            .where('used', '==', false)
-            .get();
-        return !snap.empty;
+        if (!code) return null;
+        try {
+            const snap = await window.GoHappyDB.collection('invitations')
+                .where('code', '==', code.toUpperCase())
+                .where('used', '==', false)
+                .get();
+            if (snap.empty) return null;
+            return { docId: snap.docs[0].id, ...snap.docs[0].data() };
+        } catch (e) {
+            console.warn("validateInvitation error:", e);
+            return null;
+        }
+    },
+
+    // Buscar usuario por su referralCode y premiar con puntos
+    _rewardReferrer: async (referralCode) => {
+        if (!referralCode) return;
+        try {
+            const snap = await window.GoHappyDB.collection('users')
+                .where('referralCode', '==', referralCode.toUpperCase())
+                .limit(1)
+                .get();
+            if (!snap.empty) {
+                const referrerId = snap.docs[0].id;
+                const refPoints = window.GoHappyPoints ? (window.GoHappyPoints.REWARDS.REFERRAL || 500) : 500;
+                const userRef = window.GoHappyDB.collection('users').doc(referrerId);
+                await window.GoHappyDB.runTransaction(async (t) => {
+                    const doc = await t.get(userRef);
+                    if (doc.exists) {
+                        t.update(userRef, {
+                            points: (doc.data().points || 0) + refPoints,
+                            weeklyPoints: (doc.data().weeklyPoints || 0) + refPoints
+                        });
+                    }
+                });
+                console.log(`✅ Referidor ${referrerId} recibió ${refPoints} pts`);
+            }
+        } catch (e) {
+            console.warn("_rewardReferrer error:", e);
+        }
     },
 
     login: async (email, pass) => {
@@ -72,13 +117,16 @@ window.GoHappyAuth = {
         }
     },
 
-    register: async (email, pass, nickname, firstName = "", lastName = "", photo = "👤") => {
+    register: async (email, pass, nickname, firstName = "", lastName = "", photo = "👤", referralCode = "") => {
         try {
             // 1. Crear usuario en Auth
             const res = await window.GoHappyAuthReal.createUserWithEmailAndPassword(email, pass);
             const user = res.user;
 
-            // 3. Crear perfil en Firestore
+            // 2. Generar código de referido único para este nuevo usuario
+            const myReferralCode = 'GH-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+
+            // 3. Crear perfil completo en Firestore
             const profile = {
                 uid: user.uid,
                 email,
@@ -87,11 +135,19 @@ window.GoHappyAuth = {
                 lastName,
                 photo,
                 points: 50, // Bono de bienvenida
+                weeklyPoints: 50,
                 level: "Explorador Novato",
-                referralCode: 'GH-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
+                referralCode: myReferralCode,
+                referredBy: referralCode.toUpperCase() || null,
+                familyId: null,
                 createdAt: new Date()
             };
             await window.GoHappyDB.collection('users').doc(user.uid).set(profile);
+
+            // 4. FIX: Premiar al referidor si se usó su código
+            if (referralCode && referralCode.trim() !== '') {
+                await window.GoHappyAuth._rewardReferrer(referralCode.trim());
+            }
 
             return user;
         } catch (e) {
@@ -149,16 +205,22 @@ window.GoHappyAuth = {
         try {
             const provider = new firebase.auth.GoogleAuthProvider();
             const res = await window.GoHappyAuthReal.signInWithPopup(provider);
-            // Si es nuevo usuario, crear perfil en Firestore
+            // Si es nuevo usuario, crear perfil completo en Firestore
             const doc = await window.GoHappyDB.collection('users').doc(res.user.uid).get();
             if (!doc.exists) {
+                const nameParts = (res.user.displayName || 'Explorador').split(' ');
                 const profile = {
                     uid: res.user.uid,
                     email: res.user.email,
-                    nickname: res.user.displayName || "Explorador",
+                    nickname: nameParts[0] || "Explorador",
+                    firstName: nameParts[0] || "",
+                    lastName: nameParts.slice(1).join(' ') || "",
+                    photo: res.user.photoURL || "👤",
                     points: 50,
+                    weeklyPoints: 50,
                     level: "Explorador Novato",
                     referralCode: 'GH-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
+                    familyId: null,
                     createdAt: new Date()
                 };
                 await window.GoHappyDB.collection('users').doc(res.user.uid).set(profile);
@@ -235,6 +297,11 @@ window.GoHappyAuth = {
                                     <div class="avatar-option" data-emoji="👩‍🚀">👩‍🚀</div>
                                     <div class="avatar-option" data-emoji="🦒">🦒</div>
                                 </div>
+                            </div>
+
+                            <div style="margin-top: 8px;">
+                                <input type="text" id="reg-referral" placeholder="Código de invitación (opcional)" class="auth-input" style="font-size: 13px; letter-spacing: 1px; text-transform: uppercase;">
+                                <p style="font-size: 11px; color: #94a3b8; margin: 4px 0 0 4px;">Si un amigo te invitó, ¡pega su código y él gana 500 pts! 🎁</p>
                             </div>
                         </div>
 
@@ -324,20 +391,31 @@ window.GoHappyAuth = {
                 const name = document.getElementById('reg-name').value;
                 const surname = document.getElementById('reg-surname').value;
                 const termsAccepted = document.getElementById('accept-terms').checked;
+                // FIX: Leer código de referido del nuevo campo
+                const referralInput = document.getElementById('reg-referral');
+                const referralCode = referralInput ? referralInput.value.trim().toUpperCase() : '';
 
                 if (!email || !pass || !nick || !name) return showError("Nombre, Apodo, Email y Contraseña requeridos.");
                 if (!termsAccepted) return showError("Debes aceptar los Términos.");
 
+                const mainBtn = document.getElementById('main-auth-btn');
+                mainBtn.disabled = true;
+                mainBtn.textContent = '⌛ Creando tu cuenta...';
+
                 try {
-                    await window.GoHappyAuth.register(email, pass, nick, name, surname, selectedEmoji);
+                    // FIX: Pasar referralCode al register
+                    await window.GoHappyAuth.register(email, pass, nick, name, surname, selectedEmoji, referralCode);
                     modal.remove();
                     location.reload();
                 } catch (e) {
+                    mainBtn.disabled = false;
+                    mainBtn.textContent = 'Crear Cuenta Gratis';
                     console.error("Reg error details:", e);
                     let errMsg = "Error en el registro.";
                     if (e.code === 'auth/email-already-in-use') errMsg = "El email ya está registrado.";
-                    if (e.code === 'auth/weak-password') errMsg = "La contraseña es muy débil (mín. 6 carecteres).";
+                    if (e.code === 'auth/weak-password') errMsg = "La contraseña es muy débil (mín. 6 caracteres).";
                     if (e.code === 'auth/operation-not-allowed') errMsg = "El registro por email no está activado en Firebase.";
+                    if (e.code === 'auth/invalid-email') errMsg = "El formato del email no es válido.";
 
                     showError(errMsg);
                 }
