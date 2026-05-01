@@ -273,10 +273,30 @@ window.GoHappyMap = {
     },
 
     filterMarkers: (type) => {
+        let hasVisible = false;
+        const bounds = new maplibregl.LngLatBounds();
+
         window.GoHappyMap.markers.forEach(m => {
-            if (type === 'all' || m.type === type) m.instance.addTo(window.GoHappyMap.instance);
-            else m.instance.remove();
+            if (type === 'all' || m.type === type) {
+                m.instance.addTo(window.GoHappyMap.instance);
+                bounds.extend(m.instance.getLngLat());
+                hasVisible = true;
+            } else {
+                m.instance.remove();
+            }
         });
+
+        if (hasVisible && window.GoHappyMap.instance) {
+            if (window.GoHappyMap.userMarker) {
+                bounds.extend(window.GoHappyMap.userMarker.getLngLat());
+            }
+            window.GoHappyMap.instance.fitBounds(bounds, {
+                padding: {top: 100, bottom: 100, left: 50, right: 50},
+                maxZoom: 15,
+                pitch: 0,
+                speed: 1.0
+            });
+        }
     },
 
     handleSearch: async (query) => {
@@ -289,8 +309,23 @@ window.GoHappyMap = {
             const results = await window.GoHappyData.searchLocations(query, window.GoHappyMap.lastKnownCoords);
             if (results && results.length > 0) {
                 window.GoHappyMap.clearMarkers();
-                results.forEach(loc => window.GoHappyMap.createMarker(loc));
-                window.GoHappyMap.instance.flyTo({ center: [results[0].lng, results[0].lat], zoom: 17, pitch: 0, speed: 1.0 });
+                const bounds = new maplibregl.LngLatBounds();
+                
+                results.forEach(loc => {
+                    window.GoHappyMap.createMarker(loc);
+                    bounds.extend([loc.lng, loc.lat]);
+                });
+                
+                if (window.GoHappyMap.userMarker) {
+                    bounds.extend(window.GoHappyMap.userMarker.getLngLat());
+                }
+
+                window.GoHappyMap.instance.fitBounds(bounds, {
+                    padding: {top: 100, bottom: 100, left: 50, right: 50},
+                    maxZoom: 15,
+                    pitch: 0,
+                    speed: 1.0
+                });
             } else {
                 // geocoding fallback
                 const resp = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=1`);
