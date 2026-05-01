@@ -116,27 +116,28 @@ window.GoHappyQuestsPage = {
         if (!user) return;
 
         try {
-            const quests = await window.GoHappyQuests.getFamilyQuests(user.familyId);
-            const history = await window.GoHappyQuests.getFamilyHistory(user.familyId);
-            const hoy = new Date().toISOString().split('T')[0];
-            const completadasHoy = history.filter(h => h.fecha === hoy).map(h => h.questId);
-
+            // Usar la API correcta del servicio
+            const questsDelDia = await window.GoHappyQuests.getQuestsDelDia();
+            
             // Estadísticas
-            const puntosTotales = await window.GoHappyQuests.getFamilyPoints(user.familyId);
-            document.getElementById('stat-pendientes').textContent = quests.length - completadasHoy.length;
-            document.getElementById('stat-completadas').textContent = completadasHoy.length;
+            const stats = await window.GoHappyQuests.getEstadisticasFamilia(user.familyId);
+            const puntosTotales = stats.puntosTotales;
+            const completadasHoyCount = stats.completadasHoy;
+            
+            document.getElementById('stat-pendientes').textContent = questsDelDia.length - completadasHoyCount;
+            document.getElementById('stat-completadas').textContent = completadasHoyCount;
             document.getElementById('stat-puntos').textContent = puntosTotales;
             
-            const racha = await window.GoHappyQuests.getDailyStreak(user.familyId);
+            const racha = await window.GoHappyQuests.getRacha(user.familyId);
             document.getElementById('racha-num').textContent = racha;
 
-            let filtradas = quests;
+            let filtradas = questsDelDia;
             if (filtro !== 'todas') {
-                filtradas = quests.filter(q => q.frecuencia === filtro || q.categoria === filtro);
+                filtradas = questsDelDia.filter(q => q.frecuencia === filtro || q.categoria === filtro);
             }
 
             listContainer.innerHTML = filtradas.map(q => {
-                const isDone = completadasHoy.includes(q.id);
+                const isDone = q.completadaHoy;
                 return `
                     <div class="quest-card-smart ${isDone ? 'done' : ''}">
                         <div class="q-icon">${q.icono || '✨'}</div>
