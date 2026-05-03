@@ -1,5 +1,5 @@
 {
-    "version": "12.4.0",
-    "timestamp": "2026-04-23T17:05:00Z",
-    "note": "Waze-style 3D navigator update with GoHappy colors"
+    "version": "2.3.4",
+    "timestamp": "2026-05-02T22:44:00Z",
+    "note": "Critical SW asset sync and Quests engine fix"
 }

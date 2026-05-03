@@ -250,20 +250,33 @@ window.GoHappyQuests = {
         const hoy = window.GoHappyQuests._fechaHoy();
 
         try {
+            // Soporte para firma (userId, familyId, questId, puntos) o (questId, questData)
+            let realQuestId = questId;
+            let realPuntos = 50;
+
+            if (arguments.length === 4) {
+                // Llamada desde la UI: (uid, familyId, qid, pts)
+                realQuestId = arguments[2];
+                realPuntos = arguments[3];
+            } else {
+                // Llamada interna o legacy: (qid, qdata)
+                realPuntos = questData.puntos || 50;
+            }
+
             // Verificar que no esté ya completada hoy
-            const yaCompletada = await window.GoHappyQuests._yaCompletadaHoy(familyId, questId, hoy);
+            const yaCompletada = await window.GoHappyQuests._yaCompletadaHoy(familyId, realQuestId, hoy);
             if (yaCompletada) {
                 return { ok: false, error: 'Ya completasteis esta misión hoy. ¡Volved mañana!' };
             }
 
-            const puntos = questData.puntos || 50;
+            const puntos = realPuntos;
 
             // Registrar la completación
             await window.GoHappyDB
                 .collection('completadas').doc(familyId)
                 .collection('registros').add({
-                    questId,
-                    titulo:       questData.titulo || 'Misión',
+                    questId:      realQuestId,
+                    titulo:       (typeof questData === 'object' ? questData.titulo : null) || 'Misión Completada',
                     completadoPor: user.uid,
                     completadoPorNick: user.nickname || 'Explorador',
                     fecha:        hoy,

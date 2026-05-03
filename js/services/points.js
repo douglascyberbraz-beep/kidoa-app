@@ -10,7 +10,8 @@ window.GoHappyPoints = {
         QUEST_MEDIUM: 100,
         QUEST_HARD: 200,
         SAFETY_REPORT: 20,
-        DAILY_LOGIN: 5
+        DAILY_LOGIN: 5,
+        QUEST: 50
     },
 
     LEVELS: [

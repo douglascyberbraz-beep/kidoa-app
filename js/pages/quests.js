@@ -106,8 +106,8 @@ window.GoHappyQuestsPage = {
         }
 
         // Cargar datos
-        await this.loadQuests();
-        this.setupFilters();
+        await window.GoHappyQuestsPage.loadQuests();
+        window.GoHappyQuestsPage.setupFilters();
     },
 
     loadQuests: async (filtro = 'todas') => {
@@ -124,12 +124,17 @@ window.GoHappyQuestsPage = {
             const puntosTotales = stats.puntosTotales;
             const completadasHoyCount = stats.completadasHoy;
             
-            document.getElementById('stat-pendientes').textContent = questsDelDia.length - completadasHoyCount;
-            document.getElementById('stat-completadas').textContent = completadasHoyCount;
-            document.getElementById('stat-puntos').textContent = puntosTotales;
+            const elPendientes = document.getElementById('stat-pendientes');
+            const elCompletadas = document.getElementById('stat-completadas');
+            const elPuntos = document.getElementById('stat-puntos');
+            const elRacha = document.getElementById('racha-num');
+
+            if (elPendientes) elPendientes.textContent = (questsDelDia.length || 0) - (completadasHoyCount || 0);
+            if (elCompletadas) elCompletadas.textContent = completadasHoyCount || 0;
+            if (elPuntos) elPuntos.textContent = puntosTotales || 0;
             
             const racha = await window.GoHappyQuests.getRacha(user.familyId);
-            document.getElementById('racha-num').textContent = racha;
+            if (elRacha) elRacha.textContent = racha || 0;
 
             let filtradas = questsDelDia;
             if (filtro !== 'todas') {

@@ -68,7 +68,9 @@ window.GoHappyAI = {
     },
 
     incrementTodayUsage: () => {
+        const today = new Date().toDateString();
         const usage = JSON.parse(localStorage.getItem('GoHappy_today_usage') || '{}');
+        usage.date = today;
         usage.count = (usage.count || 0) + 1;
         localStorage.setItem('GoHappy_today_usage', JSON.stringify(usage));
     },
@@ -175,6 +177,10 @@ window.GoHappyAI = {
         const prompt = `${window.GoHappyAI.SYSTEM_PROMPT}\n\nHistorial: ${JSON.stringify(history)}\nUsuario: ${userMessage}`;
         const response = await window.GoHappyAI._callGemini(prompt, false); // false = return text, not json
         return response;
+    },
+
+    askAI: async (userMessage) => {
+        return await window.GoHappyAI.chat(userMessage);
     },
 
     // Helper para llamadas a Gemini

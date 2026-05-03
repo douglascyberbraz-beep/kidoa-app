@@ -222,7 +222,20 @@ async function loadPage(pageName) {
         console.error(`Error cargando página ${pageName}:`, err);
         const container = document.getElementById('main-content');
         container.classList.remove('hidden');
-        container.innerHTML = `<div class="p-20 center-text" style="color:red;"><h3>Error de carga</h3><p>Vuelve a intentarlo o recarga la app.</p></div>`;
+        container.innerHTML = `<div class="p-20 center-text" style="color:red; word-break: break-all;">
+            <h3>Error de carga</h3>
+            <p>Vuelve a intentarlo o recarga la app.</p>
+            
+            <button onclick="window.forceResetApp()" style="margin-top: 20px; background: #E74C3C; color: white; border: none; padding: 12px 20px; border-radius: 12px; font-weight: bold; box-shadow: 0 4px 15px rgba(231,76,60,0.3);">
+                ♻️ Forzar Actualización
+            </button>
+
+            <p style="font-size: 10px; color: #888; text-align: left; margin-top: 30px; opacity: 0.7;">
+                <b>Detalle técnico:</b><br>
+                ${err.message || err}<br>
+                ${err.stack ? err.stack.split('\n').slice(0,2).join('<br>') : ''}
+            </p>
+        </div>`;
     }
 }
 

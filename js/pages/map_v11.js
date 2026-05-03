@@ -119,12 +119,10 @@ window.GoHappyMap = {
                 });
 
                 window.GoHappyMap.injectUI(container);
-                // Markers disabled as per user request
-                // await window.GoHappyMap.loadMarkers();
+                
+                // Cargar marcadores rápidos en lugar de usar IA pesada
+                await window.GoHappyMap.loadMarkers();
                 window.GoHappyMap.startGPSWatch();
-
-                // Auto-highlight parks near the initial view
-                window.GoHappyMap.highlightParksOnLoad();
             });
 
             window.GoHappyMap.instance.on('dblclick', (e) => {
@@ -373,15 +371,9 @@ window.GoHappyMap = {
             lastLng = lng;
 
             window.GoHappyMap.updateUserIcon(lat, lng, heading); // Pass the updated heading to the marker physically
-
-            window.GoHappyMap.instance.easeTo({
-                center: [lng, lat],
-                bearing: heading || window.GoHappyMap.instance.getBearing(),
-                pitch: 70, // Waze-style driving view
-                zoom: 18.5, // Closer zoom for Waze feel
-                duration: 1500,
-                easing: (t) => t * (2 - t) // Smooth deceleration
-            });
+            
+            // Removido easeTo continuo para que no pelee con los resultados de búsqueda.
+            // Si el usuario quiere centrarse, usa el botón flotante (locate-me-btn).
         }, null, { enableHighAccuracy: true });
     },
 
